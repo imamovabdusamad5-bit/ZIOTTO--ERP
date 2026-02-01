@@ -182,7 +182,7 @@ const Ombor = () => {
                     <>
                         {activeTab === 'Mato' && (
                             <MatoOmbori
-                                inventory={inventory.filter(i => i.category === 'Mato')}
+                                inventory={inventory.filter(i => i.category?.toLowerCase() === 'mato')}
                                 references={references.filter(r => r.type === 'Mato')}
                                 orders={orders}
                                 onRefresh={fetchInitialData}
@@ -190,7 +190,7 @@ const Ombor = () => {
                         )}
                         {activeTab === 'Aksessuar' && (
                             <AksessuarOmbori
-                                inventory={inventory.filter(i => i.category === 'Aksessuar')}
+                                inventory={inventory.filter(i => i.category?.toLowerCase() === 'aksessuar')}
                                 references={references}
                                 orders={orders}
                                 onRefresh={fetchInitialData}
@@ -198,7 +198,7 @@ const Ombor = () => {
                         )}
                         {activeTab === 'Tayyor Mahsulot' && (
                             <TayyorMahsulotOmbori
-                                inventory={inventory.filter(i => i.category === 'Tayyor Mahsulot')}
+                                inventory={inventory.filter(i => i.category?.toLowerCase() === 'tayyor mahsulot')}
                                 onRefresh={fetchInitialData}
                             />
                         )}

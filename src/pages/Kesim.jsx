@@ -189,6 +189,38 @@ const Kesim = () => {
         }
     };
 
+    const [actualsHistory, setActualsHistory] = useState([]);
+    const [stats, setStats] = useState({ totalActual: 0, variance: 0 });
+
+    const fetchActuals = async (orderId) => {
+        setLoading(true);
+        try {
+            const { data, error } = await supabase
+                .from('cutting_actuals')
+                .select('*')
+                .eq('production_order_id', orderId)
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+
+            const history = data || [];
+            setActualsHistory(history);
+
+            // Calculate Stats
+            const totalActual = history.reduce((sum, item) => sum + item.actual_weight_kg, 0);
+            setStats({
+                totalActual,
+                // Note: normative_consumption assumed to be total planned for the order. 
+                // If it's per unit, logic needs to be: order.total_quantity * order.normative_consumption
+            });
+
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleSaveActual = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -200,8 +232,9 @@ const Kesim = () => {
 
             if (data) {
                 alert('Mato sarfi (Fakt) muvaffaqiyatli saqlandi!');
-                setShowActualModal(false);
                 setActualData({ roll_id: '', actual_weight_kg: '', layer_count: '', lay_length_meters: '' });
+                // Refresh list
+                await fetchActuals(selectedOrder.id);
             }
         } catch (error) {
             alert('Xatolik yuz berdi: ' + error.message);
@@ -309,6 +342,7 @@ const Kesim = () => {
                                     <button
                                         onClick={() => {
                                             setSelectedOrder(order);
+                                            fetchActuals(order.id);
                                             setShowActualModal(true);
                                         }}
                                         className="w-full flex items-center justify-center gap-2 py-3 bg-blue-600/10 text-blue-500 border border-blue-500/20 rounded-2xl text-[10px] font-black uppercase hover:bg-blue-600/20 active:scale-95 transition-all"
@@ -535,65 +569,142 @@ const Kesim = () => {
             {/* ACTUAL USAGE MODAL */}
             {showActualModal && (
                 <div className="fixed inset-0 z-[101] flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl animate-in fade-in duration-300">
-                    <div className="bg-[#161b22] border border-white/10 w-full max-w-lg rounded-[3.5rem] overflow-hidden shadow-4xl animate-in zoom-in-95 duration-300 relative">
-                        <div className="p-10 border-b border-white/5 flex items-center justify-between">
-                            <h3 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
-                                <Scale className="text-blue-500" />
-                                Mato Sarfi (Fakt)
-                            </h3>
-                            <button onClick={() => setShowActualModal(false)} className="text-gray-500 hover:text-white transition-colors">
-                                <X size={24} />
-                            </button>
-                        </div>
-                        <form onSubmit={handleSaveActual} className="p-10 space-y-6">
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Rulon ID / Shtrixkod</label>
-                                <input
-                                    required
-                                    type="text"
-                                    placeholder="Masalan: M-2024-001"
-                                    className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-blue-500 transition-all font-bold"
-                                    value={actualData.roll_id}
-                                    onChange={(e) => setActualData({ ...actualData, roll_id: e.target.value })}
-                                />
+                    <div className="bg-[#161b22] border border-white/10 w-full max-w-4xl rounded-[3.5rem] overflow-hidden shadow-4xl animate-in zoom-in-95 duration-300 flex flex-col md:flex-row h-[80vh]">
+
+                        {/* INPUT FORM SIDE */}
+                        <div className="w-full md:w-1/3 bg-[#0d1117] p-8 border-r border-white/5 flex flex-col">
+                            <div className="mb-6">
+                                <h3 className="text-xl font-black text-white tracking-tight flex items-center gap-2">
+                                    <Scale className="text-blue-500" size={20} />
+                                    Yangi Kiritish
+                                </h3>
+                                <p className="text-[10px] text-gray-500 font-bold uppercase mt-1">Faktik sarfni kiriting</p>
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Haqiqiy Og'irlik (kg)</label>
-                                <input
-                                    required
-                                    type="number"
-                                    step="0.01"
-                                    className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-blue-500 transition-all font-black text-2xl"
-                                    value={actualData.actual_weight_kg}
-                                    onChange={(e) => setActualData({ ...actualData, actual_weight_kg: e.target.value })}
-                                />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
+
+                            <form onSubmit={handleSaveActual} className="space-y-4 flex-1 overflow-y-auto pr-2 custom-scrollbar">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Qavatlar Soni</label>
+                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Rulon ID / Shtrixkod</label>
+                                    <input
+                                        required
+                                        type="text"
+                                        placeholder="M-2024-..."
+                                        className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white outline-none focus:border-blue-500 transition-all font-bold text-sm"
+                                        value={actualData.roll_id}
+                                        onChange={(e) => setActualData({ ...actualData, roll_id: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Haqiqiy Og'irlik (kg)</label>
                                     <input
                                         required
                                         type="number"
-                                        className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-blue-500 transition-all font-bold"
-                                        value={actualData.layer_count}
-                                        onChange={(e) => setActualData({ ...actualData, layer_count: e.target.value })}
+                                        step="0.01"
+                                        className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white outline-none focus:border-blue-500 transition-all font-black text-xl"
+                                        value={actualData.actual_weight_kg}
+                                        onChange={(e) => setActualData({ ...actualData, actual_weight_kg: e.target.value })}
                                     />
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Lekal Uzunligi (m)</label>
-                                    <input
-                                        type="number"
-                                        step="0.01"
-                                        className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-blue-500 transition-all font-bold"
-                                        value={actualData.lay_length_meters}
-                                        onChange={(e) => setActualData({ ...actualData, lay_length_meters: e.target.value })}
-                                    />
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Qavatlar</label>
+                                        <input
+                                            required
+                                            type="number"
+                                            className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white outline-none focus:border-blue-500 transition-all font-bold text-sm"
+                                            value={actualData.layer_count}
+                                            onChange={(e) => setActualData({ ...actualData, layer_count: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Lekal (m)</label>
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white outline-none focus:border-blue-500 transition-all font-bold text-sm"
+                                            value={actualData.lay_length_meters}
+                                            onChange={(e) => setActualData({ ...actualData, lay_length_meters: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+                                <button className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl transition-all shadow-lg shadow-blue-600/20 uppercase tracking-widest text-[10px] mt-2">
+                                    Saqlash
+                                </button>
+                            </form>
+                        </div>
+
+                        {/* HISTORY & STATS SIDE */}
+                        <div className="w-full md:w-2/3 p-8 flex flex-col bg-[#161b22] relative">
+                            <button onClick={() => setShowActualModal(false)} className="absolute top-6 right-6 text-gray-500 hover:text-white transition-colors">
+                                <X size={24} />
+                            </button>
+
+                            <div className="mb-6 pr-8">
+                                <h3 className="text-xl font-black text-white tracking-tight">Kirim Tarixi va Tahlil</h3>
+                                <div className="flex gap-4 mt-4">
+                                    <div className="bg-white/5 rounded-2xl p-4 min-w-[120px]">
+                                        <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Jami Fakt (kg)</p>
+                                        <p className="text-2xl font-black text-white mt-1">{stats.totalActual.toFixed(2)}</p>
+                                    </div>
+                                    <div className="bg-white/5 rounded-2xl p-4 min-w-[120px]">
+                                        <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Normativ (kg)</p>
+                                        <p className="text-2xl font-black text-blue-500 mt-1">
+                                            {selectedOrder?.normative_consumption ? selectedOrder.normative_consumption.toFixed(2) : '---'}
+                                        </p>
+                                    </div>
+                                    <div className={`bg-white/5 rounded-2xl p-4 min-w-[120px] border ${selectedOrder?.normative_consumption && stats.totalActual > selectedOrder.normative_consumption
+                                        ? 'border-red-500/50 bg-red-500/10'
+                                        : 'border-emerald-500/50 bg-emerald-500/10'
+                                        }`}>
+                                        <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Farq</p>
+                                        <p className={`text-2xl font-black mt-1 ${selectedOrder?.normative_consumption && stats.totalActual > selectedOrder.normative_consumption
+                                            ? 'text-red-500'
+                                            : 'text-emerald-500'
+                                            }`}>
+                                            {selectedOrder?.normative_consumption
+                                                ? (stats.totalActual - selectedOrder.normative_consumption).toFixed(2)
+                                                : '0.00'}
+                                        </p>
+                                    </div>
+
                                 </div>
                             </div>
-                            <button className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-5 rounded-3xl transition-all shadow-xl shadow-blue-600/20 uppercase tracking-widest text-xs mt-4">
-                                Faktni Saqlash
-                            </button>
-                        </form>
+
+                            <div className="flex-1 overflow-hidden bg-black/20 rounded-3xl border border-white/5">
+                                <div className="overflow-y-auto h-full custom-scrollbar">
+                                    <table className="w-full text-left border-collapse">
+                                        <thead className="bg-white/5 sticky top-0 backdrop-blur-md">
+                                            <tr>
+                                                <th className="p-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">Sana</th>
+                                                <th className="p-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">Rulon ID</th>
+                                                <th className="p-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">Kg</th>
+                                                <th className="p-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">Lekal</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-white/5">
+                                            {actualsHistory.map((item) => (
+                                                <tr key={item.id} className="hover:bg-white/5 transition-colors">
+                                                    <td className="p-4 text-xs font-bold text-gray-400 font-mono">
+                                                        {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} <br />
+                                                        <span className="text-[10px] opacity-50">{new Date(item.created_at).toLocaleDateString()}</span>
+                                                    </td>
+                                                    <td className="p-4 text-xs font-bold text-white">{item.roll_id}</td>
+                                                    <td className="p-4 text-sm font-black text-blue-400">{item.actual_weight_kg}</td>
+                                                    <td className="p-4 text-xs font-bold text-gray-400">{item.lay_length_meters}m ({item.layer_count} qavat)</td>
+                                                </tr>
+                                            ))}
+                                            {actualsHistory.length === 0 && (
+                                                <tr>
+                                                    <td colSpan="4" className="p-8 text-center text-xs text-gray-600 font-bold uppercase tracking-widest">
+                                                        Hozircha ma'lumot yo'q
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             )}

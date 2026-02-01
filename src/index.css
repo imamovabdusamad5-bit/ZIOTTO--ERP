@@ -1,3 +1,17 @@
+/* FORCED GLOBAL STYLES - DO NOT REMOVE */
+input,
+select,
+textarea,
+option {
+  color: #000000 !important;
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  -webkit-text-fill-color: #000000 !important;
+  opacity: 1 !important;
+  font-weight: 900 !important;
+  border: 2px solid #000000 !important;
+}
+
 @import "tailwindcss";
 
 @theme {
@@ -70,4 +84,48 @@ body {
     break-inside: avoid;
     page-break-inside: avoid;
   }
+}
+
+/* Global Input Overrides for Ultra High Contrast */
+input:not([type="checkbox"]),
+select,
+textarea,
+.super-input {
+  color: #000000 !important;
+  /* Pure black */
+  background-color: #ffffff !important;
+  /* Pure white */
+  -webkit-text-fill-color: #000000 !important;
+  opacity: 1 !important;
+  font-weight: 900 !important;
+  border: 4px solid #000000 !important;
+  /* Very thick border */
+  visibility: visible !important;
+  filter: none !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #222222 !important;
+  opacity: 1 !important;
+}
+
+/* Modal text specifically - force white modal and black text */
+.bg-white,
+[class*="bg-white"] {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.bg-white label,
+.bg-white h3,
+.bg-white p,
+.bg-white span,
+.bg-white select,
+.bg-white input {
+  color: #000000 !important;
+}
+
+.super-border {
+  border: 4px solid #000000 !important;
 }

@@ -49,12 +49,15 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh }) => {
             const unit = ref ? ref.unit : 'dona';
             const refId = ref ? ref.id : null;
 
+            const cleanName = inboundData.selected_material_name.trim();
+            const cleanColor = inboundData.color.trim();
+
             // Check existing
             const { data: existing } = await supabase.from('inventory')
                 .select('*')
-                .eq('item_name', inboundData.selected_material_name)
-                .eq('color', inboundData.color)
-                .eq('category', 'Aksessuar')
+                .eq('item_name', cleanName)
+                .eq('color', cleanColor)
+                .filter('category', 'ilike', 'Aksessuar')
                 .maybeSingle();
 
             let inventoryId;
@@ -66,12 +69,12 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh }) => {
                 inventoryId = existing.id;
             } else {
                 const { data: created, error } = await supabase.from('inventory').insert([{
-                    item_name: inboundData.selected_material_name,
+                    item_name: cleanName,
                     category: 'Aksessuar',
                     quantity: Number(inboundData.quantity),
                     unit: unit,
-                    color: inboundData.color,
-                    color_code: inboundData.color_code,
+                    color: cleanColor,
+                    color_code: inboundData.color_code.trim(),
                     reference_id: refId,
                     last_updated: new Date()
                 }]).select().single();
@@ -86,7 +89,9 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh }) => {
                 reason: inboundData.reason
             }]);
 
-            alert('Aksessuar qabul qilindi!');
+            console.log("Aksessuar saqlandi. ID:", inventoryId);
+            alert(`Aksessuar qabul qilindi! Baza ID: ${inventoryId}`);
+            window.location.reload();
             setShowInboundModal(false);
             setInboundData({ selected_material_name: '', color: 'Asosiy', color_code: '', quantity: '', reason: 'Yangi aksessuar' });
             onRefresh();
@@ -118,6 +123,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh }) => {
             }]);
 
             alert('Chiqim qilindi!');
+            window.location.reload();
             setShowOutboundModal(false);
             onRefresh();
         } catch (error) {
@@ -203,57 +209,81 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh }) => {
             {showInboundModal && (
                 <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                     <div className="bg-white rounded-[2rem] w-full max-w-lg p-8 space-y-4">
-                        <h3 className="text-xl font-bold text-purple-600 flex items-center gap-2"><ArrowDownCircle /> Aksessuar Kirim</h3>
+                        <h3 className="text-xl font-bold text-black flex items-center gap-2" style={{ color: '#000000' }}><ArrowDownCircle /> Aksessuar Kirim</h3>
 
-                        <div className="space-y-4">
-                            <div>
-                                <label className="text-xs font-bold uppercase text-gray-400">Nomi</label>
-                                <select
-                                    className="w-full p-3 border rounded-xl font-bold"
-                                    value={inboundData.selected_material_name}
-                                    onChange={(e) => setInboundData({ ...inboundData, selected_material_name: e.target.value })}
-                                >
-                                    <option value="">Tanlang...</option>
-                                    {[...new Set(references.filter(r => r.type === 'Aksessuar').map(r => r.name))].map(n => (
-                                        <option key={n} value={n}>{n}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="text-xs font-bold uppercase text-gray-400">Rangi</label>
-                                    <input className="w-full p-3 border rounded-xl font-bold" value={inboundData.color} onChange={e => setInboundData({ ...inboundData, color: e.target.value })} />
-                                </div>
-                                <div>
-                                    <label className="text-xs font-bold uppercase text-gray-400">Miqdor</label>
-                                    <input type="number" className="w-full p-3 border rounded-xl font-bold" value={inboundData.quantity} onChange={e => setInboundData({ ...inboundData, quantity: e.target.value })} />
-                                </div>
-                            </div>
-                            <button onClick={handleKirim} className="w-full py-3 bg-purple-600 text-white rounded-xl font-bold uppercase">Saqlash</button>
-                            <button onClick={() => setShowInboundModal(false)} className="w-full py-3 text-gray-500 font-bold uppercase">Bekor qilish</button>
+                        <div>
+                            <label className="text-xs font-black uppercase mb-1 block" style={{ color: '#000000' }}>Nomi</label>
+                            <select
+                                className="w-full p-3 border-2 border-black rounded-xl font-black bg-white outline-none"
+                                style={{ color: '#000000', backgroundColor: '#ffffff', WebkitTextFillColor: '#000000', opacity: 1 }}
+                                value={inboundData.selected_material_name}
+                                onChange={(e) => setInboundData({ ...inboundData, selected_material_name: e.target.value })}
+                            >
+                                <option value="" style={{ color: '#666666' }}>Tanlang...</option>
+                                {[...new Set(references.filter(r => r.type === 'Aksessuar').map(r => r.name))].map(n => (
+                                    <option key={n} value={n} style={{ color: '#000000' }}>{n}</option>
+                                ))}
+                            </select>
                         </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="text-xs font-black uppercase mb-1 block" style={{ color: '#000000' }}>Rangi</label>
+                                <input
+                                    className="w-full p-3 border-2 border-black rounded-xl font-black bg-white outline-none"
+                                    style={{ color: '#000000', backgroundColor: '#ffffff', WebkitTextFillColor: '#000000', opacity: 1 }}
+                                    value={inboundData.color}
+                                    onChange={e => setInboundData({ ...inboundData, color: e.target.value })}
+                                    placeholder="Masalan: Qora"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-xs font-black uppercase mb-1 block" style={{ color: '#000000' }}>Miqdor</label>
+                                <input
+                                    type="number"
+                                    className="w-full p-3 border-2 border-black rounded-xl font-black bg-white outline-none"
+                                    style={{ color: '#000000', backgroundColor: '#ffffff', WebkitTextFillColor: '#000000', opacity: 1 }}
+                                    value={inboundData.quantity}
+                                    onChange={e => setInboundData({ ...inboundData, quantity: e.target.value })}
+                                    placeholder="0.00"
+                                />
+                            </div>
+                        </div>
+                        <button onClick={handleKirim} className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold uppercase shadow-lg shadow-purple-600/30 transition-all">Saqlash</button>
+                        <button onClick={() => setShowInboundModal(false)} className="w-full py-3 font-bold uppercase hover:bg-gray-100 rounded-xl transition-all text-[#194052]">Bekor qilish</button>
                     </div>
                 </div>
             )}
 
             {showOutboundModal && (
                 <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-[2rem] w-full max-w-lg p-8 space-y-4">
+                    <div className="bg-white rounded-[2rem] w-full max-w-lg p-8 space-y-4 shadow-2xl">
                         <h3 className="text-xl font-bold text-rose-600 flex items-center gap-2"><ArrowUpRight /> Chiqim</h3>
                         <div>
-                            <label className="text-xs font-bold uppercase text-gray-400">Miqdor</label>
-                            <input type="number" className="w-full p-3 border rounded-xl font-bold text-2xl text-rose-600" value={outboundData.quantity} onChange={e => setOutboundData({ ...outboundData, quantity: e.target.value })} />
+                            <label className="text-xs font-bold uppercase mb-1 block text-[#194052]">Chiqim Miqdori</label>
+                            <input
+                                type="number"
+                                className="w-full p-3 border border-gray-200 rounded-xl font-black text-3xl bg-white outline-none focus:ring-2 focus:ring-rose-500 placeholder-rose-200 super-input super-border"
+                                value={outboundData.quantity}
+                                onChange={e => setOutboundData({ ...outboundData, quantity: e.target.value })}
+                                placeholder="0"
+                            />
                         </div>
                         <div>
-                            <label className="text-xs font-bold uppercase text-gray-400">Izoh</label>
-                            <input className="w-full p-3 border rounded-xl" value={outboundData.reason} onChange={e => setOutboundData({ ...outboundData, reason: e.target.value })} />
+                            <label className="text-xs font-bold uppercase mb-1 block text-[#194052]">Izoh / Sabab</label>
+                            <input
+                                className="w-full p-3 border border-gray-200 rounded-xl font-bold bg-white outline-none focus:ring-2 focus:ring-rose-500 placeholder-gray-400 super-input super-border"
+                                value={outboundData.reason}
+                                onChange={e => setOutboundData({ ...outboundData, reason: e.target.value })}
+                                placeholder="Masalan: Ishlab chiqarish uchun"
+                            />
                         </div>
-                        <button onClick={handleChiqim} className="w-full py-3 bg-rose-600 text-white rounded-xl font-bold uppercase">Tasdiqlash</button>
-                        <button onClick={() => setShowOutboundModal(false)} className="w-full py-3 text-gray-500 font-bold uppercase">Bekor qilish</button>
+                        <button onClick={handleChiqim} className="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold uppercase shadow-lg shadow-rose-600/30 transition-all">Tasdiqlash</button>
+                        <button onClick={() => setShowOutboundModal(false)} className="w-full py-3 font-bold uppercase hover:bg-gray-100 rounded-xl transition-all text-[#194052]">Bekor qilish</button>
                     </div>
                 </div>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 };
 

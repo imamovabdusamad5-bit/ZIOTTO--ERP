@@ -52,39 +52,51 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
         try {
             setLoading(true);
             const ref = references.find(r => r.id === inboundData.reference_id);
-            if (!ref) return;
+            if (!ref) {
+                alert("Iltimos, Mato turi va grammajini qayta tanlang! (Reference not found)");
+                setLoading(false);
+                return;
+            }
 
             // 1. Check existing
+            const cleanName = ref.name.trim();
+            const cleanColor = inboundData.color.trim();
+            const cleanBatch = inboundData.batch_number.trim();
+            const cleanColorCode = inboundData.color_code.trim();
+
             const { data: existing } = await supabase
                 .from('inventory')
                 .select('*')
-                .eq('item_name', ref.name)
-                .eq('color', inboundData.color)
+                .eq('item_name', cleanName)
+                .eq('color', cleanColor)
                 .eq('category', 'Mato')
-                .eq('batch_number', inboundData.batch_number)
+                .eq('batch_number', cleanBatch)
                 .maybeSingle();
 
             let inventoryId;
 
             if (existing) {
+                console.log("Updating existing inventory item:", existing.id);
                 const newQty = Number(existing.quantity || 0) + Number(inboundData.quantity);
-                await supabase.from('inventory').update({
+                const { error: updErr } = await supabase.from('inventory').update({
                     quantity: newQty,
                     last_updated: new Date(),
-                    color_code: inboundData.color_code || existing.color_code
+                    color_code: cleanColorCode || existing.color_code
                 }).eq('id', existing.id);
+                if (updErr) throw updErr;
                 inventoryId = existing.id;
             } else {
+                console.log("Creating new inventory item");
                 const { data: created, error } = await supabase
                     .from('inventory')
                     .insert([{
-                        item_name: ref.name,
+                        item_name: cleanName,
                         category: 'Mato',
                         quantity: Number(inboundData.quantity),
                         unit: ref.unit,
-                        color: inboundData.color,
-                        color_code: inboundData.color_code,
-                        batch_number: inboundData.batch_number,
+                        color: cleanColor,
+                        color_code: cleanColorCode,
+                        batch_number: cleanBatch,
                         reference_id: ref.id,
                         last_updated: new Date()
                     }])
@@ -99,7 +111,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
                 inventory_id: inventoryId,
                 type: 'In',
                 quantity: Number(inboundData.quantity),
-                batch_number: inboundData.batch_number,
+                batch_number: cleanBatch,
                 reason: inboundData.reason
             }]);
 
@@ -113,7 +125,9 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
                 await supabase.from('inventory_rolls').insert(rollsToInsert);
             }
 
-            alert('Mato muvaffaqiyatli qabul qilindi!');
+            console.log("Mato muvaffaqiyatli saqlandi. ID:", inventoryId);
+            alert(`DIQQAT: Mato muvaffaqiyatli qabul qilindi!\nBaza ID: ${inventoryId}\n\nAgar jadvalda ko'rinmasa, sahifani "Refresh" qiling.`);
+            window.location.reload();
             setShowInboundModal(false);
             setInboundData({ reference_id: '', color: '', color_code: '', batch_number: '', quantity: '', reason: 'Yangi kirim', rolls: [] });
             onRefresh();
@@ -157,6 +171,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
             }]);
 
             alert('Mato muvaffaqiyatli chiqim qilindi!');
+            window.location.reload();
             setShowOutboundModal(false);
             onRefresh();
         } catch (error) {
@@ -177,7 +192,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
                         placeholder="Mato, rang yoki partiya bo'yicha qidiruv..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-12 pr-6 py-3 bg-white border border-gray-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 outline-none font-medium transition-all"
+                        className="w-full pl-12 pr-6 py-3 bg-white border border-gray-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 outline-none font-black transition-all super-input"
                     />
                 </div>
                 <button
@@ -287,68 +302,91 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
                             <h3 className="text-xl font-bold flex items-center gap-2">
                                 <ArrowDownCircle className="text-indigo-600" /> Yangi Mato Kirimi
                             </h3>
-                            <button onClick={() => setShowInboundModal(false)}><ArrowDownCircle className="rotate-45" /></button>
+                            <button onClick={() => setShowInboundModal(false)}><Trash2 className="rotate-45 text-red-500" /></button>
                         </div>
                         <form onSubmit={handleKirim} className="p-8 space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
-                                    <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Mato Nomi</label>
+                                    <label className="text-xs font-bold uppercase block mb-1 text-[#194052]">Mato Nomi</label>
                                     <select
                                         required
-                                        className="w-full text-lg font-bold p-3 border rounded-xl"
+                                        className="w-full text-lg font-black p-3 border-2 border-black rounded-xl"
+                                        style={{ color: '#000000', backgroundColor: '#ffffff', opacity: 1, WebkitTextFillColor: '#000000' }}
                                         value={inboundData.selected_material_name}
                                         onChange={e => setInboundData({ ...inboundData, selected_material_name: e.target.value, reference_id: '' })}
                                     >
-                                        <option value="">Tanlang...</option>
+                                        <option value="" style={{ color: '#666666' }}>Tanlang...</option>
                                         {[...new Set(references.filter(r => r.type === 'Mato').map(r => r.name))].map(n => (
-                                            <option key={n} value={n}>{n}</option>
+                                            <option key={n} value={n} style={{ color: '#000000' }}>{n}</option>
                                         ))}
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Turi va Grammaj</label>
+                                    <label className="text-xs font-black uppercase block mb-1" style={{ color: '#000000' }}>Turi va Grammaj</label>
                                     <select
                                         required
                                         disabled={!inboundData.selected_material_name}
-                                        className="w-full text-lg font-bold p-3 border rounded-xl"
+                                        className="w-full text-lg font-black p-3 border-2 border-black rounded-xl"
+                                        style={{ color: '#000000', backgroundColor: '#ffffff', opacity: 1, WebkitTextFillColor: '#000000' }}
                                         value={inboundData.reference_id}
                                         onChange={e => setInboundData({ ...inboundData, reference_id: e.target.value })}
                                     >
-                                        <option value="">Tanlang...</option>
+                                        <option value="" style={{ color: '#666666' }}>Tanlang...</option>
                                         {references
                                             .filter(r => r.name === inboundData.selected_material_name)
-                                            .map(r => <option key={r.id} value={r.id}>{r.thread_type} - {r.grammage}gr</option>)}
+                                            .map(r => <option key={r.id} value={r.id} style={{ color: '#000000' }}>{r.thread_type} - {r.grammage}gr</option>)}
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Rangi</label>
-                                    <input required type="text" className="w-full text-lg font-bold p-3 border rounded-xl uppercase" value={inboundData.color} onChange={e => setInboundData({ ...inboundData, color: e.target.value })} />
+                                    <label className="text-xs font-black uppercase block mb-1" style={{ color: '#000000' }}>Rangi</label>
+                                    <input
+                                        required
+                                        type="text"
+                                        className="w-full text-lg font-black p-3 border-2 border-black rounded-xl uppercase"
+                                        style={{ color: '#000000', backgroundColor: '#ffffff', opacity: 1, WebkitTextFillColor: '#000000' }}
+                                        value={inboundData.color}
+                                        onChange={e => setInboundData({ ...inboundData, color: e.target.value })}
+                                    />
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-6">
                                 <div>
-                                    <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Partiya №</label>
-                                    <input required type="text" className="w-full text-lg font-bold p-3 border rounded-xl uppercase" value={inboundData.batch_number} onChange={e => setInboundData({ ...inboundData, batch_number: e.target.value })} />
+                                    <label className="text-xs font-black uppercase block mb-1" style={{ color: '#000000' }}>Partiya №</label>
+                                    <input
+                                        required
+                                        type="text"
+                                        className="w-full text-lg font-black p-3 border-2 border-black rounded-xl uppercase"
+                                        style={{ color: '#000000', backgroundColor: '#ffffff', opacity: 1, WebkitTextFillColor: '#000000' }}
+                                        value={inboundData.batch_number}
+                                        onChange={e => setInboundData({ ...inboundData, batch_number: e.target.value })}
+                                    />
                                 </div>
                                 <div>
-                                    <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Rang Kodi (ID)</label>
-                                    <input type="text" className="w-full text-lg font-bold p-3 border rounded-xl uppercase" value={inboundData.color_code} onChange={e => setInboundData({ ...inboundData, color_code: e.target.value })} />
+                                    <label className="text-xs font-black uppercase block mb-1" style={{ color: '#000000' }}>Rang Kodi (ID)</label>
+                                    <input
+                                        type="text"
+                                        className="w-full text-lg font-black p-3 border-2 border-black rounded-xl uppercase"
+                                        style={{ color: '#000000', backgroundColor: '#ffffff', opacity: 1, WebkitTextFillColor: '#000000' }}
+                                        value={inboundData.color_code}
+                                        onChange={e => setInboundData({ ...inboundData, color_code: e.target.value })}
+                                    />
                                 </div>
                             </div>
 
                             {/* Rolls */}
-                            <div className="bg-gray-50 p-6 rounded-2xl border border-dashed border-gray-300">
+                            <div className="bg-gray-100 p-6 rounded-2xl border-4 border-black">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h4 className="font-bold uppercase text-xs text-gray-500">Poylar (O'ramlar)</h4>
-                                    <button type="button" onClick={() => setInboundData({ ...inboundData, rolls: [...inboundData.rolls, { weight: '' }] })} className="text-indigo-600 font-bold text-xs uppercase">+ Poy Qo'shish</button>
+                                    <h4 className="font-black uppercase text-xs" style={{ color: '#000000' }}>Poylar (O'ramlar)</h4>
+                                    <button type="button" onClick={() => setInboundData({ ...inboundData, rolls: [...inboundData.rolls, { weight: '' }] })} className="bg-black text-white px-3 py-1 rounded-lg text-xs font-black uppercase">+ Poy Qo'shish</button>
                                 </div>
                                 <div className="grid grid-cols-4 gap-3">
                                     {inboundData.rolls.map((r, i) => (
                                         <div key={i} className="relative">
                                             <input
                                                 type="number"
-                                                className="w-full py-2 text-center font-bold border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                                className="w-full py-2 text-center font-black border-2 border-black rounded-lg focus:ring-4 focus:ring-black"
+                                                style={{ color: '#000000', backgroundColor: '#ffffff', opacity: 1, WebkitTextFillColor: '#000000' }}
                                                 placeholder="kg"
                                                 value={r.weight}
                                                 onChange={e => {
@@ -362,13 +400,13 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
                                                 const newRolls = inboundData.rolls.filter((_, idx) => idx !== i);
                                                 const total = newRolls.reduce((s, r) => s + (Number(r.weight) || 0), 0);
                                                 setInboundData({ ...inboundData, rolls: newRolls, quantity: total.toFixed(2) });
-                                            }} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px]">x</button>
+                                            }} className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold border-2 border-white">x</button>
                                         </div>
                                     ))}
                                 </div>
                                 <div className="mt-4 text-right">
-                                    <span className="text-xs font-bold uppercase text-gray-400 mr-2">Jami Miqdor:</span>
-                                    <span className="text-3xl font-black text-indigo-600">{inboundData.quantity || 0} <span className="text-sm">kg</span></span>
+                                    <span className="text-xs font-black uppercase mr-2" style={{ color: '#000000' }}>Jami Miqdor:</span>
+                                    <span className="text-3xl font-black" style={{ color: '#000000' }}>{inboundData.quantity || 0} <span className="text-sm">kg</span></span>
                                 </div>
                             </div>
 
@@ -390,35 +428,35 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
                         </div>
                         <form onSubmit={handleChiqim} className="p-8 space-y-6">
                             <div>
-                                <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Qaysi Buyurtma Uchun? (Optional)</label>
+                                <label className="text-xs font-bold uppercase block mb-1 text-[#194052]">Qaysi Buyurtma Uchun? (Optional)</label>
                                 <select
-                                    className="w-full p-3 border rounded-xl font-bold text-gray-700"
+                                    className="w-full p-3 border rounded-xl font-bold bg-white super-input super-border"
                                     value={outboundData.order_id}
                                     onChange={e => setOutboundData({ ...outboundData, order_id: e.target.value })}
                                 >
-                                    <option value="">Tanlanmagan (Umumiy chiqim)</option>
+                                    <option value="" className="text-gray-400">Tanlanmagan (Umumiy chiqim)</option>
                                     {orders.map(o => (
-                                        <option key={o.id} value={o.id}>Order #{o.order_number} - {o.models?.name}</option>
+                                        <option key={o.id} value={o.id} className="text-[#194052]" style={{ color: '#194052' }}>Order #{o.order_number} - {o.models?.name}</option>
                                     ))}
                                 </select>
                             </div>
 
                             <div>
-                                <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Chiqim Miqdori</label>
+                                <label className="text-xs font-bold uppercase block mb-1 text-[#194052]">Chiqim Miqdori</label>
                                 <input
                                     required
                                     type="number"
                                     step="0.01"
-                                    className="w-full p-4 border-2 border-rose-100 rounded-xl font-black text-3xl text-rose-600 focus:border-rose-500 outline-none"
+                                    className="w-full p-4 border-2 border-rose-100 rounded-xl font-black text-3xl focus:border-rose-500 outline-none super-input super-border"
                                     value={outboundData.quantity}
                                     onChange={e => setOutboundData({ ...outboundData, quantity: e.target.value })}
                                 />
                             </div>
 
                             <div>
-                                <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Sabab / Qayerga</label>
+                                <label className="text-xs font-bold uppercase block mb-1 text-[#194052]">Sabab / Qayerga</label>
                                 <textarea
-                                    className="w-full p-3 border rounded-xl"
+                                    className="w-full p-3 border rounded-xl bg-white super-input super-border"
                                     value={outboundData.reason}
                                     onChange={e => setOutboundData({ ...outboundData, reason: e.target.value })}
                                 />
@@ -427,9 +465,9 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
                             <button className="w-full py-4 bg-rose-600 text-white rounded-xl font-bold uppercase hover:bg-rose-700 transition">Chiqimni Tasdiqlash</button>
                         </form>
                     </div>
-                </div>
+                </div >
             )}
-        </div>
+        </div >
     );
 };
 

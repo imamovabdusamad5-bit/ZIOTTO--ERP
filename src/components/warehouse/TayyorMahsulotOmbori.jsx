@@ -66,6 +66,7 @@ const TayyorMahsulotOmbori = ({ inventory, onRefresh }) => {
             }]);
 
             alert('Mahsulot sotuvga chiqarildi!');
+            window.location.reload();
             setShowSaleModal(false);
             setSaleData({ inventory_id: '', quantity: '', client_name: '', price: '', notes: '' });
             onRefresh();
@@ -120,7 +121,9 @@ const TayyorMahsulotOmbori = ({ inventory, onRefresh }) => {
                 reason: kirimData.reason
             }]);
 
-            alert('Mahsulot muvaffaqiyatli kirim qilindi!');
+            console.log("Tayyor mahsulot saqlandi. ID:", inventoryId);
+            alert(`Mahsulot muvaffaqiyatli kirim qilindi! Baza ID: ${inventoryId}`);
+            window.location.reload();
             setShowKirimModal(false);
             setKirimData({ item_name: '', color: '', color_code: '', quantity: '', unit: 'dona', reason: 'Yangi Kirim' });
             onRefresh();
@@ -234,10 +237,10 @@ const TayyorMahsulotOmbori = ({ inventory, onRefresh }) => {
                             </div>
 
                             <div>
-                                <label className="text-xs font-bold text-gray-400 uppercase block mb-2">1. Mijoz Nomi</label>
+                                <label className="text-xs font-bold uppercase block mb-2 text-[#194052]">1. Mijoz Nomi</label>
                                 <input
                                     required
-                                    className="w-full p-4 bg-gray-50 rounded-2xl font-bold border-2 border-transparent focus:border-emerald-500 outline-none transition-all"
+                                    className="w-full p-4 bg-gray-50 rounded-2xl font-bold border-2 border-transparent focus:border-emerald-500 outline-none transition-all super-input super-border"
                                     placeholder="Masalan: ABDULLOH SAVDO..."
                                     value={saleData.client_name}
                                     onChange={e => setSaleData({ ...saleData, client_name: e.target.value })}
@@ -246,21 +249,21 @@ const TayyorMahsulotOmbori = ({ inventory, onRefresh }) => {
 
                             <div className="grid grid-cols-2 gap-6">
                                 <div>
-                                    <label className="text-xs font-bold text-gray-400 uppercase block mb-2">2. Miqdor (Dona)</label>
+                                    <label className="text-xs font-bold uppercase block mb-2 text-[#194052]">2. Miqdor (Dona)</label>
                                     <input
                                         required
                                         type="number"
-                                        className="w-full p-4 bg-gray-50 rounded-2xl font-black text-2xl text-emerald-600 border-2 border-transparent focus:border-emerald-500 outline-none"
+                                        className="w-full p-4 bg-gray-50 rounded-2xl font-black text-2xl border-2 border-transparent focus:border-emerald-500 outline-none super-input super-border"
                                         placeholder="0"
                                         value={saleData.quantity}
                                         onChange={e => setSaleData({ ...saleData, quantity: e.target.value })}
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs font-bold text-gray-400 uppercase block mb-2">3. Narxi (Opt, $)</label>
+                                    <label className="text-xs font-bold uppercase block mb-2 text-[#194052]">3. Narxi (Opt, $)</label>
                                     <input
                                         type="number"
-                                        className="w-full p-4 bg-gray-50 rounded-2xl font-black text-xl text-gray-700 border-2 border-transparent focus:border-emerald-500 outline-none"
+                                        className="w-full p-4 bg-gray-50 rounded-2xl font-black text-xl border-2 border-transparent focus:border-emerald-500 outline-none super-input super-border"
                                         placeholder="$0.00"
                                         value={saleData.price}
                                         onChange={e => setSaleData({ ...saleData, price: e.target.value })}
@@ -269,10 +272,10 @@ const TayyorMahsulotOmbori = ({ inventory, onRefresh }) => {
                             </div>
 
                             <div>
-                                <label className="text-xs font-bold text-gray-400 uppercase block mb-2">4. Qo'shimcha Izoh</label>
+                                <label className="text-xs font-bold uppercase block mb-2 text-[#194052]">4. Qo'shimcha Izoh</label>
                                 <textarea
                                     rows="2"
-                                    className="w-full p-4 bg-gray-50 rounded-2xl font-medium border-2 border-transparent focus:border-emerald-500 outline-none resize-none"
+                                    className="w-full p-4 bg-gray-50 rounded-2xl font-medium border-2 border-transparent focus:border-emerald-500 outline-none resize-none super-input super-border"
                                     placeholder="Yuk xati raqami yoki mashina nomeri..."
                                     value={saleData.notes}
                                     onChange={e => setSaleData({ ...saleData, notes: e.target.value })}
@@ -315,31 +318,31 @@ const TayyorMahsulotOmbori = ({ inventory, onRefresh }) => {
                         </div>
                         <form onSubmit={handleKirim} className="p-8 space-y-6">
                             <div>
-                                <label className="text-xs font-bold text-gray-400 uppercase block mb-2">Model Nomi</label>
-                                <input required className="w-full p-4 bg-gray-50 rounded-2xl font-bold border-2 border-transparent focus:border-emerald-500 outline-none uppercase" value={kirimData.item_name} onChange={e => setKirimData({ ...kirimData, item_name: e.target.value })} />
+                                <label className="text-xs font-bold uppercase block mb-2 text-[#194052]">Model Nomi</label>
+                                <input required className="w-full p-4 bg-gray-50 rounded-2xl font-bold border-2 border-transparent focus:border-emerald-500 outline-none uppercase super-input super-border" value={kirimData.item_name} onChange={e => setKirimData({ ...kirimData, item_name: e.target.value })} />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-xs font-bold text-gray-400 uppercase block mb-2">Rangi</label>
-                                    <input required className="w-full p-4 bg-gray-50 rounded-2xl font-bold border-2 border-transparent focus:border-emerald-500 outline-none uppercase" value={kirimData.color} onChange={e => setKirimData({ ...kirimData, color: e.target.value })} />
+                                    <label className="text-xs font-bold uppercase block mb-2 text-[#194052]">Rangi</label>
+                                    <input required className="w-full p-4 bg-gray-50 rounded-2xl font-bold border-2 border-transparent focus:border-emerald-500 outline-none uppercase super-input super-border" value={kirimData.color} onChange={e => setKirimData({ ...kirimData, color: e.target.value })} />
                                 </div>
                                 <div>
-                                    <label className="text-xs font-bold text-gray-400 uppercase block mb-2">Artikul (Code)</label>
-                                    <input className="w-full p-4 bg-gray-50 rounded-2xl font-bold border-2 border-transparent focus:border-emerald-500 outline-none uppercase" value={kirimData.color_code} onChange={e => setKirimData({ ...kirimData, color_code: e.target.value })} />
+                                    <label className="text-xs font-bold uppercase block mb-2 text-[#194052]">Artikul (Code)</label>
+                                    <input className="w-full p-4 bg-gray-50 rounded-2xl font-bold border-2 border-transparent focus:border-emerald-500 outline-none uppercase super-input super-border" value={kirimData.color_code} onChange={e => setKirimData({ ...kirimData, color_code: e.target.value })} />
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-xs font-bold text-gray-400 uppercase block mb-2">Miqdor</label>
-                                    <input required type="number" className="w-full p-4 bg-gray-50 rounded-2xl font-black text-2xl text-emerald-600 border-2 border-transparent focus:border-emerald-500 outline-none" value={kirimData.quantity} onChange={e => setKirimData({ ...kirimData, quantity: e.target.value })} />
+                                    <label className="text-xs font-bold uppercase block mb-2 text-[#194052]">Miqdor</label>
+                                    <input required type="number" className="w-full p-4 bg-gray-50 rounded-2xl font-black text-2xl border-2 border-transparent focus:border-emerald-500 outline-none super-input super-border" value={kirimData.quantity} onChange={e => setKirimData({ ...kirimData, quantity: e.target.value })} />
                                 </div>
                                 <div>
-                                    <label className="text-xs font-bold text-gray-400 uppercase block mb-2">O'lchov Birligi</label>
-                                    <select className="w-full p-4 bg-gray-50 rounded-2xl font-bold border-2 border-transparent focus:border-emerald-500 outline-none uppercase" value={kirimData.unit} onChange={e => setKirimData({ ...kirimData, unit: e.target.value })}>
-                                        <option value="dona">Dona</option>
-                                        <option value="kg">Kg</option>
-                                        <option value="metr">Metr</option>
-                                        <option value="komplekt">Komplekt</option>
+                                    <label className="text-xs font-bold uppercase block mb-2 text-[#194052]">O'lchov Birligi</label>
+                                    <select className="w-full p-4 bg-gray-50 rounded-2xl font-bold border-2 border-transparent focus:border-emerald-500 outline-none uppercase super-input super-border" value={kirimData.unit} onChange={e => setKirimData({ ...kirimData, unit: e.target.value })}>
+                                        <option value="dona" className="text-[#194052]">Dona</option>
+                                        <option value="kg" className="text-[#194052]">Kg</option>
+                                        <option value="metr" className="text-[#194052]">Metr</option>
+                                        <option value="komplekt" className="text-[#194052]">Komplekt</option>
                                     </select>
                                 </div>
                             </div>

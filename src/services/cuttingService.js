@@ -60,3 +60,15 @@ export const fetchActivePlans = async () => {
     if (error) throw error;
     return data;
 };
+
+// 4. Muayyan buyurtma uchun faktlarni olish
+export const getCuttingActuals = async (orderId) => {
+    const { data, error } = await supabase
+        .from('cutting_actuals')
+        .select('*')
+        .eq('production_order_id', orderId)
+        .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data;
+};
