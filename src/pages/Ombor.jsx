@@ -96,13 +96,13 @@ const Ombor = () => {
 
     const stats = {
         totalMato: inventory
-            .filter(i => i.category?.toLowerCase() === 'mato')
+            .filter(i => i.category?.toLowerCase() === 'mato' || i.category === 'Mato')
             .reduce((acc, curr) => acc + Number(curr.quantity || 0), 0),
         totalAcc: inventory
-            .filter(i => i.category?.toLowerCase() === 'aksessuar')
+            .filter(i => i.category?.toLowerCase() === 'aksessuar' || i.category === 'Aksessuar')
             .reduce((acc, curr) => acc + Number(curr.quantity || 0), 0),
         totalFinished: inventory
-            .filter(i => i.category?.toLowerCase() === 'tayyor mahsulot')
+            .filter(i => i.category?.toLowerCase() === 'tayyor mahsulot' || i.category === 'Tayyor Mahsulot')
             .reduce((acc, curr) => acc + Number(curr.quantity || 0), 0),
         lowStock: inventory.filter(i => Number(i.quantity || 0) < 5).length
     };
@@ -115,6 +115,7 @@ const Ombor = () => {
                     <h2 className="text-3xl font-black text-white tracking-tight flex items-center gap-3">
                         <Warehouse size={32} className="text-indigo-600" />
                         {activeTab === 'Mato' ? 'Mato Ombori' : activeTab === 'Aksessuar' ? 'Aksessuar Ombori' : activeTab === 'Tayyor Mahsulot' ? 'Tayyor Mahsulot (Sotuv)' : 'Ombor Tarixi'}
+                        <span className="text-[10px] bg-red-600 text-white px-2 py-1 rounded-lg animate-pulse">VERSIYA: 1.0.5</span>
                     </h2>
                     <p className="text-gray-500 text-sm font-medium mt-1">
                         Ombor qoldig'i va kirim-chiqim operatsiyalari nazorati

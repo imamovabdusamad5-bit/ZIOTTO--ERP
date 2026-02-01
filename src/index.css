@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 /* FORCED GLOBAL STYLES - DO NOT REMOVE */
 input,
 select,
@@ -9,10 +11,8 @@ option {
   -webkit-text-fill-color: #000000 !important;
   opacity: 1 !important;
   font-weight: 900 !important;
-  border: 2px solid #000000 !important;
+  border: 3px solid #000000 !important;
 }
-
-@import "tailwindcss";
 
 @theme {
   --color-primary: #0F766E;
