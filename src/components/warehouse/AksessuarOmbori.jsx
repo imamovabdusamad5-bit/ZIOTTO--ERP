@@ -207,9 +207,10 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh }) => {
 
             {/* MODALS */}
             {showInboundModal && (
-                <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-[2rem] w-full max-w-lg p-8 space-y-4 border-4 border-white shadow-2xl">
-                        <h3 className="text-xl font-bold text-black flex items-center gap-2" style={{ color: '#000000' }}><ArrowDownCircle /> Aksessuar Kirim</h3>
+                <div className="fixed inset-0 bg-black/95 z-[100] flex items-center justify-center p-4">
+                    <div className="bg-white rounded-[2rem] w-full max-w-lg p-8 space-y-4 border-8 border-red-600 shadow-2xl scale-110">
+                        <div className="bg-red-600 text-white text-[10px] font-black p-1 rounded w-fit animate-bounce">YANGI KOD: 16:30</div>
+                        <h3 className="text-2xl font-black text-black flex items-center gap-2" style={{ color: '#000000' }}><ArrowDownCircle /> Aksessuar Kirim</h3>
 
                         <div>
                             <label className="text-xs font-black uppercase mb-1 block" style={{ color: '#000000' }}>Nomi</label>
