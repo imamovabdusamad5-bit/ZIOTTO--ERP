@@ -207,8 +207,8 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh }) => {
 
             {/* MODALS */}
             {showInboundModal && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-[2rem] w-full max-w-lg p-8 space-y-4">
+                <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-[2rem] w-full max-w-lg p-8 space-y-4 border-4 border-white shadow-2xl">
                         <h3 className="text-xl font-bold text-black flex items-center gap-2" style={{ color: '#000000' }}><ArrowDownCircle /> Aksessuar Kirim</h3>
 
                         <div>

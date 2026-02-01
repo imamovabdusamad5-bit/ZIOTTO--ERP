@@ -115,7 +115,7 @@ const Ombor = () => {
                     <h2 className="text-3xl font-black text-white tracking-tight flex items-center gap-3">
                         <Warehouse size={32} className="text-indigo-600" />
                         {activeTab === 'Mato' ? 'Mato Ombori' : activeTab === 'Aksessuar' ? 'Aksessuar Ombori' : activeTab === 'Tayyor Mahsulot' ? 'Tayyor Mahsulot (Sotuv)' : 'Ombor Tarixi'}
-                        <span className="text-[10px] bg-red-600 text-white px-2 py-1 rounded-lg animate-pulse">VERSIYA: 1.0.5</span>
+                        <span className="text-[10px] bg-red-600 text-white px-2 py-1 rounded-lg animate-pulse">VERSIYA: 1.0.6</span>
                     </h2>
                     <p className="text-gray-500 text-sm font-medium mt-1">
                         Ombor qoldig'i va kirim-chiqim operatsiyalari nazorati

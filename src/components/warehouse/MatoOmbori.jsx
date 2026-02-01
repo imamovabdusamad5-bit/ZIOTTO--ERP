@@ -296,10 +296,10 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
 
             {/* INBOUND MODAL */}
             {showInboundModal && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-[2rem] w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+                <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-[2rem] w-full max-w-4xl max-h-[90vh] overflow-y-auto border-4 border-white">
                         <div className="p-6 border-b flex justify-between items-center">
-                            <h3 className="text-xl font-bold flex items-center gap-2">
+                            <h3 className="text-xl font-bold flex items-center gap-2" style={{ color: '#000000' }}>
                                 <ArrowDownCircle className="text-indigo-600" /> Yangi Mato Kirimi
                             </h3>
                             <button onClick={() => setShowInboundModal(false)}><Trash2 className="rotate-45 text-red-500" /></button>
@@ -307,7 +307,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
                         <form onSubmit={handleKirim} className="p-8 space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
-                                    <label className="text-xs font-bold uppercase block mb-1 text-[#194052]">Mato Nomi</label>
+                                    <label className="text-xs font-black uppercase block mb-1" style={{ color: '#000000' }}>Mato Nomi</label>
                                     <select
                                         required
                                         className="w-full text-lg font-black p-3 border-2 border-black rounded-xl"
