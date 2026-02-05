@@ -108,30 +108,33 @@ const Ombor = () => {
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="space-y-8 animate-in fade-in duration-500 pb-20">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-[#0f172a]/40 p-6 rounded-[3rem] border border-white/5 backdrop-blur-xl">
                 <div>
-                    <h2 className="text-3xl font-black text-white tracking-tight flex items-center gap-3">
-                        <Warehouse size={32} className="text-indigo-600" />
-                        {activeTab === 'Mato' ? 'Mato Ombori' : activeTab === 'Aksessuar' ? 'Aksessuar Ombori' : activeTab === 'Tayyor Mahsulot' ? 'Tayyor Mahsulot (Sotuv)' : 'Ombor Tarixi'}
-                        <span className="text-[10px] bg-red-600 text-white px-2 py-1 rounded-lg animate-pulse">VERSIYA: 1.0.6</span>
+                    <h2 className="text-4xl font-black text-white tracking-tight flex items-center gap-3">
+                        <div className="p-3 bg-indigo-600 rounded-2xl shadow-lg shadow-indigo-600/30">
+                            <Warehouse size={28} className="text-white" />
+                        </div>
+                        <span className="bg-gradient-to-r from-white via-indigo-200 to-slate-400 bg-clip-text text-transparent">
+                            {activeTab === 'Mato' ? 'Mato Ombori' : activeTab === 'Aksessuar' ? 'Aksessuar Ombori' : activeTab === 'Tayyor Mahsulot' ? 'Tayyor Mahsulot' : 'Ombor Tarixi'}
+                        </span>
                     </h2>
-                    <p className="text-gray-500 text-sm font-medium mt-1">
+                    <p className="text-slate-400 text-sm font-medium mt-2 ml-[4.5rem]">
                         Ombor qoldig'i va kirim-chiqim operatsiyalari nazorati
-                        {inventory.length > 0 && <span className="text-[10px] bg-indigo-50 text-indigo-500 px-2 py-0.5 rounded-full ml-3 font-black">BAZADA: {inventory.length} TUR ZAXIRA</span>}
+                        {inventory.length > 0 && <span className="text-[10px] bg-indigo-500/10 text-indigo-400 px-3 py-1 rounded-full ml-3 font-black border border-indigo-500/20">BAZADA: {inventory.length} TUR ZAXIRA</span>}
                     </p>
                 </div>
                 <div className="flex gap-3">
                     <button
                         onClick={fetchInitialData}
-                        className={`p-3 rounded-2xl bg-white border border-gray-100 text-gray-400 hover:text-indigo-600 hover:border-indigo-100 transition-all ${loading ? 'animate-spin' : ''}`}
+                        className={`p-4 rounded-2xl bg-[#0f172a]/80 backdrop-blur-xl border border-white/5 text-slate-400 hover:text-white hover:bg-slate-800 transition-all ${loading ? 'animate-spin' : ''}`}
                         title="Ma'lumotlarni yangilash"
                     >
                         <History size={20} />
                     </button>
                     {(activeTab === 'Mato' || activeTab === 'Aksessuar') && (
-                        <div className="bg-indigo-500/10 text-indigo-400 px-4 py-2 rounded-xl text-xs font-bold uppercase border border-indigo-500/20 flex items-center gap-2">
+                        <div className="bg-indigo-500/10 text-indigo-400 px-6 py-3 rounded-2xl text-xs font-black uppercase border border-indigo-500/20 flex items-center gap-2 shadow-lg shadow-indigo-500/10 backdrop-blur-md">
                             <CheckCircle2 size={16} /> Avto Sinxron
                         </div>
                     )}
@@ -139,22 +142,22 @@ const Ombor = () => {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 {[
-                    { label: 'Jami Mato', value: stats.totalMato.toFixed(1), unit: 'kg', icon: Layers, color: 'text-blue-600', bg: 'bg-blue-50', show: activeTab === 'Mato' || activeTab === 'Tarix' },
-                    { label: 'Aksessuarlar', value: stats.totalAcc, unit: 'dona', icon: Package, color: 'text-purple-600', bg: 'bg-purple-50', show: activeTab === 'Aksessuar' || activeTab === 'Tarix' },
-                    { label: 'Tayyor Mahsulot', value: stats.totalFinished, unit: 'dona', icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50', show: activeTab === 'Tayyor Mahsulot' || activeTab === 'Tarix' },
-                    { label: 'Zaxira Kam', value: stats.lowStock, unit: 'tur', icon: AlertTriangle, color: 'text-rose-600', bg: 'bg-rose-50', show: activeTab !== 'Tayyor Mahsulot' && activeTab !== 'So\'rovlar' }
+                    { label: 'Jami Mato', value: stats.totalMato.toFixed(1), unit: 'kg', icon: Layers, color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20', show: activeTab === 'Mato' || activeTab === 'Tarix' },
+                    { label: 'Aksessuarlar', value: stats.totalAcc, unit: 'dona', icon: Package, color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/20', show: activeTab === 'Aksessuar' || activeTab === 'Tarix' },
+                    { label: 'Tayyor Mahsulot', value: stats.totalFinished, unit: 'dona', icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', show: activeTab === 'Tayyor Mahsulot' || activeTab === 'Tarix' },
+                    { label: 'Zaxira Kam', value: stats.lowStock, unit: 'tur', icon: AlertTriangle, color: 'text-rose-400', bg: 'bg-rose-500/10', border: 'border-rose-500/20', show: activeTab !== 'Tayyor Mahsulot' && activeTab !== 'So\'rovlar' }
                 ].filter(s => s.show).map((stat, idx) => (
-                    <div key={idx} className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex items-center justify-between">
+                    <div key={idx} className={`bg-[#0f172a]/60 backdrop-blur-3xl p-6 rounded-[3rem] border ${stat.border || 'border-white/5'} shadow-2xl hover:-translate-y-1 transition-all flex items-center justify-between relative group`}>
                         <div>
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">{stat.label}</p>
+                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">{stat.label}</p>
                             <div className="flex items-baseline gap-1">
-                                <h3 className="text-3xl font-black text-gray-800">{stat.value}</h3>
-                                <span className="text-xs font-bold text-gray-400">{stat.unit}</span>
+                                <h3 className="text-3xl font-black text-white">{stat.value}</h3>
+                                <span className="text-xs font-bold text-slate-500">{stat.unit}</span>
                             </div>
                         </div>
-                        <div className={`w-14 h-14 ${stat.bg} ${stat.color} rounded-2xl flex items-center justify-center`}>
+                        <div className={`w-14 h-14 ${stat.bg} ${stat.color} rounded-2xl flex items-center justify-center border border-white/5 group-hover:scale-110 transition-transform shadow-inner`}>
                             <stat.icon size={28} />
                         </div>
                     </div>
@@ -162,12 +165,12 @@ const Ombor = () => {
             </div>
 
             {/* Navigation Tabs */}
-            <div className="flex bg-[#161b22] p-1.5 rounded-2xl border border-white/5 w-fit overflow-x-auto max-w-full">
+            <div className="flex bg-[#0f172a]/60 backdrop-blur-3xl p-1.5 rounded-[3rem] border border-white/10 w-fit overflow-x-auto max-w-full shadow-2xl">
                 {['Mato', 'Aksessuar', 'Tayyor Mahsulot', 'So\'rovlar', 'Tarix'].map(tab => (
                     <button
                         key={tab}
                         onClick={() => { setActiveTab(tab); setSearchParams({ tab }); }}
-                        className={`px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === tab ? 'bg-white/10 text-white shadow-xl' : 'text-gray-500 hover:text-gray-300'
+                        className={`px-8 py-3 rounded-3xl text-[11px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === tab ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 scale-105' : 'text-slate-500 hover:text-white hover:bg-white/5'
                             }`}
                     >
                         {tab}
@@ -178,7 +181,7 @@ const Ombor = () => {
             {/* Content Area */}
             <div className="min-h-[400px]">
                 {loading && inventory.length === 0 ? (
-                    <div className="text-center py-20 text-gray-500">Yuklanmoqda...</div>
+                    <div className="text-center py-20 text-slate-500 font-bold uppercase tracking-widest text-xs">Yuklanmoqda...</div>
                 ) : (
                     <>
                         {activeTab === 'Mato' && (

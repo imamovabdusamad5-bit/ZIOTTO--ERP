@@ -1,19 +1,5 @@
 @import "tailwindcss";
 
-/* FORCED GLOBAL STYLES - DO NOT REMOVE */
-input,
-select,
-textarea,
-option {
-  color: #000000 !important;
-  background-color: #ffffff !important;
-  background: #ffffff !important;
-  -webkit-text-fill-color: #000000 !important;
-  opacity: 1 !important;
-  font-weight: 900 !important;
-  border: 3px solid #000000 !important;
-}
-
 @theme {
   --color-primary: #0F766E;
 }
@@ -30,102 +16,40 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.high-contrast-text {
-  color: #ffffff !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
 }
 
-/* Print Styles for Summary Modal */
-@media print {
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
 
-  /* Hide everything by default */
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Print Styles */
+@media print {
   body * {
     visibility: hidden;
   }
 
-  /* Show only the printable area and its children */
   #printable-area,
   #printable-area * {
     visibility: visible;
   }
 
-  /* Reset positioning for the printable area to take up the full page */
   #printable-area {
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
-    margin: 0;
-    padding: 0;
     background: white;
     z-index: 9999;
-    box-shadow: none !important;
-    max-width: none !important;
-    max-height: none !important;
-    border-radius: 0 !important;
-    overflow: visible !important;
   }
-
-  /* Flatten scrollable containers */
-  .custom-scrollbar,
-  .overflow-y-auto {
-    overflow: visible !important;
-    max-height: none !important;
-    height: auto !important;
-  }
-
-  /* Explicitly hide elements marked no-print */
-  .no-print {
-    display: none !important;
-  }
-
-  /* Ensure items don't split across pages awkwardly */
-  .break-inside-avoid {
-    break-inside: avoid;
-    page-break-inside: avoid;
-  }
-}
-
-/* Global Input Overrides for Ultra High Contrast */
-input:not([type="checkbox"]),
-select,
-textarea,
-.super-input {
-  color: #000000 !important;
-  /* Pure black */
-  background-color: #ffffff !important;
-  /* Pure white */
-  -webkit-text-fill-color: #000000 !important;
-  opacity: 1 !important;
-  font-weight: 900 !important;
-  border: 4px solid #000000 !important;
-  /* Very thick border */
-  visibility: visible !important;
-  filter: none !important;
-}
-
-input::placeholder,
-textarea::placeholder {
-  color: #222222 !important;
-  opacity: 1 !important;
-}
-
-/* Modal text specifically - force white modal and black text */
-.bg-white,
-[class*="bg-white"] {
-  background-color: #ffffff !important;
-  color: #000000 !important;
-}
-
-.bg-white label,
-.bg-white h3,
-.bg-white p,
-.bg-white span,
-.bg-white select,
-.bg-white input {
-  color: #000000 !important;
-}
-
-.super-border {
-  border: 4px solid #000000 !important;
 }

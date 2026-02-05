@@ -182,168 +182,174 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 animate-in fade-in duration-500">
             {/* Header / Search / Add */}
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-[#161b22] p-4 rounded-3xl border border-white/5 shadow-2xl">
-                <div className="relative w-full md:w-96">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-[#0f172a]/60 backdrop-blur-3xl p-6 rounded-[2.5rem] border border-white/5 shadow-2xl">
+                <div className="relative w-full md:w-96 group">
+                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-indigo-400 transition-colors" size={20} />
                     <input
                         type="text"
                         placeholder="Mato, rang yoki partiya bo'yicha qidiruv..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-12 pr-6 py-3 bg-white border border-gray-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 outline-none font-black transition-all super-input"
+                        className="w-full pl-14 pr-6 py-4 bg-[#020617]/50 border border-white/5 rounded-2xl focus:border-indigo-500/50 text-white placeholder-slate-500 outline-none font-bold transition-all shadow-inner hover:bg-[#020617]/80"
                     />
                 </div>
                 <button
                     onClick={() => setShowInboundModal(true)}
-                    className="flex items-center gap-2 bg-indigo-600 text-white px-8 py-3 rounded-2xl hover:scale-105 transition-all shadow-xl shadow-indigo-600/20 font-bold uppercase text-xs tracking-widest"
+                    className="flex items-center gap-2 bg-indigo-600 text-white px-8 py-4 rounded-2xl hover:bg-indigo-500 transition-all shadow-xl shadow-indigo-600/20 font-black uppercase text-xs tracking-widest border border-indigo-400/20"
                 >
                     <Plus size={18} /> Yangi Mato Kirimi
                 </button>
             </div>
 
             {/* Content Table */}
-            <div className="overflow-x-auto bg-[#1a1c2e]/50 rounded-[2.5rem] border border-white/5">
-                <table className="w-full text-left">
-                    <thead className="bg-[#1a1c2e] text-gray-400 uppercase tracking-widest text-[10px]">
-                        <tr>
-                            <th className="px-8 py-6">Mato Nomi / Turi</th>
-                            <th className="px-8 py-6">Xususiya (Parametr)</th>
-                            <th className="px-8 py-6">Rangi / Kodi</th>
-                            <th className="px-8 py-6 text-right">Qoldiq</th>
-                            <th className="px-8 py-6 text-right">Amallar</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/5">
-                        {filteredInventory.map(item => (
-                            <tr key={item.id} className="hover:bg-white/5 transition-all group">
-                                <td className="px-8 py-6 align-top">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
-                                            <Warehouse size={24} />
-                                        </div>
-                                        <div>
-                                            <div className="text-white font-black text-lg uppercase tracking-tight">{item.item_name}</div>
-                                            <div className="text-[10px] text-indigo-400 font-bold uppercase tracking-widest">Partiya: {item.batch_number || '---'}</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td className="px-8 py-6 align-top text-gray-300 font-medium text-sm">
-                                    {item.material_types?.thread_type || '---'}
-                                    <br />
-                                    <span className="text-xs text-gray-500">{item.material_types?.grammage ? `${item.material_types.grammage} gr` : ''}</span>
-                                </td>
-                                <td className="px-8 py-6 align-top">
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-white font-bold uppercase text-sm">{item.color}</span>
-                                        {item.color_code && (
-                                            <span className="text-[10px] bg-white/10 px-2 py-0.5 rounded text-gray-400 font-mono w-fit">{item.color_code}</span>
-                                        )}
-                                    </div>
-                                </td>
-                                <td className="px-8 py-6 align-top text-right">
-                                    <div className="text-2xl font-black text-indigo-400">{item.quantity}</div>
-                                    <div className="text-[10px] text-gray-500 uppercase font-black tracking-widest">{item.unit}</div>
-                                </td>
-                                <td className="px-8 py-6 align-top text-right">
-                                    <div className="flex justify-end gap-2">
-                                        <button
-                                            onClick={() => {
-                                                setInboundData({
-                                                    reference_id: item.reference_id,
-                                                    color: item.color,
-                                                    color_code: item.color_code,
-                                                    batch_number: item.batch_number,
-                                                    quantity: '',
-                                                    reason: 'Qaytim',
-                                                    rolls: []
-                                                });
-                                                setShowInboundModal(true);
-                                            }}
-                                            className="p-3 bg-white/5 text-amber-500 hover:bg-amber-500 hover:text-white rounded-xl transition-all"
-                                            title="Qaytim qilish (Qo'shish)"
-                                        >
-                                            <History size={16} />
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                setOutboundData({
-                                                    inventory_id: item.id,
-                                                    quantity: '',
-                                                    order_id: '',
-                                                    reason: 'Kesimga'
-                                                });
-                                                setShowOutboundModal(true);
-                                            }}
-                                            className="p-3 bg-white/5 text-rose-500 hover:bg-rose-500 hover:text-white rounded-xl transition-all"
-                                            title="Chiqim qilish"
-                                        >
-                                            <ArrowUpRight size={16} />
-                                        </button>
-                                    </div>
-                                </td>
+            <div className="overflow-hidden bg-[#0f172a]/60 backdrop-blur-3xl rounded-[3rem] border border-white/5 shadow-2xl">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead className="bg-[#020617]/50 text-slate-400 uppercase tracking-widest text-[10px] font-black border-b border-white/5">
+                            <tr>
+                                <th className="px-8 py-6">Mato Nomi / Turi</th>
+                                <th className="px-8 py-6">Xususiya (Parametr)</th>
+                                <th className="px-8 py-6">Rangi / Kodi</th>
+                                <th className="px-8 py-6 text-right">Qoldiq</th>
+                                <th className="px-8 py-6 text-right">Amallar</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                            {filteredInventory.map(item => (
+                                <tr key={item.id} className="hover:bg-white/[0.02] transition-colors group">
+                                    <td className="px-8 py-6 align-top">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center border border-indigo-500/10 shadow-inner group-hover:scale-110 transition-transform duration-300">
+                                                <Warehouse size={26} />
+                                            </div>
+                                            <div>
+                                                <div className="text-white font-black text-lg uppercase tracking-tight leading-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">{item.item_name}</div>
+                                                <div className="text-[10px] text-indigo-400 font-bold uppercase tracking-widest mt-1">Partiya: {item.batch_number || '---'}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-8 py-6 align-top text-slate-300 font-bold text-sm">
+                                        {item.material_types?.thread_type || '---'}
+                                        <br />
+                                        <span className="text-xs text-slate-500 font-medium">{item.material_types?.grammage ? `${item.material_types.grammage} gr` : ''}</span>
+                                    </td>
+                                    <td className="px-8 py-6 align-top">
+                                        <div className="flex flex-col gap-1.5">
+                                            <span className="text-white font-bold uppercase text-sm tracking-wide">{item.color}</span>
+                                            {item.color_code && (
+                                                <span className="text-[10px] bg-slate-800/80 px-2 py-1 rounded-lg text-slate-400 font-mono w-fit border border-white/5">{item.color_code}</span>
+                                            )}
+                                        </div>
+                                    </td>
+                                    <td className="px-8 py-6 align-top text-right">
+                                        <div className={`text-2xl font-black ${Number(item.quantity) < 100 ? 'text-rose-500' : 'text-indigo-400'}`}>{item.quantity}</div>
+                                        <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest">{item.unit}</div>
+                                    </td>
+                                    <td className="px-8 py-6 align-top text-right">
+                                        <div className="flex justify-end gap-2">
+                                            <button
+                                                onClick={() => {
+                                                    setInboundData({
+                                                        reference_id: item.reference_id,
+                                                        color: item.color,
+                                                        color_code: item.color_code,
+                                                        batch_number: item.batch_number,
+                                                        quantity: '',
+                                                        reason: 'Qaytim',
+                                                        rolls: []
+                                                    });
+                                                    setShowInboundModal(true);
+                                                }}
+                                                className="p-3 bg-slate-800/50 text-amber-500 hover:bg-amber-500 hover:text-white rounded-xl transition-all border border-white/5 hover:border-amber-500 shadow-lg hover:shadow-amber-500/20"
+                                                title="Qaytim qilish (Qo'shish)"
+                                            >
+                                                <History size={18} />
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setOutboundData({
+                                                        inventory_id: item.id,
+                                                        quantity: '',
+                                                        order_id: '',
+                                                        reason: 'Kesimga'
+                                                    });
+                                                    setShowOutboundModal(true);
+                                                }}
+                                                className="p-3 bg-slate-800/50 text-rose-500 hover:bg-rose-500 hover:text-white rounded-xl transition-all border border-white/5 hover:border-rose-500 shadow-lg hover:shadow-rose-500/20"
+                                                title="Chiqim qilish"
+                                            >
+                                                <ArrowUpRight size={18} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
                 {filteredInventory.length === 0 && (
-                    <div className="p-10 text-center text-gray-500">
-                        Ma'lumot topilmadi
+                    <div className="py-20 flex flex-col items-center justify-center text-slate-500 border-t border-white/5">
+                        <Warehouse size={48} className="mb-4 opacity-20" />
+                        <span className="font-bold uppercase tracking-widest text-xs">Ma'lumot topilmadi</span>
                     </div>
                 )}
             </div>
 
             {/* INBOUND MODAL */}
             {showInboundModal && (
-                <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-[2rem] w-full max-w-4xl max-h-[90vh] overflow-y-auto border-4 border-white">
-                        <div className="p-6 border-b flex justify-between items-center">
-                            <h3 className="text-xl font-bold flex items-center gap-2" style={{ color: '#000000' }}>
-                                <ArrowDownCircle className="text-indigo-600" /> Yangi Mato Kirimi
-                            </h3>
-                            <button onClick={() => setShowInboundModal(false)}><Trash2 className="rotate-45 text-red-500" /></button>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#020617]/90 backdrop-blur-xl animate-in fade-in duration-300">
+                    <div className="bg-[#0f172a] border border-white/10 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[3rem] shadow-2xl shadow-indigo-900/40 animate-in zoom-in-95 duration-300 relative custom-scrollbar">
+                        <div className="p-8 border-b border-white/5 flex justify-between items-center sticky top-0 bg-[#0f172a]/95 backdrop-blur-md z-10 rounded-t-[3rem]">
+                            <div>
+                                <h3 className="text-2xl font-black text-white tracking-tight flex items-center gap-4">
+                                    <div className="p-3 bg-indigo-600 rounded-2xl text-white shadow-lg shadow-indigo-600/30"><ArrowDownCircle size={24} /></div>
+                                    <span className="bg-gradient-to-r from-white via-indigo-100 to-slate-400 bg-clip-text text-transparent">Yangi Mato Kirimi</span>
+                                </h3>
+                                <p className="text-[11px] text-indigo-300/60 font-black uppercase tracking-widest mt-2 ml-[3.25rem]">Omborga yangi mato qabul qilish</p>
+                            </div>
+                            <button onClick={() => setShowInboundModal(false)} className="p-3 rounded-2xl bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-500 transition-all border border-white/5"><Trash2 className="rotate-45" size={20} /></button>
                         </div>
-                        <form onSubmit={handleKirim} className="p-8 space-y-6">
+
+                        <form onSubmit={handleKirim} className="p-10 space-y-8">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
-                                    <label className="text-xs font-black uppercase block mb-1" style={{ color: '#000000' }}>Mato Nomi</label>
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Mato Nomi</label>
                                     <select
                                         required
-                                        className="w-full text-lg font-black p-3 border-2 border-black rounded-xl"
-                                        style={{ color: '#000000', backgroundColor: '#ffffff', opacity: 1, WebkitTextFillColor: '#000000' }}
+                                        className="w-full bg-[#020617] border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-indigo-500 focus:bg-[#020617] transition-all font-bold appearance-none cursor-pointer placeholder-slate-500 shadow-inner"
                                         value={inboundData.selected_material_name}
                                         onChange={e => setInboundData({ ...inboundData, selected_material_name: e.target.value, reference_id: '' })}
                                     >
-                                        <option value="" style={{ color: '#666666' }}>Tanlang...</option>
+                                        <option value="" className="bg-slate-900 text-slate-500">Tanlang...</option>
                                         {[...new Set(references.filter(r => r.type === 'Mato').map(r => r.name))].map(n => (
-                                            <option key={n} value={n} style={{ color: '#000000' }}>{n}</option>
+                                            <option key={n} value={n} className="bg-slate-900 text-white">{n}</option>
                                         ))}
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="text-xs font-black uppercase block mb-1" style={{ color: '#000000' }}>Turi va Grammaj</label>
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Turi va Grammaj</label>
                                     <select
                                         required
                                         disabled={!inboundData.selected_material_name}
-                                        className="w-full text-lg font-black p-3 border-2 border-black rounded-xl"
-                                        style={{ color: '#000000', backgroundColor: '#ffffff', opacity: 1, WebkitTextFillColor: '#000000' }}
+                                        className="w-full bg-[#020617] border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-indigo-500 transition-all font-bold appearance-none cursor-pointer disabled:opacity-50 placeholder-gray-500 shadow-inner"
                                         value={inboundData.reference_id}
                                         onChange={e => setInboundData({ ...inboundData, reference_id: e.target.value })}
                                     >
-                                        <option value="" style={{ color: '#666666' }}>Tanlang...</option>
+                                        <option value="" className="bg-[#161b22]">Tanlang...</option>
                                         {references
                                             .filter(r => r.name === inboundData.selected_material_name)
-                                            .map(r => <option key={r.id} value={r.id} style={{ color: '#000000' }}>{r.thread_type} - {r.grammage}gr</option>)}
+                                            .map(r => <option key={r.id} value={r.id} className="bg-slate-900">{r.thread_type} - {r.grammage}gr</option>)}
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="text-xs font-black uppercase block mb-1" style={{ color: '#000000' }}>Rangi</label>
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Rangi</label>
                                     <input
                                         required
                                         type="text"
-                                        className="w-full text-lg font-black p-3 border-2 border-black rounded-xl uppercase"
-                                        style={{ color: '#000000', backgroundColor: '#ffffff', opacity: 1, WebkitTextFillColor: '#000000' }}
+                                        placeholder="Mato rangi..."
+                                        className="w-full bg-[#020617] border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-indigo-500 focus:bg-[#020617] transition-all font-bold uppercase placeholder-slate-600 shadow-inner"
                                         value={inboundData.color}
                                         onChange={e => setInboundData({ ...inboundData, color: e.target.value })}
                                     />
@@ -352,22 +358,22 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
 
                             <div className="grid grid-cols-2 gap-6">
                                 <div>
-                                    <label className="text-xs font-black uppercase block mb-1" style={{ color: '#000000' }}>Partiya №</label>
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Partiya №</label>
                                     <input
                                         required
                                         type="text"
-                                        className="w-full text-lg font-black p-3 border-2 border-black rounded-xl uppercase"
-                                        style={{ color: '#000000', backgroundColor: '#ffffff', opacity: 1, WebkitTextFillColor: '#000000' }}
+                                        placeholder="Partiya raqami"
+                                        className="w-full bg-[#020617] border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-indigo-500 focus:bg-[#020617] transition-all font-black uppercase text-lg placeholder-slate-600 shadow-inner"
                                         value={inboundData.batch_number}
                                         onChange={e => setInboundData({ ...inboundData, batch_number: e.target.value })}
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs font-black uppercase block mb-1" style={{ color: '#000000' }}>Rang Kodi (ID)</label>
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Rang Kodi (ID)</label>
                                     <input
                                         type="text"
-                                        className="w-full text-lg font-black p-3 border-2 border-black rounded-xl uppercase"
-                                        style={{ color: '#000000', backgroundColor: '#ffffff', opacity: 1, WebkitTextFillColor: '#000000' }}
+                                        placeholder="Rang kodi (ixtiyoriy)"
+                                        className="w-full bg-[#020617] border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-indigo-500 focus:bg-[#020617] transition-all font-bold uppercase placeholder-slate-600 shadow-inner"
                                         value={inboundData.color_code}
                                         onChange={e => setInboundData({ ...inboundData, color_code: e.target.value })}
                                     />
@@ -375,18 +381,18 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
                             </div>
 
                             {/* Rolls */}
-                            <div className="bg-gray-100 p-6 rounded-2xl border-4 border-black">
-                                <div className="flex justify-between items-center mb-4">
-                                    <h4 className="font-black uppercase text-xs" style={{ color: '#000000' }}>Poylar (O'ramlar)</h4>
-                                    <button type="button" onClick={() => setInboundData({ ...inboundData, rolls: [...inboundData.rolls, { weight: '' }] })} className="bg-black text-white px-3 py-1 rounded-lg text-xs font-black uppercase">+ Poy Qo'shish</button>
+                            <div className="bg-white/[0.02] p-8 rounded-[2.5rem] border border-white/5">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h4 className="font-black uppercase text-xs text-indigo-400 tracking-widest flex items-center gap-2"><ScrollText size={16} /> Poylar (O'ramlar)</h4>
+                                    <button type="button" onClick={() => setInboundData({ ...inboundData, rolls: [...inboundData.rolls, { weight: '' }] })} className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase transition-all shadow-lg shadow-indigo-600/20 hover:bg-indigo-500">+ Poy Qo'shish</button>
                                 </div>
-                                <div className="grid grid-cols-4 gap-3">
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                     {inboundData.rolls.map((r, i) => (
-                                        <div key={i} className="relative">
+                                        <div key={i} className="relative group animate-in zoom-in-50 duration-300">
+                                            <div className="absolute inset-0 bg-indigo-500/5 rounded-2xl blur-sm group-hover:bg-indigo-500/10 transition-all"></div>
                                             <input
                                                 type="number"
-                                                className="w-full py-2 text-center font-black border-2 border-black rounded-lg focus:ring-4 focus:ring-black"
-                                                style={{ color: '#000000', backgroundColor: '#ffffff', opacity: 1, WebkitTextFillColor: '#000000' }}
+                                                className="relative w-full py-4 text-center font-black bg-[#020617] border border-white/10 rounded-2xl focus:border-indigo-500 outline-none text-white text-lg transition-all shadow-inner group-hover:border-indigo-500/30"
                                                 placeholder="kg"
                                                 value={r.weight}
                                                 onChange={e => {
@@ -400,17 +406,22 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
                                                 const newRolls = inboundData.rolls.filter((_, idx) => idx !== i);
                                                 const total = newRolls.reduce((s, r) => s + (Number(r.weight) || 0), 0);
                                                 setInboundData({ ...inboundData, rolls: newRolls, quantity: total.toFixed(2) });
-                                            }} className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold border-2 border-white">x</button>
+                                            }} className="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full w-7 h-7 flex items-center justify-center text-[10px] font-black border-4 border-[#0F172A] hover:scale-110 transition-transform shadow-lg z-10 hover:bg-rose-600">×</button>
                                         </div>
                                     ))}
+                                    {inboundData.rolls.length === 0 && (
+                                        <div className="col-span-full py-8 text-center text-slate-600 text-[10px] font-bold uppercase tracking-widest border border-dashed border-white/10 rounded-2xl">
+                                            Hozircha poylar yo'q
+                                        </div>
+                                    )}
                                 </div>
-                                <div className="mt-4 text-right">
-                                    <span className="text-xs font-black uppercase mr-2" style={{ color: '#000000' }}>Jami Miqdor:</span>
-                                    <span className="text-3xl font-black" style={{ color: '#000000' }}>{inboundData.quantity || 0} <span className="text-sm">kg</span></span>
+                                <div className="mt-8 flex items-end justify-end gap-3 border-t border-white/5 pt-6">
+                                    <span className="text-xs font-black uppercase text-slate-500 tracking-widest mb-1">Jami Og'irlik:</span>
+                                    <span className="text-4xl font-black text-white leading-none tracking-tight">{inboundData.quantity || 0} <span className="text-lg text-slate-600">kg</span></span>
                                 </div>
                             </div>
 
-                            <button className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold uppercase hover:bg-indigo-700 transition">Kirimni Saqlash</button>
+                            <button className="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-indigo-500 transition-all shadow-2xl shadow-indigo-600/30 text-xs active:scale-95">Kirimni Saqlash</button>
                         </form>
                     </div>
                 </div>
@@ -418,56 +429,65 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
 
             {/* OUTBOUND MODAL */}
             {showOutboundModal && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-[2rem] w-full max-w-lg">
-                        <div className="p-6 border-b flex justify-between items-center bg-rose-50 rounded-t-[2rem]">
-                            <h3 className="text-xl font-bold flex items-center gap-2 text-rose-600">
-                                <ArrowUpRight /> Ombordan Chiqim
-                            </h3>
-                            <button onClick={() => setShowOutboundModal(false)} className="text-rose-400 font-bold text-2xl">×</button>
-                        </div>
-                        <form onSubmit={handleChiqim} className="p-8 space-y-6">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#020617]/90 backdrop-blur-xl animate-in fade-in duration-300">
+                    <div className="bg-[#0f172a] border border-white/10 w-full max-w-lg rounded-[3rem] p-10 space-y-8 shadow-2xl shadow-rose-900/20 animate-in zoom-in-95 duration-300 relative">
+                        <div className="flex items-center gap-4 border-b border-white/5 pb-8">
+                            <div className="p-3 bg-rose-500 rounded-2xl text-white shadow-lg shadow-rose-500/30">
+                                <ArrowUpRight size={28} />
+                            </div>
                             <div>
-                                <label className="text-xs font-bold uppercase block mb-1 text-[#194052]">Qaysi Buyurtma Uchun? (Optional)</label>
+                                <h3 className="text-2xl font-black text-white tracking-tight">Ombordan Chiqim</h3>
+                                <p className="text-[11px] text-rose-300/60 font-black uppercase tracking-widest mt-1">Matoni ishlab chiqarishga berish</p>
+                            </div>
+                        </div>
+
+                        <form onSubmit={handleChiqim} className="space-y-6">
+                            <div>
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Qaysi Buyurtma Uchun? (Optional)</label>
                                 <select
-                                    className="w-full p-3 border rounded-xl font-bold bg-white super-input super-border"
+                                    className="w-full bg-[#020617] border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-rose-500 focus:bg-[#020617] transition-all font-bold appearance-none cursor-pointer shadow-inner"
                                     value={outboundData.order_id}
                                     onChange={e => setOutboundData({ ...outboundData, order_id: e.target.value })}
                                 >
-                                    <option value="" className="text-gray-400">Tanlanmagan (Umumiy chiqim)</option>
+                                    <option value="" className="bg-slate-900 text-slate-400">Tanlanmagan (Umumiy chiqim)</option>
                                     {orders.map(o => (
-                                        <option key={o.id} value={o.id} className="text-[#194052]" style={{ color: '#194052' }}>Order #{o.order_number} - {o.models?.name}</option>
+                                        <option key={o.id} value={o.id} className="bg-slate-900">Order #{o.order_number} - {o.models?.name}</option>
                                     ))}
                                 </select>
                             </div>
 
                             <div>
-                                <label className="text-xs font-bold uppercase block mb-1 text-[#194052]">Chiqim Miqdori</label>
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Chiqim Miqdori</label>
                                 <input
                                     required
                                     type="number"
                                     step="0.01"
-                                    className="w-full p-4 border-2 border-rose-100 rounded-xl font-black text-3xl focus:border-rose-500 outline-none super-input super-border"
+                                    className="w-full bg-[#020617] border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-rose-500 focus:bg-[#020617] transition-all font-black text-2xl placeholder-slate-600 shadow-inner"
                                     value={outboundData.quantity}
                                     onChange={e => setOutboundData({ ...outboundData, quantity: e.target.value })}
+                                    placeholder="0.00"
                                 />
                             </div>
 
                             <div>
-                                <label className="text-xs font-bold uppercase block mb-1 text-[#194052]">Sabab / Qayerga</label>
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Sabab / Qayerga</label>
                                 <textarea
-                                    className="w-full p-3 border rounded-xl bg-white super-input super-border"
+                                    className="w-full bg-[#020617] border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-rose-500 focus:bg-[#020617] transition-all font-bold placeholder-slate-600 shadow-inner resize-none h-24"
                                     value={outboundData.reason}
                                     onChange={e => setOutboundData({ ...outboundData, reason: e.target.value })}
+                                    placeholder="Masalan: Kesim bo'limiga"
                                 />
                             </div>
 
-                            <button className="w-full py-4 bg-rose-600 text-white rounded-xl font-bold uppercase hover:bg-rose-700 transition">Chiqimni Tasdiqlash</button>
+                            <div className="pt-4 flex gap-3">
+                                <button type="button" onClick={() => setShowOutboundModal(false)} className="flex-1 py-4 bg-white/5 hover:bg-white/10 text-slate-400 rounded-2xl font-bold uppercase text-[10px] tracking-widest transition-all">Bekor qilish</button>
+                                <button className="flex-[2] py-4 bg-rose-600 hover:bg-rose-500 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-rose-600/30 transition-all active:scale-95">Chiqimni Tasdiqlash</button>
+                            </div>
                         </form>
                     </div>
-                </div >
+                </div>
             )}
-        </div >
+        </div>
     );
 };
 

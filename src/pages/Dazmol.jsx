@@ -1,16 +1,25 @@
-import React from 'react';
-import { Package, Truck, Users } from 'lucide-react';
-
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Package, Truck, Users, X, UserCheck, Activity, RefreshCw } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 const Dazmol = () => {
     const [bundles, setBundles] = useState([]);
+    const [workers, setWorkers] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const [showFinishModal, setShowFinishModal] = useState(false);
+    const [selectedBundle, setSelectedBundle] = useState(null);
+    const [selectedWorkerId, setSelectedWorkerId] = useState('');
 
     useEffect(() => {
         fetchBundles();
+        fetchWorkers();
     }, []);
+
+    const fetchWorkers = async () => {
+        const { data } = await supabase.from('profiles').select('*').eq('status', true);
+        setWorkers(data || []);
+    };
 
     const fetchBundles = async () => {
         setLoading(true);
@@ -24,8 +33,19 @@ const Dazmol = () => {
         setLoading(false);
     };
 
-    const handleFinish = async (bundle) => {
-        if (!confirm(`${bundle.bundle_number} ni omborga topshirasizmi?`)) return;
+    const handleOpenFinish = (bundle) => {
+        setSelectedBundle(bundle);
+        setShowFinishModal(true);
+    };
+
+    const handleFinish = async () => {
+        if (!selectedWorkerId) {
+            alert('Iltimos, ishni bajargan xodimni tanlang!');
+            return;
+        }
+
+        const bundle = selectedBundle;
+        const worker = workers.find(w => w.id === selectedWorkerId);
 
         setLoading(true);
 
@@ -46,14 +66,13 @@ const Dazmol = () => {
 
         // 2. Add to Inventory (Tayyor Mahsulot)
         const modelName = bundle.production_orders?.models?.name;
-        // Check if exists
-        const { data: existing, error: fetchError } = await supabase
+        const { data: existing } = await supabase
             .from('inventory')
             .select('*')
             .eq('item_name', modelName)
             .eq('category', 'Tayyor Mahsulot')
             .eq('color', bundle.color)
-            .maybeSingle(); // Use maybeSingle to avoid 406 if multiple (shouldn't happen if unique constraint matches logic, otherwise use list)
+            .maybeSingle();
 
         if (existing) {
             await supabase.from('inventory').update({
@@ -71,79 +90,134 @@ const Dazmol = () => {
             }]);
         }
 
-        // 3. Log
+        // 3. Log with Worker Info
         await supabase.from('activity_logs').insert([{
             department: 'Dazmol',
-            user_name: 'Dazmol/Qadoq',
+            user_name: worker.username,
             action: `${bundle.bundle_number} - Omborga topshirildi`,
-            details: JSON.stringify(bundle)
+            details: JSON.stringify({
+                bundle_id: bundle.id,
+                worker_id: worker.id,
+                quantity: bundle.quantity,
+                operation: 'Ironing'
+            })
         }]);
 
+        setShowFinishModal(false);
+        setSelectedWorkerId('');
         fetchBundles();
         setLoading(false);
     };
 
     return (
-        <div className="space-y-6 animate-in fade-in duration-500">
+        <div className="space-y-8 pb-20 animate-in fade-in duration-500">
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-2xl font-bold text-gray-800">Dazmol va Qadoqlash</h2>
-                    <p className="text-gray-500">Juftliklar (Dazmolchi + Qadoqlovchi) ishi nazorati</p>
+                    <h2 className="text-3xl font-black text-white tracking-tight">Dazmol va Qadoqlash</h2>
+                    <p className="text-gray-500 font-bold uppercase tracking-widest text-[10px] mt-1">Tayyor mahsulotlarni omborga topshirish</p>
                 </div>
+                <button onClick={fetchBundles} className="p-4 bg-[#161b22] text-gray-400 hover:text-white rounded-2xl border border-white/5 transition-all">
+                    <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
+                </button>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {loading ? (
-                    <div className="col-span-full py-20 text-center text-gray-400">Yuklanmoqda...</div>
+                {loading && bundles.length === 0 ? (
+                    <div className="col-span-full py-20 text-center"><Activity className="animate-spin mx-auto text-indigo-600" size={32} /></div>
                 ) : bundles.length === 0 ? (
-                    <div className="col-span-full py-20 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                        <Package className="mx-auto text-gray-300 mb-2" size={48} />
-                        <p className="text-gray-500 font-medium">Qadoqlash uchun tayyor mahsulot yo'q</p>
+                    <div className="col-span-full py-20 text-center bg-[#161b22] rounded-[3rem] border border-white/5 shadow-2xl">
+                        <Package className="mx-auto text-gray-700 mb-4" size={64} />
+                        <p className="text-gray-500 font-bold uppercase tracking-widest text-xs">Hozircha qadoqlash uchun ish yo'q</p>
                     </div>
-                ) : bundles.map((team) => (
-                    <div key={team.id} className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-4 opacity-10">
-                            <Package size={100} />
+                ) : bundles.map((bundle) => (
+                    <div key={bundle.id} className="bg-[#161b22] p-8 rounded-[3rem] border border-white/5 shadow-2xl hover:border-orange-500/30 transition-all relative group overflow-hidden">
+                        <div className="absolute top-0 right-0 p-8 opacity-0 group-hover:opacity-10 transition-opacity">
+                            <Package size={120} className="text-orange-400" />
                         </div>
 
                         <div className="relative z-10">
-                            <div className="flex justify-between items-start mb-4">
+                            <div className="flex justify-between items-start mb-6">
                                 <div>
-                                    <span className="bg-orange-100 text-orange-600 px-2 py-1 rounded text-xs font-bold mb-2 inline-block">Ishlanmoqda</span>
-                                    <h3 className="text-lg font-bold text-gray-900">{team.production_orders?.models?.name}</h3>
-                                    <p className="text-xs text-gray-400 font-mono">{team.bundle_number}</p>
+                                    <span className="bg-orange-500/10 text-orange-400 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest mb-3 inline-block">Tayyorlandi</span>
+                                    <h3 className="text-2xl font-black text-white uppercase tracking-tight leading-none">{bundle.production_orders?.models?.name}</h3>
+                                    <p className="text-[10px] text-gray-500 font-bold mt-2 uppercase tracking-widest">{bundle.bundle_number}</p>
+                                </div>
+                                <div className="p-4 bg-orange-500/10 text-orange-400 rounded-2xl border border-orange-500/20 shadow-inner">
+                                    <Package size={24} />
                                 </div>
                             </div>
 
-                            <div className="flex gap-4 mb-6">
-                                <div className="flex-1 bg-gray-50 p-3 rounded-lg border border-gray-200">
-                                    <p className="text-xs text-gray-500 mb-1">Miqdor</p>
-                                    <div className="flex items-center gap-2 font-bold text-gray-800 text-lg">
+                            <div className="grid grid-cols-2 gap-4 mb-8">
+                                <div className="bg-black/20 p-4 rounded-2xl border border-white/5 shadow-inner">
+                                    <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest mb-1">Miqdor</p>
+                                    <div className="flex items-center gap-2 font-black text-white text-xl">
                                         <Users size={16} className="text-orange-500" />
-                                        {team.quantity} dona
+                                        {bundle.quantity} <span className="text-[10px] text-gray-600 uppercase">dona</span>
                                     </div>
                                 </div>
-                                <div className="flex-1 bg-gray-50 p-3 rounded-lg border border-gray-200">
-                                    <p className="text-xs text-gray-500 mb-1">Rang / O'lcham</p>
-                                    <div className="flex items-center gap-2 font-bold text-gray-800">
-                                        {team.color} | {team.size}
+                                <div className="bg-black/20 p-4 rounded-2xl border border-white/5 shadow-inner">
+                                    <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest mb-1">Rang / O'lcham</p>
+                                    <div className="text-sm font-black text-white mt-1">
+                                        {bundle.color} | {bundle.size}
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="mt-6 flex justify-end">
-                                <button
-                                    onClick={() => handleFinish(team)}
-                                    className="flex items-center gap-2 bg-gray-900 text-white px-6 py-3 rounded-xl hover:bg-gray-800 transition font-bold text-sm shadow-lg shadow-gray-900/20"
-                                >
-                                    <Truck size={18} />
-                                    Omborga Topshirish
-                                </button>
-                            </div>
+                            <button
+                                onClick={() => handleOpenFinish(bundle)}
+                                className="w-full flex items-center justify-center gap-3 bg-orange-600 text-white py-4 rounded-2xl hover:bg-orange-500 transition-all font-black text-[10px] uppercase tracking-widest shadow-2xl shadow-orange-600/20"
+                            >
+                                <Truck size={18} />
+                                Omborga Topshirish
+                            </button>
                         </div>
                     </div>
                 ))}
             </div>
+
+            {/* Finish Modal */}
+            {showFinishModal && selectedBundle && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl animate-in fade-in duration-300">
+                    <div className="bg-[#161b22] border border-white/10 w-full max-w-md rounded-[3.5rem] p-10 shadow-4xl animate-in zoom-in-95 duration-300">
+                        <div className="flex justify-between items-center mb-8">
+                            <div>
+                                <h3 className="text-2xl font-black text-white tracking-tight">Qadoqlashni Yakunlash</h3>
+                                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">Partiya: {selectedBundle.bundle_number}</p>
+                            </div>
+                            <button onClick={() => setShowFinishModal(false)} className="text-gray-500 hover:text-white">
+                                <X size={24} />
+                            </button>
+                        </div>
+
+                        <div className="space-y-6">
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+                                    <UserCheck size={14} className="text-orange-400" />
+                                    Dazmolchi / Qadoqlovchi
+                                </label>
+                                <select
+                                    className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-orange-500 transition-all font-bold appearance-none cursor-pointer"
+                                    value={selectedWorkerId}
+                                    onChange={(e) => setSelectedWorkerId(e.target.value)}
+                                >
+                                    <option value="">Xodimni tanlang...</option>
+                                    {workers.map(w => (
+                                        <option key={w.id} value={w.id} className="bg-[#161b22]">{w.full_name} (@{w.username})</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <button
+                                onClick={handleFinish}
+                                disabled={loading}
+                                className="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-5 rounded-3xl transition-all shadow-2xl shadow-orange-600/20 uppercase tracking-widest text-xs disabled:opacity-50"
+                            >
+                                {loading ? 'Yozilmoqda...' : 'Omborga Topshirish'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
