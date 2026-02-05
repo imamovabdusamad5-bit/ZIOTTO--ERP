@@ -128,15 +128,15 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
             }
 
             console.log("Mato muvaffaqiyatli saqlandi. ID:", inventoryId);
-            console.log("Mato muvaffaqiyatli saqlandi. ID:", inventoryId);
-            // alert(`DIQQAT: Mato muvaffaqiyatli qabul qilindi!\nBaza ID: ${inventoryId}`);
 
             // Clean state first
             setShowInboundModal(false);
             setInboundData({ reference_id: '', color: '', color_code: '', batch_number: '', quantity: '', reason: 'Yangi kirim', rolls: [] });
 
-            // Update parent state
-            await onRefresh();
+            // Update parent state with a slight delay to ensure DB propagation
+            setTimeout(async () => {
+                await onRefresh();
+            }, 1000);
 
             // Simple success toast/alert
             alert("Mato muvaffaqiyatli qo'shildi!");
