@@ -114,33 +114,35 @@ const ZiyoChat = () => {
 
                 {/* Messages Area */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-indigo-200 scrollbar-track-transparent bg-gray-50/50 sm:bg-transparent">
-                    {messages.map((msg) => (
+                    const isUser = msg.sender === 'user';
+                    return (
+                    <div
+                        key={msg.id}
+                        className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}
+                    >
                         <div
-                            key={msg.id}
-                            className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                            className={`
+                                                    max-w-[85%] p-3.5 rounded-2xl relative group
+                                                    ${isUser
+                                    ? 'bg-gradient-to-br from-indigo-600 to-indigo-700 text-white rounded-tr-none shadow-lg shadow-indigo-500/20'
+                                    : (hasAlert && msg.text.includes('kamchilik') ? 'bg-red-50 border border-red-100 text-red-900' : 'bg-white border border-gray-100 text-gray-900') + ' rounded-tl-none shadow-sm'
+                                }
+                                                `}
                         >
-                            <div
-                                className={`
-                                    max-w-[85%] p-3.5 rounded-2xl relative group
-                                    ${msg.sender === 'user'
-                                        ? 'bg-gradient-to-br from-indigo-600 to-indigo-700 text-white rounded-tr-none shadow-lg shadow-indigo-500/20'
-                                        : (hasAlert && msg.text.includes('kamchilik') ? 'bg-red-50 border border-red-100 text-red-800' : 'bg-white border border-gray-100 text-gray-800') + ' rounded-tl-none shadow-sm'
-                                    }
-                                `}
-                            >
-                                <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.text}</p>
-                                <span className={`text-[10px] absolute -bottom-4 ${msg.sender === 'user' ? 'right-0 text-gray-400' : 'left-0 text-gray-400'} opacity-0 group-hover:opacity-100 transition-opacity`}>
-                                    {msg.time}
-                                </span>
-                            </div>
+                            <p className="text-sm leading-relaxed whitespace-pre-wrap font-medium">{msg.text}</p>
+                            <span className={`text-[10px] absolute -bottom-4 ${isUser ? 'right-0 text-gray-400' : 'left-0 text-gray-400'} opacity-0 group-hover:opacity-100 transition-opacity`}>
+                                {msg.time}
+                            </span>
                         </div>
-                    ))}
+                    </div>
+                    );
+                                })}
                     {isTyping && (
                         <div className="flex justify-start">
                             <div className="bg-white border border-gray-100 p-4 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-1.5">
-                                <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce delay-0"></span>
-                                <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce delay-150"></span>
-                                <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce delay-300"></span>
+                                <span className="w-1.5 h-1.5 bg-indigo-600 rounded-full animate-bounce delay-0"></span>
+                                <span className="w-1.5 h-1.5 bg-indigo-600 rounded-full animate-bounce delay-150"></span>
+                                <span className="w-1.5 h-1.5 bg-indigo-600 rounded-full animate-bounce delay-300"></span>
                             </div>
                         </div>
                     )}
@@ -149,45 +151,47 @@ const ZiyoChat = () => {
 
                 {/* Input Area */}
                 <form onSubmit={handleSend} className="p-3 bg-white border-t border-gray-100 sm:bg-white/50 sm:backdrop-blur-sm shrink-0 pb-safe sm:pb-3">
-                    <div className="relative flex items-center gap-2">
-                        <input
-                            type="text"
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            placeholder="Savolingizni yozing..."
-                            className="w-full bg-gray-50 sm:bg-white border border-gray-200 pl-4 pr-12 py-3.5 sm:py-3 rounded-[1.25rem] focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 text-base sm:text-sm font-medium placeholder:text-gray-400 shadow-sm"
-                        />
-                        <button
-                            type="submit"
-                            disabled={!input.trim()}
-                            className="absolute right-1.5 p-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:scale-105 active:scale-95"
-                        >
-                            <Send size={20} />
-                        </button>
-                    </div>
-                </form>
+                    <input
+                        type="text"
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        placeholder="Savolingizni yozing..."
+                        style={{ color: '#000000' }}
+                        className="w-full bg-gray-50 sm:bg-white border border-gray-200 pl-4 pr-12 py-3.5 sm:py-3 rounded-[1.25rem] focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 text-base sm:text-sm font-black text-black placeholder:text-gray-500 shadow-sm"
+                    />
+                    <button
+                        type="submit"
+                        disabled={!input.trim()}
+                        className="absolute right-1.5 p-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:scale-105 active:scale-95"
+                    >
+                        <Send size={20} />
+                    </button>
             </div>
+        </form>
+            </div >
 
-            {/* Floating Button */}
-            {!isOpen && (
-                <button
-                    onClick={() => setIsOpen(true)}
-                    className={`
+    {/* Floating Button */ }
+{
+    !isOpen && (
+        <button
+            onClick={() => setIsOpen(true)}
+            className={`
                         group pointer-events-auto relative flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 
                         ${hasAlert ? 'bg-gradient-to-br from-rose-500 to-red-600 shadow-rose-600/30' : 'bg-gradient-to-br from-indigo-600 to-purple-600 shadow-indigo-600/30'}
                         rounded-2xl sm:rounded-[1.5rem] shadow-2xl hover:scale-110 hover:-translate-y-1 transition-all duration-300
                     `}
-                >
-                    <div className="absolute inset-0 rounded-[1.5rem] bg-white/20 blur-md group-hover:blur-lg transition-all opacity-0 group-hover:opacity-100"></div>
-                    {hasAlert ? <AlertTriangle className="text-white relative z-10" size={28} /> : <Bot className="text-white relative z-10" size={28} />}
+        >
+            <div className="absolute inset-0 rounded-[1.5rem] bg-white/20 blur-md group-hover:blur-lg transition-all opacity-0 group-hover:opacity-100"></div>
+            {hasAlert ? <AlertTriangle className="text-white relative z-10" size={28} /> : <Bot className="text-white relative z-10" size={28} />}
 
-                    <span className="absolute -top-1 -right-1 flex h-3 w-3 sm:h-4 sm:w-4">
-                        <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${hasAlert ? 'bg-yellow-400' : 'bg-red-400'} opacity-75`}></span>
-                        <span className={`relative inline-flex rounded-full h-full w-full ${hasAlert ? 'bg-yellow-500' : 'bg-red-500'} border-2 border-white`}></span>
-                    </span>
-                </button>
-            )}
-        </div>
+            <span className="absolute -top-1 -right-1 flex h-3 w-3 sm:h-4 sm:w-4">
+                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${hasAlert ? 'bg-yellow-400' : 'bg-red-400'} opacity-75`}></span>
+                <span className={`relative inline-flex rounded-full h-full w-full ${hasAlert ? 'bg-yellow-500' : 'bg-red-500'} border-2 border-white`}></span>
+            </span>
+        </button>
+    )
+}
+        </div >
     );
 };
 
