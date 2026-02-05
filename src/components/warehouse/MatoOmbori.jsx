@@ -126,11 +126,19 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
             }
 
             console.log("Mato muvaffaqiyatli saqlandi. ID:", inventoryId);
-            alert(`DIQQAT: Mato muvaffaqiyatli qabul qilindi!\nBaza ID: ${inventoryId}\n\nAgar jadvalda ko'rinmasa, sahifani "Refresh" qiling.`);
-            window.location.reload();
+            console.log("Mato muvaffaqiyatli saqlandi. ID:", inventoryId);
+            // alert(`DIQQAT: Mato muvaffaqiyatli qabul qilindi!\nBaza ID: ${inventoryId}`);
+
+            // Clean state first
             setShowInboundModal(false);
             setInboundData({ reference_id: '', color: '', color_code: '', batch_number: '', quantity: '', reason: 'Yangi kirim', rolls: [] });
-            onRefresh();
+
+            // Update parent state
+            await onRefresh();
+
+            // Simple success toast/alert
+            alert("Mato muvaffaqiyatli qo'shildi!");
+
         } catch (error) {
             alert('Xatolik: ' + error.message);
         } finally {
@@ -171,7 +179,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
             }]);
 
             alert('Mato muvaffaqiyatli chiqim qilindi!');
-            window.location.reload();
+            // window.location.reload();
             setShowOutboundModal(false);
             onRefresh();
         } catch (error) {
