@@ -51,9 +51,11 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
         e.preventDefault();
         try {
             setLoading(true);
-            const ref = references.find(r => r.id === inboundData.reference_id);
+            // Loose equality check (==) to handle string '1' vs number 1 id mismatch
+            const ref = references.find(r => r.id == inboundData.reference_id);
             if (!ref) {
-                alert("Iltimos, Mato turi va grammajini qayta tanlang! (Reference not found)");
+                console.error("Reference ID mismatch:", inboundData.reference_id, references);
+                alert("Xatolik: Mato turi topilmadi (ID mismatch). Iltimos qaytadan tanlang.");
                 setLoading(false);
                 return;
             }
