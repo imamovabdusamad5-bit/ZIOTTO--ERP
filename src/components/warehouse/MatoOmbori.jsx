@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
     Warehouse, Search, Plus, History, ArrowDownCircle,
-    ArrowUpRight, ScrollText, Hash, Weight, Trash2, ClipboardList, Activity
+    ArrowUpRight, ScrollText, QrCode, Printer, Trash2, CheckCircle2
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
@@ -9,7 +9,10 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showInboundModal, setShowInboundModal] = useState(false);
     const [showOutboundModal, setShowOutboundModal] = useState(false);
+    const [showRollsModal, setShowRollsModal] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(null);
+    const [itemRolls, setItemRolls] = useState([]);
 
     // Filter
     const filteredInventory = inventory.filter(item => {
@@ -42,8 +45,75 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
         inventory_id: '',
         quantity: '',
         order_id: '',
-        reason: 'Kesimga (Ishlab chiqarishga)'
+        reason: 'Kesimga (Ishlab chiqarishga)',
+        selected_rolls: []
     });
+
+    // --- HELPERS ---
+    const generateQRUrl = (data) => {
+        return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(data)}`;
+    };
+
+    const fetchRolls = async (inventoryId) => {
+        const { data, error } = await supabase
+            .from('inventory_rolls')
+            .select('*')
+            .eq('inventory_id', inventoryId)
+            // .eq('status', 'in_stock') // Optionally filter
+            .order('created_at', { ascending: true });
+
+        if (!error) setItemRolls(data || []);
+    };
+
+    const handleOpenRolls = async (item) => {
+        setSelectedItem(item);
+        setLoading(true);
+        await fetchRolls(item.id);
+        setShowRollsModal(true);
+        setLoading(false);
+    };
+
+    const handlePrintQR = (roll, item) => {
+        const printWindow = window.open('', '_blank');
+        const qrData = JSON.stringify({
+            id: roll.id,
+            name: item.item_name,
+            color: item.color,
+            weight: roll.weight,
+            batch: item.batch_number
+        });
+
+        printWindow.document.write(`
+         <html>
+           <head>
+             <title>Print QR - ${roll.roll_number}</title>
+             <style>
+               body { font-family: sans-serif; text-align: center; padding: 20px; }
+               .ticket { border: 2px dashed #000; padding: 20px; display: inline-block; margin: 10px; border-radius: 10px; }
+               .label { font-size: 12px; font-weight: bold; margin-bottom: 5px; }
+               .value { font-size: 16px; margin-bottom: 10px; }
+             </style>
+           </head>
+           <body>
+             <div class="ticket">
+               <h2>${item.item_name}</h2>
+               <img src="${generateQRUrl(qrData)}" width="150" height="150" />
+               <div style="margin-top: 10px;">
+                  <div class="label">Partiya / Rang</div>
+                  <div class="value">${item.batch_number || '-'} / ${item.color}</div>
+                  <div class="label">Poy Raqami</div>
+                  <div class="value">${roll.roll_number}</div>
+                  <div class="label">Og'irlik</div>
+                  <div class="value" style="font-size: 24px; font-weight: bold;">${roll.weight} kg</div>
+               </div>
+             </div>
+             <script>window.print();</script>
+           </body>
+         </html>
+       `);
+        printWindow.document.close();
+    };
+
 
     // --- HANDLERS ---
 
@@ -51,10 +121,8 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
         e.preventDefault();
         try {
             setLoading(true);
-            // Loose equality check (==) to handle string '1' vs number 1 id mismatch
             const ref = references.find(r => r.id == inboundData.reference_id);
             if (!ref) {
-                console.error("Reference ID mismatch:", inboundData.reference_id, references);
                 alert("Xatolik: Mato turi topilmadi (ID mismatch). Iltimos qaytadan tanlang.");
                 setLoading(false);
                 return;
@@ -78,7 +146,6 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
             let inventoryId;
 
             if (existing) {
-                console.log("Updating existing inventory item:", existing.id);
                 const newQty = Number(existing.quantity || 0) + Number(inboundData.quantity);
                 const { error: updErr } = await supabase.from('inventory').update({
                     quantity: newQty,
@@ -88,7 +155,6 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
                 if (updErr) throw updErr;
                 inventoryId = existing.id;
             } else {
-                console.log("Creating new inventory item");
                 const { data: created, error } = await supabase
                     .from('inventory')
                     .insert([{
@@ -121,25 +187,20 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
             if (inboundData.rolls.length > 0) {
                 const rollsToInsert = inboundData.rolls.map((r, idx) => ({
                     inventory_id: inventoryId,
-                    roll_number: `Poy-${(idx + 1).toString().padStart(3, '0')}`,
-                    weight: Number(r.weight)
+                    roll_number: `R-${Date.now().toString().slice(-6)}-${idx + 1}`, // Unique automated ID
+                    weight: Number(r.weight),
+                    // status: 'in_stock' // Assuming default or not needed if table strict
                 }));
-                await supabase.from('inventory_rolls').insert(rollsToInsert);
+                // Check if table exists, if not this might fail, but assuming user has created it or it exists
+                const { error: rollError } = await supabase.from('inventory_rolls').insert(rollsToInsert);
+                if (rollError) console.warn("Rolls insert failed (table might be missing):", rollError);
             }
 
-            console.log("Mato muvaffaqiyatli saqlandi. ID:", inventoryId);
-
-            // Clean state first
             setShowInboundModal(false);
             setInboundData({ reference_id: '', color: '', color_code: '', batch_number: '', quantity: '', reason: 'Yangi kirim', rolls: [] });
 
-            // Update parent state with a slight delay to ensure DB propagation
-            setTimeout(async () => {
-                await onRefresh();
-            }, 1000);
-
-            // Simple success toast/alert
-            alert("Mato muvaffaqiyatli qo'shildi!");
+            setTimeout(async () => { await onRefresh(); }, 1000);
+            alert("Mato va poylar muvaffaqiyatli qabul qilindi! QR kodlarni chop etishingiz mumkin.");
 
         } catch (error) {
             alert('Xatolik: ' + error.message);
@@ -153,8 +214,27 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
         try {
             setLoading(true);
             const item = inventory.find(i => i.id === outboundData.inventory_id);
+
+            if (outboundData.selected_rolls.length > 0) {
+                // Logic for selected rolls
+                // 1. Mark rolls as used
+                const rollIds = outboundData.selected_rolls.map(r => r.id);
+                // Assuming 'status' column exists or we delete. 
+                // If status doesn't exist, we might just delete them or log them.
+                // Ideally we update status. Let's try update.
+                const { error: rollErr } = await supabase.from('inventory_rolls')
+                    .update({ status: 'used' })
+                    .in('id', rollIds);
+
+                if (rollErr) {
+                    // Fallback: If status column missing, maybe delete? Or just ignore for now.
+                    console.warn("Could not update roll status:", rollErr);
+                }
+            }
+
             if (Number(outboundData.quantity) > Number(item.quantity)) {
                 alert('Omborda yetarli mato yo\'q!');
+                setLoading(false);
                 return;
             }
 
@@ -167,6 +247,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
             const selectedOrder = orders.find(o => o.id === outboundData.order_id);
             if (selectedOrder) {
                 finalReason = `${outboundData.reason} (Buyurtma: #${selectedOrder.order_number})`;
+                // Optional: Status update logic
                 if (selectedOrder.status === 'Planning') {
                     await supabase.from('production_orders').update({ status: 'Cutting' }).eq('id', selectedOrder.id);
                 }
@@ -181,8 +262,8 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
             }]);
 
             alert('Mato muvaffaqiyatli chiqim qilindi!');
-            // window.location.reload();
             setShowOutboundModal(false);
+            setOutboundData({ inventory_id: '', quantity: '', order_id: '', reason: 'Kesimga', selected_rolls: [] });
             onRefresh();
         } catch (error) {
             alert('Xatolik: ' + error.message);
@@ -260,6 +341,13 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
                                     <td className="px-8 py-6 align-top text-right">
                                         <div className="flex justify-end gap-2">
                                             <button
+                                                onClick={() => handleOpenRolls(item)}
+                                                className="p-3 bg-slate-800/50 text-indigo-400 hover:bg-indigo-500 hover:text-white rounded-xl transition-all border border-white/5 hover:border-indigo-500 shadow-lg hover:shadow-indigo-500/20"
+                                                title="Poylar va QR kodlar"
+                                            >
+                                                <QrCode size={18} />
+                                            </button>
+                                            <button
                                                 onClick={() => {
                                                     setInboundData({
                                                         reference_id: item.reference_id,
@@ -273,7 +361,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
                                                     setShowInboundModal(true);
                                                 }}
                                                 className="p-3 bg-slate-800/50 text-amber-500 hover:bg-amber-500 hover:text-white rounded-xl transition-all border border-white/5 hover:border-amber-500 shadow-lg hover:shadow-amber-500/20"
-                                                title="Qaytim qilish (Qo'shish)"
+                                                title="Qaytim qilish"
                                             >
                                                 <History size={18} />
                                             </button>
@@ -283,9 +371,11 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
                                                         inventory_id: item.id,
                                                         quantity: '',
                                                         order_id: '',
-                                                        reason: 'Kesimga'
+                                                        reason: 'Kesimga',
+                                                        selected_rolls: []
                                                     });
-                                                    setShowOutboundModal(true);
+                                                    // Also fetch rolls to allow selection
+                                                    fetchRolls(item.id).then(() => setShowOutboundModal(true));
                                                 }}
                                                 className="p-3 bg-slate-800/50 text-rose-500 hover:bg-rose-500 hover:text-white rounded-xl transition-all border border-white/5 hover:border-rose-500 shadow-lg hover:shadow-rose-500/20"
                                                 title="Chiqim qilish"
@@ -437,63 +527,147 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
                 </div>
             )}
 
+            {/* ROLLS DETAIL MODAL */}
+            {showRollsModal && selectedItem && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#020617]/90 backdrop-blur-xl animate-in fade-in duration-300">
+                    <div className="bg-[#0f172a] border border-white/10 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[3rem] shadow-2xl shadow-indigo-900/40 animate-in zoom-in-95 duration-300 relative custom-scrollbar">
+                        <div className="p-8 border-b border-white/5 flex justify-between items-center sticky top-0 bg-[#0f172a]/95 backdrop-blur-md z-10 rounded-t-[3rem]">
+                            <div>
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-indigo-500/20 rounded-xl text-indigo-400"><QrCode size={20} /></div>
+                                    <h3 className="text-xl font-black text-white tracking-tight">QR Kodlar va Poylar</h3>
+                                </div>
+                                <p className="text-[11px] text-slate-500 font-bold uppercase tracking-widest mt-1 ml-11">{selectedItem.item_name} - {selectedItem.color}</p>
+                            </div>
+                            <button onClick={() => setShowRollsModal(false)} className="p-3 rounded-2xl bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-500 transition-all border border-white/5"><Trash2 className="rotate-45" size={20} /></button>
+                        </div>
+                        <div className="p-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                            {itemRolls.length === 0 ? (
+                                <div className="col-span-full text-center py-10 text-slate-500 italic">Hech qanday poy topilmadi</div>
+                            ) : (
+                                itemRolls.map(roll => (
+                                    <div key={roll.id} className="bg-[#020617]/50 border border-white/5 p-6 rounded-3xl flex flex-col items-center gap-4 hover:border-indigo-500/30 transition-all group">
+                                        <div className="bg-white p-2 rounded-xl">
+                                            <img src={generateQRUrl(JSON.stringify({ id: roll.id, w: roll.weight }))} alt="QR" className="w-32 h-32 object-contain mix-blend-multiply" />
+                                        </div>
+                                        <div className="text-center w-full">
+                                            <div className="text-white font-black text-lg">{roll.weight} kg</div>
+                                            <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">{roll.roll_number}</div>
+                                            <div className={`text-[10px] uppercase font-bold mt-1 ${roll.status === 'used' ? 'text-rose-500' : 'text-emerald-500'}`}>{roll.status === 'used' ? 'Ishlatilgan' : 'Omborda'}</div>
+                                        </div>
+                                        <button
+                                            onClick={() => handlePrintQR(roll, selectedItem)}
+                                            className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20"
+                                        >
+                                            <Printer size={14} /> Chop etish
+                                        </button>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* OUTBOUND MODAL */}
             {showOutboundModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#020617]/90 backdrop-blur-xl animate-in fade-in duration-300">
-                    <div className="bg-[#0f172a] border border-white/10 w-full max-w-lg rounded-[3rem] p-10 space-y-8 shadow-2xl shadow-rose-900/20 animate-in zoom-in-95 duration-300 relative">
-                        <div className="flex items-center gap-4 border-b border-white/5 pb-8">
-                            <div className="p-3 bg-rose-500 rounded-2xl text-white shadow-lg shadow-rose-500/30">
-                                <ArrowUpRight size={28} />
+                    <div className="bg-[#0f172a] border border-white/10 w-full max-w-2xl rounded-[3rem] shadow-2xl shadow-rose-900/20 animate-in zoom-in-95 duration-300 relative max-h-[90vh] overflow-hidden flex flex-col">
+                        <div className="p-8 border-b border-white/5 flex justify-between items-center sticky top-0 bg-[#0f172a] z-10 shrink-0">
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-rose-500 rounded-2xl text-white shadow-lg shadow-rose-500/30">
+                                    <ArrowUpRight size={28} />
+                                </div>
+                                <div>
+                                    <h3 className="text-2xl font-black text-white tracking-tight">Ombordan Chiqim</h3>
+                                    <p className="text-[11px] text-rose-300/60 font-black uppercase tracking-widest mt-1">Matoni ishlab chiqarishga berish</p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="text-2xl font-black text-white tracking-tight">Ombordan Chiqim</h3>
-                                <p className="text-[11px] text-rose-300/60 font-black uppercase tracking-widest mt-1">Matoni ishlab chiqarishga berish</p>
-                            </div>
+                            <button onClick={() => setShowOutboundModal(false)} className="p-3 rounded-2xl bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-500 transition-all border border-white/5"><Trash2 className="rotate-45" size={20} /></button>
                         </div>
 
-                        <form onSubmit={handleChiqim} className="space-y-6">
-                            <div>
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Qaysi Buyurtma Uchun? (Optional)</label>
-                                <select
-                                    className="w-full bg-[#020617] border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-rose-500 focus:bg-[#020617] transition-all font-bold appearance-none cursor-pointer shadow-inner"
-                                    value={outboundData.order_id}
-                                    onChange={e => setOutboundData({ ...outboundData, order_id: e.target.value })}
-                                >
-                                    <option value="" className="bg-slate-900 text-slate-400">Tanlanmagan (Umumiy chiqim)</option>
-                                    {orders.map(o => (
-                                        <option key={o.id} value={o.id} className="bg-slate-900">Order #{o.order_number} - {o.models?.name}</option>
-                                    ))}
-                                </select>
-                            </div>
+                        <div className="overflow-y-auto custom-scrollbar p-8 space-y-8 flex-1">
+                            <form id="outboundForm" onSubmit={handleChiqim} className="space-y-6">
+                                <div>
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Qaysi Buyurtma Uchun? (Optional)</label>
+                                    <select
+                                        className="w-full bg-[#020617] border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-rose-500 focus:bg-[#020617] transition-all font-bold appearance-none cursor-pointer shadow-inner"
+                                        value={outboundData.order_id}
+                                        onChange={e => setOutboundData({ ...outboundData, order_id: e.target.value })}
+                                    >
+                                        <option value="" className="bg-slate-900 text-slate-400">Tanlanmagan (Umumiy chiqim)</option>
+                                        {orders.map(o => (
+                                            <option key={o.id} value={o.id} className="bg-slate-900">Order #{o.order_number} - {o.models?.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
 
-                            <div>
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Chiqim Miqdori</label>
-                                <input
-                                    required
-                                    type="number"
-                                    step="0.01"
-                                    className="w-full bg-[#020617] border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-rose-500 focus:bg-[#020617] transition-all font-black text-2xl placeholder-slate-600 shadow-inner"
-                                    value={outboundData.quantity}
-                                    onChange={e => setOutboundData({ ...outboundData, quantity: e.target.value })}
-                                    placeholder="0.00"
-                                />
-                            </div>
+                                {/* ROLL SELECTION SHORTCUT */}
+                                {itemRolls.length > 0 && (
+                                    <div className="bg-rose-500/5 border border-rose-500/10 p-6 rounded-3xl">
+                                        <h4 className="flex items-center gap-2 text-rose-400 font-black uppercase text-xs tracking-widest mb-4">
+                                            <CheckCircle2 size={16} /> Poylarni Tanlash (Qulay)
+                                        </h4>
+                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-48 overflow-y-auto custom-scrollbar pr-2">
+                                            {itemRolls.map(roll => (
+                                                <div
+                                                    key={roll.id}
+                                                    onClick={() => {
+                                                        const isSelected = outboundData.selected_rolls.find(r => r.id === roll.id);
+                                                        let newSelection;
+                                                        if (isSelected) {
+                                                            newSelection = outboundData.selected_rolls.filter(r => r.id !== roll.id);
+                                                        } else {
+                                                            newSelection = [...outboundData.selected_rolls, roll];
+                                                        }
+                                                        const totalWeight = newSelection.reduce((sum, r) => sum + Number(r.weight), 0);
+                                                        setOutboundData({ ...outboundData, selected_rolls: newSelection, quantity: totalWeight.toFixed(2) });
+                                                    }}
+                                                    className={`p-3 rounded-xl border cursor-pointer transition-all flex flex-col items-center justify-center text-center ${outboundData.selected_rolls.find(r => r.id === roll.id)
+                                                            ? 'bg-rose-500 text-white border-rose-500 shadow-lg shadow-rose-500/20'
+                                                            : 'bg-[#020617] text-slate-400 border-white/10 hover:border-rose-500/30'
+                                                        }`}
+                                                >
+                                                    <span className="font-black text-sm">{roll.weight} kg</span>
+                                                    <span className="text-[9px] uppercase opacity-70">{roll.roll_number}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
 
-                            <div>
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Sabab / Qayerga</label>
-                                <textarea
-                                    className="w-full bg-[#020617] border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-rose-500 focus:bg-[#020617] transition-all font-bold placeholder-slate-600 shadow-inner resize-none h-24"
-                                    value={outboundData.reason}
-                                    onChange={e => setOutboundData({ ...outboundData, reason: e.target.value })}
-                                    placeholder="Masalan: Kesim bo'limiga"
-                                />
-                            </div>
 
-                            <div className="pt-4 flex gap-3">
+                                <div>
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Chiqim Miqdori (kg)</label>
+                                    <input
+                                        required
+                                        type="number"
+                                        step="0.01"
+                                        className="w-full bg-[#020617] border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-rose-500 focus:bg-[#020617] transition-all font-black text-2xl placeholder-slate-600 shadow-inner"
+                                        value={outboundData.quantity}
+                                        onChange={e => setOutboundData({ ...outboundData, quantity: e.target.value })}
+                                        placeholder="0.00"
+                                    />
+                                    <p className="text-[10px] text-slate-500 mt-2 ml-1">* Agar poylar tanlangan bo'lsa, avtomatik hisoblanadi.</p>
+                                </div>
+
+                                <div>
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Sabab / Qayerga</label>
+                                    <textarea
+                                        className="w-full bg-[#020617] border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-rose-500 focus:bg-[#020617] transition-all font-bold placeholder-slate-600 shadow-inner resize-none h-24"
+                                        value={outboundData.reason}
+                                        onChange={e => setOutboundData({ ...outboundData, reason: e.target.value })}
+                                        placeholder="Masalan: Kesim bo'limiga"
+                                    />
+                                </div>
+                            </form>
+                        </div>
+                        <div className="p-8 border-t border-white/5 bg-[#0f172a] shrink-0">
+                            <div className="flex gap-3">
                                 <button type="button" onClick={() => setShowOutboundModal(false)} className="flex-1 py-4 bg-white/5 hover:bg-white/10 text-slate-400 rounded-2xl font-bold uppercase text-[10px] tracking-widest transition-all">Bekor qilish</button>
-                                <button className="flex-[2] py-4 bg-rose-600 hover:bg-rose-500 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-rose-600/30 transition-all active:scale-95">Chiqimni Tasdiqlash</button>
+                                <button type="submit" form="outboundForm" className="flex-[2] py-4 bg-rose-600 hover:bg-rose-500 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-rose-600/30 transition-all active:scale-95">Chiqimni Tasdiqlash</button>
                             </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
             )}

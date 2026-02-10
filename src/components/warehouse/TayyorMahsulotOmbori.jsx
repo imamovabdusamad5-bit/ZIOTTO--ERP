@@ -50,6 +50,7 @@ const TayyorMahsulotOmbori = ({ inventory, onRefresh }) => {
 
             if (Number(saleData.quantity) > Number(item.quantity)) {
                 alert('Omborda yetarli mahsulot yo\'q!');
+                setLoading(false);
                 return;
             }
 
@@ -66,10 +67,9 @@ const TayyorMahsulotOmbori = ({ inventory, onRefresh }) => {
             }]);
 
             alert('Mahsulot sotuvga chiqarildi!');
-            window.location.reload();
             setShowSaleModal(false);
             setSaleData({ inventory_id: '', quantity: '', client_name: '', price: '', notes: '' });
-            onRefresh();
+            await onRefresh();
         } catch (error) {
             alert('Xatolik: ' + error.message);
         } finally {
@@ -121,12 +121,10 @@ const TayyorMahsulotOmbori = ({ inventory, onRefresh }) => {
                 reason: kirimData.reason
             }]);
 
-            console.log("Tayyor mahsulot saqlandi. ID:", inventoryId);
-            alert(`Mahsulot muvaffaqiyatli kirim qilindi! Baza ID: ${inventoryId}`);
-            window.location.reload();
+            alert(`Mahsulot muvaffaqiyatli kirim qilindi!`);
             setShowKirimModal(false);
             setKirimData({ item_name: '', color: '', color_code: '', quantity: '', unit: 'dona', reason: 'Yangi Kirim' });
-            onRefresh();
+            await onRefresh();
         } catch (error) {
             alert('Xatolik: ' + error.message);
         } finally {
@@ -219,6 +217,7 @@ const TayyorMahsulotOmbori = ({ inventory, onRefresh }) => {
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#020617]/90 backdrop-blur-xl animate-in fade-in duration-300">
                     <div className="bg-[#0f172a] border border-white/10 w-full max-w-lg rounded-[3rem] overflow-hidden animate-in zoom-in-95 duration-200 shadow-2xl shadow-emerald-900/20 relative backdrop-blur-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
                         <div className="p-8 border-b border-white/5 bg-[#020617]/50 sticky top-0 z-10">
+                            <button onClick={() => setShowSaleModal(false)} className="absolute top-4 right-4 p-3 rounded-2xl bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-500 transition-all border border-white/5"><X size={20} /></button>
                             <h3 className="text-2xl font-black text-white flex items-center gap-4">
                                 <div className="p-3 bg-emerald-500 rounded-2xl text-white shadow-lg shadow-emerald-500/30"><Truck size={24} /></div>
                                 <span className="bg-gradient-to-r from-white via-emerald-200 to-slate-400 bg-clip-text text-transparent">Mahsulotni Sotish</span>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
     Package, Search, Plus, History, ArrowDownCircle,
-    ArrowUpRight, Trash2
+    ArrowUpRight, Trash2, X
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
@@ -44,8 +44,16 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh }) => {
             const cleanName = inboundData.selected_material_name.trim();
             const cleanColor = inboundData.color.trim();
 
-            if (!cleanName) return alert('Iltimos, aksessuar nomini tanlang!');
-            if (!inboundData.quantity || Number(inboundData.quantity) <= 0) return alert('Iltimos, to\'g\'ri miqdor kiriting!');
+            if (!cleanName) {
+                alert('Iltimos, aksessuar nomini tanlang!');
+                setLoading(false);
+                return;
+            }
+            if (!inboundData.quantity || Number(inboundData.quantity) <= 0) {
+                alert('Iltimos, to\'g\'ri miqdor kiriting!');
+                setLoading(false);
+                return;
+            }
 
             const ref = references.find(r => r.name === inboundData.selected_material_name);
             const unit = ref ? ref.unit : 'dona';
@@ -113,6 +121,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh }) => {
             const item = inventory.find(i => i.id === outboundData.inventory_id);
             if (Number(outboundData.quantity) > Number(item.quantity)) {
                 alert('Yetarli miqdor yo\'q!');
+                setLoading(false);
                 return;
             }
 
@@ -228,17 +237,20 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh }) => {
             {showInboundModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#020617]/90 backdrop-blur-xl animate-in fade-in duration-300">
                     <div className="bg-[#0f172a] border border-white/10 w-full max-w-lg rounded-[3rem] p-10 space-y-8 shadow-2xl shadow-purple-900/20 animate-in zoom-in-95 duration-300 relative max-h-[90vh] overflow-y-auto custom-scrollbar">
-                        <div className="flex items-center gap-4 border-b border-white/5 pb-8 sticky top-0 bg-[#0f172a] z-10 pt-2">
-                            <div className="p-3 bg-purple-600 rounded-2xl text-white shadow-lg shadow-purple-600/30">
-                                <ArrowDownCircle size={28} />
+                        <div className="flex items-center justify-between border-b border-white/5 pb-8 sticky top-0 bg-[#0f172a] z-10 pt-2">
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-purple-600 rounded-2xl text-white shadow-lg shadow-purple-600/30">
+                                    <ArrowDownCircle size={28} />
+                                </div>
+                                <div>
+                                    <h3 className="text-2xl font-black text-white tracking-tight bg-gradient-to-r from-white via-purple-200 to-slate-400 bg-clip-text text-transparent">Aksessuar Kirim</h3>
+                                    <p className="text-[11px] text-purple-300/60 font-black uppercase tracking-widest mt-1">Omborga yangi aksessuar qabul qilish</p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="text-2xl font-black text-white tracking-tight bg-gradient-to-r from-white via-purple-200 to-slate-400 bg-clip-text text-transparent">Aksessuar Kirim</h3>
-                                <p className="text-[11px] text-purple-300/60 font-black uppercase tracking-widest mt-1">Omborga yangi aksessuar qabul qilish</p>
-                            </div>
+                            <button onClick={() => setShowInboundModal(false)} className="p-3 rounded-2xl bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-500 transition-all border border-white/5"><X className="" size={20} /></button>
                         </div>
 
-                        <div className="space-y-6">
+                        <form onSubmit={handleKirim} className="space-y-6">
                             <div>
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Nomi</label>
                                 <select
@@ -275,10 +287,10 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh }) => {
                             </div>
 
                             <div className="pt-4 flex gap-3">
-                                <button onClick={() => setShowInboundModal(false)} className="flex-1 py-4 bg-white/5 hover:bg-white/10 text-slate-400 rounded-2xl font-bold uppercase text-[10px] tracking-widest transition-all">Bekor qilish</button>
-                                <button onClick={handleKirim} className="flex-[2] py-4 bg-purple-600 hover:bg-purple-500 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-purple-600/30 transition-all active:scale-95">Saqlash</button>
+                                <button type="button" onClick={() => setShowInboundModal(false)} className="flex-1 py-4 bg-white/5 hover:bg-white/10 text-slate-400 rounded-2xl font-bold uppercase text-[10px] tracking-widest transition-all">Bekor qilish</button>
+                                <button type="submit" disabled={loading} className="flex-[2] py-4 bg-purple-600 hover:bg-purple-500 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-purple-600/30 transition-all active:scale-95">Saqlash</button>
                             </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             )}
@@ -286,17 +298,20 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh }) => {
             {showOutboundModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#020617]/90 backdrop-blur-xl animate-in fade-in duration-300">
                     <div className="bg-[#0f172a] border border-white/10 w-full max-w-lg rounded-[3rem] p-10 space-y-8 shadow-2xl shadow-rose-900/20 animate-in zoom-in-95 duration-300 relative max-h-[90vh] overflow-y-auto custom-scrollbar">
-                        <div className="flex items-center gap-4 border-b border-white/5 pb-8 sticky top-0 bg-[#0f172a] z-10 pt-2">
-                            <div className="p-3 bg-rose-500 rounded-2xl text-white shadow-lg shadow-rose-500/30">
-                                <ArrowUpRight size={28} />
+                        <div className="flex items-center justify-between border-b border-white/5 pb-8 sticky top-0 bg-[#0f172a] z-10 pt-2">
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-rose-500 rounded-2xl text-white shadow-lg shadow-rose-500/30">
+                                    <ArrowUpRight size={28} />
+                                </div>
+                                <div>
+                                    <h3 className="text-2xl font-black text-white tracking-tight bg-gradient-to-r from-white via-rose-200 to-slate-400 bg-clip-text text-transparent">Chiqim Qilish</h3>
+                                    <p className="text-[11px] text-rose-300/60 font-black uppercase tracking-widest mt-1">Aksessuarni ishlab chiqarishga berish</p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="text-2xl font-black text-white tracking-tight bg-gradient-to-r from-white via-rose-200 to-slate-400 bg-clip-text text-transparent">Chiqim Qilish</h3>
-                                <p className="text-[11px] text-rose-300/60 font-black uppercase tracking-widest mt-1">Aksessuarni ishlab chiqarishga berish</p>
-                            </div>
+                            <button onClick={() => setShowOutboundModal(false)} className="p-3 rounded-2xl bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-500 transition-all border border-white/5"><X className="" size={20} /></button>
                         </div>
 
-                        <div className="space-y-6">
+                        <form onSubmit={handleChiqim} className="space-y-6">
                             <div>
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Chiqim Miqdori</label>
                                 <input
@@ -318,10 +333,10 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh }) => {
                             </div>
 
                             <div className="pt-4 flex gap-3">
-                                <button onClick={() => setShowOutboundModal(false)} className="flex-1 py-4 bg-white/5 hover:bg-white/10 text-slate-400 rounded-2xl font-bold uppercase text-[10px] tracking-widest transition-all">Bekor qilish</button>
-                                <button onClick={handleChiqim} className="flex-[2] py-4 bg-rose-600 hover:bg-rose-500 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-rose-600/30 transition-all active:scale-95">Tasdiqlash</button>
+                                <button type="button" onClick={() => setShowOutboundModal(false)} className="flex-1 py-4 bg-white/5 hover:bg-white/10 text-slate-400 rounded-2xl font-bold uppercase text-[10px] tracking-widest transition-all">Bekor qilish</button>
+                                <button type="submit" disabled={loading} className="flex-[2] py-4 bg-rose-600 hover:bg-rose-500 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-rose-600/30 transition-all active:scale-95">Tasdiqlash</button>
                             </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             )}

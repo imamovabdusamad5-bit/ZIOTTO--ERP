@@ -57,10 +57,27 @@ const Ombor = () => {
     };
 
     const fetchInventory = async () => {
+        // First try with the relation
         const { data, error } = await supabase
             .from('inventory')
             .select(`*, material_types(thread_type, grammage, code)`);
-        if (!error) setInventory(data || []);
+
+        if (error) {
+            console.error("Inventory Fetch Error (Relation):", error);
+            // If relation fails (e.g. FK missing), try fetching simple inventory
+            const { data: simpleData, error: simpleError } = await supabase
+                .from('inventory')
+                .select('*');
+
+            if (simpleError) {
+                console.error("Inventory Fetch Error (Simple):", simpleError);
+                setError(simpleError.message);
+            } else {
+                setInventory(simpleData || []);
+            }
+        } else {
+            setInventory(data || []);
+        }
     };
 
     const fetchLogs = async () => {
