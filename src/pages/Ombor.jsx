@@ -111,18 +111,78 @@ const Ombor = () => {
         if (!error) setRequests(data || []);
     };
 
-    const stats = {
-        totalMato: inventory
-            .filter(i => i.category?.toLowerCase() === 'mato' || i.category === 'Mato')
-            .reduce((acc, curr) => acc + Number(curr.quantity || 0), 0),
-        totalAcc: inventory
-            .filter(i => i.category?.toLowerCase() === 'aksessuar' || i.category === 'Aksessuar')
-            .reduce((acc, curr) => acc + Number(curr.quantity || 0), 0),
-        totalFinished: inventory
-            .filter(i => i.category?.toLowerCase() === 'tayyor mahsulot' || i.category === 'Tayyor Mahsulot')
-            .reduce((acc, curr) => acc + Number(curr.quantity || 0), 0),
-        lowStock: inventory.filter(i => Number(i.quantity || 0) < 5).length
+    // --- AGGREGATION LOGIC ---
+    const getAggregatedItems = (category) => {
+        const filtered = inventory.filter(i => i.category?.toLowerCase() === category.toLowerCase() || i.category === category);
+        const map = new Map();
+
+        filtered.forEach(item => {
+            const name = item.item_name;
+            const current = map.get(name) || { quantity: 0, unit: item.unit, count: 0 };
+            map.set(name, {
+                quantity: current.quantity + (Number(item.quantity) || 0),
+                unit: item.unit || current.unit,
+                count: current.count + 1
+            });
+        });
+
+        return Array.from(map.entries()).map(([name, data]) => ({
+            label: name,
+            value: data.quantity,
+            unit: data.unit,
+            isLow: data.quantity <= 0 // Condition for Red alert
+        }));
     };
+
+    // Generic Stats for History/Overview
+    const genericStats = [
+        { label: 'Jami Mato', value: inventory.filter(i => i.category === 'Mato').reduce((a, b) => a + (Number(b.quantity) || 0), 0).toFixed(1), unit: 'kg', icon: Layers, color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20' },
+        { label: 'Aksessuarlar', value: inventory.filter(i => i.category === 'Aksessuar').reduce((a, b) => a + (Number(b.quantity) || 0), 0), unit: 'dona', icon: Package, color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/20' },
+        { label: 'Tayyor Mahsulot', value: inventory.filter(i => i.category === 'Tayyor Mahsulot').reduce((a, b) => a + (Number(b.quantity) || 0), 0), unit: 'dona', icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
+        { label: 'Zaxira Kam', value: inventory.filter(i => Number(i.quantity || 0) < 5).length, unit: 'tur', icon: AlertTriangle, color: 'text-rose-400', bg: 'bg-rose-500/10', border: 'border-rose-500/20' }
+    ];
+
+    // Determine what to show based on Tab
+    let displayStats = [];
+    if (activeTab === 'Mato') {
+        const items = getAggregatedItems('Mato');
+        displayStats = items.map(i => ({
+            label: i.label,
+            value: i.value.toFixed(1),
+            unit: i.unit || 'kg',
+            icon: Layers,
+            color: i.isLow ? 'text-rose-500' : 'text-indigo-400',
+            bg: i.isLow ? 'bg-rose-500/10' : 'bg-indigo-500/10',
+            border: i.isLow ? 'border-rose-500/20' : 'border-indigo-500/20',
+            isLow: i.isLow
+        }));
+    } else if (activeTab === 'Aksessuar') {
+        const items = getAggregatedItems('Aksessuar');
+        displayStats = items.map(i => ({
+            label: i.label,
+            value: i.value,
+            unit: i.unit || 'dona',
+            icon: Package,
+            color: i.isLow ? 'text-rose-500' : 'text-purple-400',
+            bg: i.isLow ? 'bg-rose-500/10' : 'bg-purple-500/10',
+            border: i.isLow ? 'border-rose-500/20' : 'border-purple-500/20',
+            isLow: i.isLow
+        }));
+    } else if (activeTab === 'Tayyor Mahsulot') {
+        const items = getAggregatedItems('Tayyor Mahsulot');
+        displayStats = items.map(i => ({
+            label: i.label,
+            value: i.value,
+            unit: i.unit || 'dona',
+            icon: CheckCircle2, // Changed from Package to CheckCircle2 per original
+            color: i.isLow ? 'text-rose-500' : 'text-emerald-400',
+            bg: i.isLow ? 'bg-rose-500/10' : 'bg-emerald-500/10',
+            border: i.isLow ? 'border-rose-500/20' : 'border-emerald-500/20',
+            isLow: i.isLow
+        }));
+    } else {
+        displayStats = genericStats;
+    }
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 pb-20">
@@ -139,7 +199,7 @@ const Ombor = () => {
                     </h2>
                     <p className="text-slate-400 text-sm font-medium mt-2 ml-[4.5rem]">
                         Ombor qoldig'i va kirim-chiqim operatsiyalari nazorati
-                        {inventory.length > 0 && <span className="text-[10px] bg-indigo-500/10 text-indigo-400 px-3 py-1 rounded-full ml-3 font-black border border-indigo-500/20">BAZADA: {inventory.length} TUR ZAXIRA</span>}
+                        {inventory.length > 0 && <span className="text-[10px] bg-indigo-500/10 text-indigo-400 px-3 py-1 rounded-full ml-3 font-black border border-indigo-500/20">BAZADA: {inventory.length} OBYEKT (KIRIM)</span>}
                     </p>
                 </div>
                 <div className="flex gap-3">
@@ -158,27 +218,29 @@ const Ombor = () => {
                 </div>
             </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                {[
-                    { label: 'Jami Mato', value: stats.totalMato.toFixed(1), unit: 'kg', icon: Layers, color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20', show: activeTab === 'Mato' || activeTab === 'Tarix' },
-                    { label: 'Aksessuarlar', value: stats.totalAcc, unit: 'dona', icon: Package, color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/20', show: activeTab === 'Aksessuar' || activeTab === 'Tarix' },
-                    { label: 'Tayyor Mahsulot', value: stats.totalFinished, unit: 'dona', icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', show: activeTab === 'Tayyor Mahsulot' || activeTab === 'Tarix' },
-                    { label: 'Zaxira Kam', value: stats.lowStock, unit: 'tur', icon: AlertTriangle, color: 'text-rose-400', bg: 'bg-rose-500/10', border: 'border-rose-500/20', show: activeTab !== 'Tayyor Mahsulot' && activeTab !== 'So\'rovlar' }
-                ].filter(s => s.show).map((stat, idx) => (
-                    <div key={idx} className={`bg-[#0f172a]/60 backdrop-blur-3xl p-6 rounded-[3rem] border ${stat.border || 'border-white/5'} shadow-2xl hover:-translate-y-1 transition-all flex items-center justify-between relative group`}>
-                        <div>
-                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">{stat.label}</p>
-                            <div className="flex items-baseline gap-1">
-                                <h3 className="text-3xl font-black text-white">{stat.value}</h3>
-                                <span className="text-xs font-bold text-slate-500">{stat.unit}</span>
+            {/* Dynamic Stats Cards - Horizontal Scroll if many */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 overflow-x-auto pb-4 custom-scrollbar">
+                {displayStats.length === 0 ? (
+                    <div className="col-span-full py-10 text-center text-slate-500 italic border border-dashed border-white/10 rounded-3xl">Hech qanday ma'lumot topilmadi</div>
+                ) : (
+                    displayStats.map((stat, idx) => (
+                        <div key={idx} className={`bg-[#0f172a]/60 backdrop-blur-3xl p-6 rounded-[3rem] border ${stat.border || 'border-white/5'} shadow-2xl hover:-translate-y-1 transition-all flex items-center justify-between relative group min-w-[250px]`}>
+                            <div>
+                                <p className={`text-[10px] font-black uppercase tracking-[0.2em] mb-2 ${stat.isLow ? 'text-rose-500' : 'text-slate-500'}`}>
+                                    {stat.label.length > 20 ? stat.label.substring(0, 20) + '...' : stat.label}
+                                </p>
+                                <div className="flex items-baseline gap-1">
+                                    <h3 className={`text-3xl font-black ${stat.isLow ? 'text-rose-500' : 'text-white'}`}>{stat.value}</h3>
+                                    <span className="text-xs font-bold text-slate-500">{stat.unit}</span>
+                                </div>
+                                {stat.isLow && <span className="text-[9px] text-rose-500 font-bold uppercase tracking-widest mt-1 block animate-pulse">Qoldiq tugadi</span>}
+                            </div>
+                            <div className={`w-14 h-14 ${stat.bg} ${stat.color} rounded-2xl flex items-center justify-center border border-white/5 group-hover:scale-110 transition-transform shadow-inner shrink-0`}>
+                                <stat.icon size={28} />
                             </div>
                         </div>
-                        <div className={`w-14 h-14 ${stat.bg} ${stat.color} rounded-2xl flex items-center justify-center border border-white/5 group-hover:scale-110 transition-transform shadow-inner`}>
-                            <stat.icon size={28} />
-                        </div>
-                    </div>
-                ))}
+                    ))
+                )}
             </div>
 
             {/* Navigation Tabs */}
