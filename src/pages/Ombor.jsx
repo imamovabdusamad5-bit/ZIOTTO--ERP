@@ -17,6 +17,7 @@ const Ombor = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const initialTab = searchParams.get('tab') || 'Mato';
     const [activeTab, setActiveTab] = useState(initialTab);
+    const [viewMode, setViewMode] = useState('card'); // 'card' or 'table'
 
     // Data State
     const [inventory, setInventory] = useState([]);
@@ -187,69 +188,56 @@ const Ombor = () => {
     return (
         <div className="space-y-8 animate-in fade-in duration-500 pb-20">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-[#0f172a]/40 p-6 rounded-[3rem] border border-white/5 backdrop-blur-xl">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-[var(--bg-card)] p-6 rounded-[3rem] border border-[var(--border-color)] backdrop-blur-xl shadow-lg">
                 <div>
-                    <h2 className="text-4xl font-black text-white tracking-tight flex items-center gap-3">
+                    <h2 className="text-4xl font-black text-[var(--text-primary)] tracking-tight flex items-center gap-3">
                         <div className="p-3 bg-indigo-600 rounded-2xl shadow-lg shadow-indigo-600/30">
                             <Warehouse size={28} className="text-white" />
                         </div>
-                        <span className="bg-gradient-to-r from-white via-indigo-200 to-slate-400 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-[var(--text-primary)] via-indigo-400 to-slate-400 bg-clip-text text-transparent">
                             {activeTab === 'Mato' ? 'Mato Ombori' : activeTab === 'Aksessuar' ? 'Aksessuar Ombori' : activeTab === 'Tayyor Mahsulot' ? 'Tayyor Mahsulot' : 'Ombor Tarixi'}
                         </span>
                     </h2>
-                    <p className="text-slate-400 text-sm font-medium mt-2 ml-[4.5rem]">
+                    <p className="text-[var(--text-secondary)] text-sm font-medium mt-2 ml-[4.5rem]">
                         Ombor qoldig'i va kirim-chiqim operatsiyalari nazorati
                         {inventory.length > 0 && <span className="text-[10px] bg-indigo-500/10 text-indigo-400 px-3 py-1 rounded-full ml-3 font-black border border-indigo-500/20">BAZADA: {inventory.length} OBYEKT (KIRIM)</span>}
                     </p>
                 </div>
                 <div className="flex gap-3">
+                    <div className="bg-[var(--bg-body)] p-1 rounded-2xl flex border border-[var(--border-color)]">
+                        <button
+                            onClick={() => setViewMode('card')}
+                            className={`p-3 rounded-xl transition-all ${viewMode === 'card' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)]'}`}
+                            title="Karta ko'rinishi"
+                        >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="7" x="3" y="3" rx="1" /><rect width="7" height="7" x="14" y="3" rx="1" /><rect width="7" height="7" x="14" y="14" rx="1" /><rect width="7" height="7" x="3" y="14" rx="1" /></svg>
+                        </button>
+                        <button
+                            onClick={() => setViewMode('table')}
+                            className={`p-3 rounded-xl transition-all ${viewMode === 'table' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)]'}`}
+                            title="Jadval ko'rinishi (Excel)"
+                        >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3h18v18H3zM21 9H3M21 15H3M12 3v18" /></svg>
+                        </button>
+                    </div>
+
                     <button
                         onClick={fetchInitialData}
-                        className={`p-4 rounded-2xl bg-[#0f172a]/80 backdrop-blur-xl border border-white/5 text-slate-400 hover:text-white hover:bg-slate-800 transition-all ${loading ? 'animate-spin' : ''}`}
+                        className={`p-4 rounded-2xl bg-[var(--bg-card)] backdrop-blur-xl border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] transition-all ${loading ? 'animate-spin' : ''}`}
                         title="Ma'lumotlarni yangilash"
                     >
                         <History size={20} />
                     </button>
-                    {(activeTab === 'Mato' || activeTab === 'Aksessuar') && (
-                        <div className="bg-indigo-500/10 text-indigo-400 px-6 py-3 rounded-2xl text-xs font-black uppercase border border-indigo-500/20 flex items-center gap-2 shadow-lg shadow-indigo-500/10 backdrop-blur-md">
-                            <CheckCircle2 size={16} /> Avto Sinxron
-                        </div>
-                    )}
                 </div>
             </div>
 
-            {/* Dynamic Stats Cards - Horizontal Scroll if many */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 overflow-x-auto pb-4 custom-scrollbar">
-                {displayStats.length === 0 ? (
-                    <div className="col-span-full py-10 text-center text-slate-500 italic border border-dashed border-white/10 rounded-3xl">Hech qanday ma'lumot topilmadi</div>
-                ) : (
-                    displayStats.map((stat, idx) => (
-                        <div key={idx} className={`bg-[#0f172a]/60 backdrop-blur-3xl p-6 rounded-[3rem] border ${stat.border || 'border-white/5'} shadow-2xl hover:-translate-y-1 transition-all flex items-center justify-between relative group min-w-[250px]`}>
-                            <div>
-                                <p className={`text-[10px] font-black uppercase tracking-[0.2em] mb-2 ${stat.isLow ? 'text-rose-500' : 'text-slate-500'}`}>
-                                    {stat.label.length > 20 ? stat.label.substring(0, 20) + '...' : stat.label}
-                                </p>
-                                <div className="flex items-baseline gap-1">
-                                    <h3 className={`text-3xl font-black ${stat.isLow ? 'text-rose-500' : 'text-white'}`}>{stat.value}</h3>
-                                    <span className="text-xs font-bold text-slate-500">{stat.unit}</span>
-                                </div>
-                                {stat.isLow && <span className="text-[9px] text-rose-500 font-bold uppercase tracking-widest mt-1 block animate-pulse">Qoldiq tugadi</span>}
-                            </div>
-                            <div className={`w-14 h-14 ${stat.bg} ${stat.color} rounded-2xl flex items-center justify-center border border-white/5 group-hover:scale-110 transition-transform shadow-inner shrink-0`}>
-                                <stat.icon size={28} />
-                            </div>
-                        </div>
-                    ))
-                )}
-            </div>
-
             {/* Navigation Tabs */}
-            <div className="flex bg-[#0f172a]/60 backdrop-blur-3xl p-1.5 rounded-[3rem] border border-white/10 w-fit overflow-x-auto max-w-full shadow-2xl">
+            <div className="flex bg-[var(--bg-card)] backdrop-blur-3xl p-1.5 rounded-[3rem] border border-[var(--border-color)] w-fit overflow-x-auto max-w-full shadow-2xl">
                 {['Mato', 'Aksessuar', 'Tayyor Mahsulot', 'So\'rovlar', 'Tarix'].map(tab => (
                     <button
                         key={tab}
                         onClick={() => { setActiveTab(tab); setSearchParams({ tab }); }}
-                        className={`px-8 py-3 rounded-3xl text-[11px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === tab ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 scale-105' : 'text-slate-500 hover:text-white hover:bg-white/5'
+                        className={`px-8 py-3 rounded-3xl text-[11px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === tab ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 scale-105' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5'
                             }`}
                     >
                         {tab}
@@ -257,10 +245,35 @@ const Ombor = () => {
                 ))}
             </div>
 
+            {/* Dynamic Stats Cards - Horizontal Scroll if many */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 overflow-x-auto pb-4 custom-scrollbar">
+                {displayStats.length === 0 ? (
+                    <div className="col-span-full py-10 text-center text-[var(--text-secondary)] italic border border-dashed border-[var(--border-color)] rounded-3xl">Hech qanday ma'lumot topilmadi</div>
+                ) : (
+                    displayStats.map((stat, idx) => (
+                        <div key={idx} className={`bg-[var(--bg-card)] backdrop-blur-3xl p-6 rounded-[3rem] border ${stat.border || 'border-[var(--border-color)]'} shadow-2xl hover:-translate-y-1 transition-all flex items-center justify-between relative group min-w-[250px]`}>
+                            <div>
+                                <p className={`text-[10px] font-black uppercase tracking-[0.2em] mb-2 ${stat.isLow ? 'text-rose-500' : 'text-[var(--text-secondary)]'}`}>
+                                    {stat.label.length > 20 ? stat.label.substring(0, 20) + '...' : stat.label}
+                                </p>
+                                <div className="flex items-baseline gap-1">
+                                    <h3 className={`text-3xl font-black ${stat.isLow ? 'text-rose-500' : 'text-[var(--text-primary)]'}`}>{stat.value}</h3>
+                                    <span className="text-xs font-bold text-[var(--text-secondary)]">{stat.unit}</span>
+                                </div>
+                                {stat.isLow && <span className="text-[9px] text-rose-500 font-bold uppercase tracking-widest mt-1 block animate-pulse">Qoldiq tugadi</span>}
+                            </div>
+                            <div className={`w-14 h-14 ${stat.bg} ${stat.color} rounded-2xl flex items-center justify-center border border-[var(--border-color)] group-hover:scale-110 transition-transform shadow-inner shrink-0`}>
+                                <stat.icon size={28} />
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+
             {/* Content Area */}
             <div className="min-h-[400px]">
                 {loading && inventory.length === 0 ? (
-                    <div className="text-center py-20 text-slate-500 font-bold uppercase tracking-widest text-xs">Yuklanmoqda...</div>
+                    <div className="text-center py-20 text-[var(--text-secondary)] font-bold uppercase tracking-widest text-xs">Yuklanmoqda...</div>
                 ) : (
                     <>
                         {activeTab === 'Mato' && (
@@ -269,6 +282,7 @@ const Ombor = () => {
                                 references={references.filter(r => r.type === 'Mato')}
                                 orders={orders}
                                 onRefresh={fetchInitialData}
+                                viewMode={viewMode}
                             />
                         )}
                         {activeTab === 'Aksessuar' && (
@@ -277,22 +291,25 @@ const Ombor = () => {
                                 references={references}
                                 orders={orders}
                                 onRefresh={fetchInitialData}
+                                viewMode={viewMode}
                             />
                         )}
                         {activeTab === 'Tayyor Mahsulot' && (
                             <TayyorMahsulotOmbori
                                 inventory={inventory.filter(i => i.category?.toLowerCase() === 'tayyor mahsulot')}
                                 onRefresh={fetchInitialData}
+                                viewMode={viewMode}
                             />
                         )}
                         {activeTab === 'So\'rovlar' && (
                             <MaterialRequests
                                 requests={requests}
                                 onRefresh={fetchInitialData}
+                                viewMode={viewMode}
                             />
                         )}
                         {activeTab === 'Tarix' && (
-                            <OmborTarix logs={logs} />
+                            <OmborTarix logs={logs} viewMode={viewMode} />
                         )}
                     </>
                 )}

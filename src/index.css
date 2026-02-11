@@ -4,10 +4,43 @@
   --color-primary: #0F766E;
 }
 
+:root {
+  /* Default (Light) */
+  --bg-body: #f8fafc;
+  --bg-card: rgba(255, 255, 255, 0.8);
+  --bg-card-hover: rgba(255, 255, 255, 0.9);
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --border-color: rgba(0, 0, 0, 0.05);
+  --input-bg: #ffffff;
+
+  /* Sidebar Light */
+  --bg-sidebar: #ffffff;
+  --bg-sidebar-footer: #f8fafc;
+  --border-sidebar: rgba(0, 0, 0, 0.05);
+}
+
+:root.dark {
+  /* Dark Mode */
+  --bg-body: #020617;
+  --bg-card: rgba(15, 23, 42, 0.6);
+  --bg-card-hover: rgba(30, 41, 59, 0.8);
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --border-color: rgba(255, 255, 255, 0.05);
+  --input-bg: rgba(2, 6, 23, 0.5);
+
+  /* Sidebar Dark */
+  --bg-sidebar: #1a1c2e;
+  --bg-sidebar-footer: #141625;
+  --border-sidebar: rgba(255, 255, 255, 0.05);
+}
+
 body {
-  background-color: #0d1117;
-  color: #e6edf3;
+  background-color: var(--bg-body);
+  color: var(--text-primary);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .glass-card {

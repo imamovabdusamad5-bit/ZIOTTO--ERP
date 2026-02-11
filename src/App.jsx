@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -31,32 +32,34 @@ const ProtectedRoute = ({ children }) => {
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <ZiyoChat />
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-            <Route index element={<Dashboard />} />
-            <Route path="modelxona" element={<Modelxona />} />
-            <Route path="reja" element={<Rejalashtirish />} />
-            <Route path="ombor" element={<Ombor />} />
-            <Route path="kesim" element={<Kesim />} />
-            <Route path="taminot" element={<Taminot />} />
-            <Route path="tasnif" element={<Tasnif />} />
-            <Route path="tikuv" element={<Tikuv />} />
-            <Route path="otk" element={<OTK />} />
-            <Route path="dazmol" element={<Dazmol />} />
-            <Route path="hr" element={<HR />} />
-            <Route path="moliya" element={<Moliya />} />
-            <Route path="xodimlar" element={<Xodimlar />} />
-            <Route path="pechat" element={<Pechat />} />
-            <Route path="vishefka" element={<Vishefka />} />
-            <Route path="malumotlar" element={<Ma_lumotlar />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <ZiyoChat />
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+              <Route index element={<Dashboard />} />
+              <Route path="modelxona" element={<Modelxona />} />
+              <Route path="reja" element={<Rejalashtirish />} />
+              <Route path="ombor" element={<Ombor />} />
+              <Route path="kesim" element={<Kesim />} />
+              <Route path="taminot" element={<Taminot />} />
+              <Route path="tasnif" element={<Tasnif />} />
+              <Route path="tikuv" element={<Tikuv />} />
+              <Route path="otk" element={<OTK />} />
+              <Route path="dazmol" element={<Dazmol />} />
+              <Route path="hr" element={<HR />} />
+              <Route path="moliya" element={<Moliya />} />
+              <Route path="xodimlar" element={<Xodimlar />} />
+              <Route path="pechat" element={<Pechat />} />
+              <Route path="vishefka" element={<Vishefka />} />
+              <Route path="malumotlar" element={<Ma_lumotlar />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

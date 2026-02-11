@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
-const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
+const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showInboundModal, setShowInboundModal] = useState(false);
     const [showOutboundModal, setShowOutboundModal] = useState(false);
@@ -272,18 +272,20 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
         }
     };
 
+    // ... existing helpers ...
+
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
             {/* Header / Search / Add */}
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-[#0f172a]/60 backdrop-blur-3xl p-6 rounded-[2.5rem] border border-white/5 shadow-2xl">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-[var(--bg-card)] backdrop-blur-3xl p-6 rounded-[2.5rem] border border-[var(--border-color)] shadow-2xl">
                 <div className="relative w-full md:w-96 group">
-                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-indigo-400 transition-colors" size={20} />
+                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] group-hover:text-indigo-400 transition-colors" size={20} />
                     <input
                         type="text"
                         placeholder="Mato, rang yoki partiya bo'yicha qidiruv..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-14 pr-6 py-4 bg-[#020617]/50 border border-white/5 rounded-2xl focus:border-indigo-500/50 text-white placeholder-slate-500 outline-none font-bold transition-all shadow-inner hover:bg-[#020617]/80"
+                        className="w-full pl-14 pr-6 py-4 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl focus:border-indigo-500/50 text-[var(--text-primary)] placeholder-[var(--text-secondary)] outline-none font-bold transition-all shadow-inner hover:bg-[var(--bg-card-hover)]"
                     />
                 </div>
                 <button
@@ -294,61 +296,42 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
                 </button>
             </div>
 
-            {/* Content Table */}
-            <div className="overflow-hidden bg-[#0f172a]/60 backdrop-blur-3xl rounded-[3rem] border border-white/5 shadow-2xl">
+            {/* Content Display */}
+            <div className={`overflow-hidden bg-[var(--bg-card)] backdrop-blur-3xl rounded-[3rem] border border-[var(--border-color)] shadow-2xl ${viewMode === 'table' ? 'rounded-xl' : ''}`}>
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                        <thead className="bg-[#020617]/50 text-slate-400 uppercase tracking-widest text-[10px] font-black border-b border-white/5">
-                            <tr>
-                                <th className="px-8 py-6">Mato Nomi / Turi</th>
-                                <th className="px-8 py-6">Xususiya (Parametr)</th>
-                                <th className="px-8 py-6">Rangi / Kodi</th>
-                                <th className="px-8 py-6 text-right">Qoldiq</th>
-                                <th className="px-8 py-6 text-right">Amallar</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-white/5">
-                            {filteredInventory.map(item => (
-                                <tr key={item.id} className="hover:bg-white/[0.02] transition-colors group">
-                                    <td className="px-8 py-6 align-top">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center border border-indigo-500/10 shadow-inner group-hover:scale-110 transition-transform duration-300">
-                                                <Warehouse size={26} />
-                                            </div>
-                                            <div>
-                                                <div className="text-white font-black text-lg uppercase tracking-tight leading-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">{item.item_name}</div>
-                                                <div className="text-[10px] text-indigo-400 font-bold uppercase tracking-widest mt-1">Partiya: {item.batch_number || '---'}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-8 py-6 align-top text-slate-300 font-bold text-sm">
-                                        {item.material_types?.thread_type || '---'}
-                                        <br />
-                                        <span className="text-xs text-slate-500 font-medium">{item.material_types?.grammage ? `${item.material_types.grammage} gr` : ''}</span>
-                                    </td>
-                                    <td className="px-8 py-6 align-top">
-                                        <div className="flex flex-col gap-1.5">
-                                            <span className="text-white font-bold uppercase text-sm tracking-wide">{item.color}</span>
-                                            {item.color_code && (
-                                                <span className="text-[10px] bg-slate-800/80 px-2 py-1 rounded-lg text-slate-400 font-mono w-fit border border-white/5">{item.color_code}</span>
-                                            )}
-                                        </div>
-                                    </td>
-                                    <td className="px-8 py-6 align-top text-right">
-                                        <div className={`text-2xl font-black ${Number(item.quantity) < 100 ? 'text-rose-500' : 'text-indigo-400'}`}>{item.quantity}</div>
-                                        <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest">{item.unit}</div>
-                                    </td>
-                                    <td className="px-8 py-6 align-top text-right">
-                                        <div className="flex justify-end gap-2">
-                                            <button
-                                                onClick={() => handleOpenRolls(item)}
-                                                className="p-3 bg-slate-800/50 text-indigo-400 hover:bg-indigo-500 hover:text-white rounded-xl transition-all border border-white/5 hover:border-indigo-500 shadow-lg hover:shadow-indigo-500/20"
-                                                title="Poylar va QR kodlar"
-                                            >
-                                                <QrCode size={18} />
-                                            </button>
-                                            <button
-                                                onClick={() => {
+                    {viewMode === 'table' ? (
+                        // EXCEL-LIKE TABLE VIEW
+                        <table className="w-full text-left border-collapse text-sm">
+                            <thead className="bg-[var(--bg-sidebar-footer)] text-[var(--text-secondary)] uppercase tracking-widest text-[10px] font-black border-b border-[var(--border-color)] sticky top-0 z-10">
+                                <tr>
+                                    <th className="px-4 py-3 border-r border-[var(--border-color)]">№</th>
+                                    <th className="px-4 py-3 border-r border-[var(--border-color)]">Mato Nomi</th>
+                                    <th className="px-4 py-3 border-r border-[var(--border-color)]">Turi</th>
+                                    <th className="px-4 py-3 border-r border-[var(--border-color)]">Grammaj</th>
+                                    <th className="px-4 py-3 border-r border-[var(--border-color)]">Rangi</th>
+                                    <th className="px-4 py-3 border-r border-[var(--border-color)]">Kodi</th>
+                                    <th className="px-4 py-3 border-r border-[var(--border-color)]">Partiya</th>
+                                    <th className="px-4 py-3 border-r border-[var(--border-color)] text-right">Qoldiq</th>
+                                    <th className="px-4 py-3 border-r border-[var(--border-color)] text-center">Birlik</th>
+                                    <th className="px-4 py-3 text-center">Amallar</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-[var(--border-color)]">
+                                {filteredInventory.map((item, index) => (
+                                    <tr key={item.id} className="hover:bg-[var(--bg-card-hover)] transition-colors even:bg-[var(--bg-body)]">
+                                        <td className="px-4 py-2 border-r border-[var(--border-color)] text-[var(--text-secondary)] font-mono text-xs">{index + 1}</td>
+                                        <td className="px-4 py-2 border-r border-[var(--border-color)] font-bold text-[var(--text-primary)]">{item.item_name}</td>
+                                        <td className="px-4 py-2 border-r border-[var(--border-color)] text-[var(--text-secondary)]">{item.material_types?.thread_type || '-'}</td>
+                                        <td className="px-4 py-2 border-r border-[var(--border-color)] text-[var(--text-secondary)]">{item.material_types?.grammage || '-'}</td>
+                                        <td className="px-4 py-2 border-r border-[var(--border-color)] text-[var(--text-primary)]">{item.color}</td>
+                                        <td className="px-4 py-2 border-r border-[var(--border-color)] font-mono text-xs text-[var(--text-secondary)]">{item.color_code || '-'}</td>
+                                        <td className="px-4 py-2 border-r border-[var(--border-color)] font-mono text-xs text-[var(--text-secondary)]">{item.batch_number || '-'}</td>
+                                        <td className={`px-4 py-2 border-r border-[var(--border-color)] text-right font-bold ${Number(item.quantity) < 100 ? 'text-rose-500' : 'text-emerald-500'}`}>{item.quantity}</td>
+                                        <td className="px-4 py-2 border-r border-[var(--border-color)] text-center text-xs text-[var(--text-secondary)] uppercase">{item.unit}</td>
+                                        <td className="px-2 py-1 text-center">
+                                            <div className="flex justify-center gap-1">
+                                                <button onClick={() => handleOpenRolls(item)} className="p-1.5 hover:bg-indigo-50 text-indigo-500 rounded"><QrCode size={16} /></button>
+                                                <button onClick={() => {
                                                     setInboundData({
                                                         reference_id: item.reference_id,
                                                         color: item.color,
@@ -359,14 +342,8 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
                                                         rolls: []
                                                     });
                                                     setShowInboundModal(true);
-                                                }}
-                                                className="p-3 bg-slate-800/50 text-amber-500 hover:bg-amber-500 hover:text-white rounded-xl transition-all border border-white/5 hover:border-amber-500 shadow-lg hover:shadow-amber-500/20"
-                                                title="Qaytim qilish"
-                                            >
-                                                <History size={18} />
-                                            </button>
-                                            <button
-                                                onClick={() => {
+                                                }} className="p-1.5 hover:bg-amber-50 text-amber-500 rounded"><History size={16} /></button>
+                                                <button onClick={() => {
                                                     setOutboundData({
                                                         inventory_id: item.id,
                                                         quantity: '',
@@ -374,23 +351,111 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
                                                         reason: 'Kesimga',
                                                         selected_rolls: []
                                                     });
-                                                    // Also fetch rolls to allow selection
                                                     fetchRolls(item.id).then(() => setShowOutboundModal(true));
-                                                }}
-                                                className="p-3 bg-slate-800/50 text-rose-500 hover:bg-rose-500 hover:text-white rounded-xl transition-all border border-white/5 hover:border-rose-500 shadow-lg hover:shadow-rose-500/20"
-                                                title="Chiqim qilish"
-                                            >
-                                                <ArrowUpRight size={18} />
-                                            </button>
-                                        </div>
-                                    </td>
+                                                }} className="p-1.5 hover:bg-rose-50 text-rose-500 rounded"><ArrowUpRight size={16} /></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    ) : (
+                        // STANDARD / CARD VIEW
+                        <table className="w-full text-left border-collapse">
+                            <thead className="bg-[var(--bg-body)] text-[var(--text-secondary)] uppercase tracking-widest text-[10px] font-black border-b border-[var(--border-color)]">
+                                <tr>
+                                    <th className="px-8 py-6">Mato Nomi / Turi</th>
+                                    <th className="px-8 py-6">Xususiya (Parametr)</th>
+                                    <th className="px-8 py-6">Rangi / Kodi</th>
+                                    <th className="px-8 py-6 text-right">Qoldiq</th>
+                                    <th className="px-8 py-6 text-right">Amallar</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody className="divide-y divide-[var(--border-color)]">
+                                {filteredInventory.map(item => (
+                                    <tr key={item.id} className="hover:bg-[var(--bg-card-hover)] transition-colors group">
+                                        <td className="px-8 py-6 align-top">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center border border-indigo-500/10 shadow-inner group-hover:scale-110 transition-transform duration-300">
+                                                    <Warehouse size={26} />
+                                                </div>
+                                                <div>
+                                                    <div className="text-[var(--text-primary)] font-black text-lg uppercase tracking-tight leading-tight bg-gradient-to-r from-[var(--text-primary)] to-slate-400 bg-clip-text text-transparent">{item.item_name}</div>
+                                                    <div className="text-[10px] text-indigo-400 font-bold uppercase tracking-widest mt-1">Partiya: {item.batch_number || '---'}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-6 align-top text-[var(--text-secondary)] font-bold text-sm">
+                                            {item.material_types?.thread_type || '---'}
+                                            <br />
+                                            <span className="text-xs text-[var(--text-secondary)] opacity-70 font-medium">{item.material_types?.grammage ? `${item.material_types.grammage} gr` : ''}</span>
+                                        </td>
+                                        <td className="px-8 py-6 align-top">
+                                            <div className="flex flex-col gap-1.5">
+                                                <span className="text-[var(--text-primary)] font-bold uppercase text-sm tracking-wide">{item.color}</span>
+                                                {item.color_code && (
+                                                    <span className="text-[10px] bg-[var(--bg-body)] px-2 py-1 rounded-lg text-[var(--text-secondary)] font-mono w-fit border border-[var(--border-color)]">{item.color_code}</span>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-6 align-top text-right">
+                                            <div className={`text-2xl font-black ${Number(item.quantity) < 100 ? 'text-rose-500' : 'text-indigo-400'}`}>{item.quantity}</div>
+                                            <div className="text-[10px] text-[var(--text-secondary)] uppercase font-black tracking-widest">{item.unit}</div>
+                                        </td>
+                                        <td className="px-8 py-6 align-top text-right">
+                                            <div className="flex justify-end gap-2">
+                                                <button
+                                                    onClick={() => handleOpenRolls(item)}
+                                                    className="p-3 bg-[var(--bg-body)] text-indigo-400 hover:bg-indigo-500 hover:text-white rounded-xl transition-all border border-[var(--border-color)] hover:border-indigo-500 shadow-lg hover:shadow-indigo-500/20"
+                                                    title="Poylar va QR kodlar"
+                                                >
+                                                    <QrCode size={18} />
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        setInboundData({
+                                                            reference_id: item.reference_id,
+                                                            color: item.color,
+                                                            color_code: item.color_code,
+                                                            batch_number: item.batch_number,
+                                                            quantity: '',
+                                                            reason: 'Qaytim',
+                                                            rolls: []
+                                                        });
+                                                        setShowInboundModal(true);
+                                                    }}
+                                                    className="p-3 bg-[var(--bg-body)] text-amber-500 hover:bg-amber-500 hover:text-white rounded-xl transition-all border border-[var(--border-color)] hover:border-amber-500 shadow-lg hover:shadow-amber-500/20"
+                                                    title="Qaytim qilish"
+                                                >
+                                                    <History size={18} />
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        setOutboundData({
+                                                            inventory_id: item.id,
+                                                            quantity: '',
+                                                            order_id: '',
+                                                            reason: 'Kesimga',
+                                                            selected_rolls: []
+                                                        });
+                                                        // Also fetch rolls to allow selection
+                                                        fetchRolls(item.id).then(() => setShowOutboundModal(true));
+                                                    }}
+                                                    className="p-3 bg-[var(--bg-body)] text-rose-500 hover:bg-rose-500 hover:text-white rounded-xl transition-all border border-[var(--border-color)] hover:border-rose-500 shadow-lg hover:shadow-rose-500/20"
+                                                    title="Chiqim qilish"
+                                                >
+                                                    <ArrowUpRight size={18} />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
                 </div>
                 {filteredInventory.length === 0 && (
-                    <div className="py-20 flex flex-col items-center justify-center text-slate-500 border-t border-white/5">
+                    <div className="py-20 flex flex-col items-center justify-center text-[var(--text-secondary)] border-t border-[var(--border-color)]">
                         <Warehouse size={48} className="mb-4 opacity-20" />
                         <span className="font-bold uppercase tracking-widest text-xs">Ma'lumot topilmadi</span>
                     </div>
@@ -624,8 +689,8 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh }) => {
                                                         setOutboundData({ ...outboundData, selected_rolls: newSelection, quantity: totalWeight.toFixed(2) });
                                                     }}
                                                     className={`p-3 rounded-xl border cursor-pointer transition-all flex flex-col items-center justify-center text-center ${outboundData.selected_rolls.find(r => r.id === roll.id)
-                                                            ? 'bg-rose-500 text-white border-rose-500 shadow-lg shadow-rose-500/20'
-                                                            : 'bg-[#020617] text-slate-400 border-white/10 hover:border-rose-500/30'
+                                                        ? 'bg-rose-500 text-white border-rose-500 shadow-lg shadow-rose-500/20'
+                                                        : 'bg-[#020617] text-slate-400 border-white/10 hover:border-rose-500/30'
                                                         }`}
                                                 >
                                                     <span className="font-black text-sm">{roll.weight} kg</span>

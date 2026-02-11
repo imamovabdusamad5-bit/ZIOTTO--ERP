@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
-import { useLocation, Outlet } from 'react-router-dom';
-import { Activity, Menu, CheckCircle, Eye, EyeOff, History, RotateCcw } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
+import { Activity, Menu, CheckCircle, Eye, EyeOff, History, RotateCcw, Sun, Moon } from 'lucide-react';
 import Sidebar from './Sidebar';
 
 const Layout = () => {
+    const { theme, toggleTheme } = useTheme();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [alerts, setAlerts] = useState([]);
 
@@ -100,7 +99,7 @@ const Layout = () => {
     const showPanel = alerts.length > 0;
 
     return (
-        <div className="min-h-screen bg-[#0d1117] flex">
+        <div className="min-h-screen bg-[var(--bg-body)] text-[var(--text-primary)] flex transition-colors duration-300">
             {/* Mobile Sidebar Overlay */}
             {isSidebarOpen && (
                 <div
@@ -112,20 +111,27 @@ const Layout = () => {
             <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
             <div className="flex-1 transition-all duration-300 md:pl-64 flex flex-col min-h-screen">
-                <header className="bg-[#161b22]/80 backdrop-blur-xl border-b border-white/5 h-16 flex items-center justify-between px-4 md:px-8 sticky top-0 z-30 shrink-0">
+                <header className="bg-[var(--bg-card)] backdrop-blur-xl border-b border-[var(--border-color)] h-16 flex items-center justify-between px-4 md:px-8 sticky top-0 z-30 shrink-0 transition-colors duration-300 shadow-sm">
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => setIsSidebarOpen(true)}
-                            className="p-3 -ml-3 hover:bg-gray-100 rounded-xl md:hidden text-gray-700 active:bg-gray-200 transition-colors"
+                            className="p-3 -ml-3 hover:bg-gray-100 dark:hover:bg-white/5 rounded-xl md:hidden text-[var(--text-secondary)] active:bg-gray-200 transition-colors"
                         >
                             <Menu size={28} />
                         </button>
-                        <h2 className="text-lg md:text-xl font-black text-white tracking-tight uppercase">
+                        <h2 className="text-lg md:text-xl font-black text-[var(--text-primary)] tracking-tight uppercase">
                             Ziotto <span className="text-indigo-500">ERP</span>
                         </h2>
                     </div>
                     <div className="flex items-center gap-4">
-                        <span className="hidden sm:block text-[10px] text-gray-400 font-black uppercase tracking-widest bg-white/5 px-4 py-2 rounded-xl">
+                        <button
+                            onClick={toggleTheme}
+                            className="p-2 rounded-xl bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-300 hover:text-indigo-500 transition-all border border-transparent hover:border-indigo-500/20"
+                            title={theme === 'dark' ? "Yorug' rejimga o'tish" : "Tungi rejimga o'tish"}
+                        >
+                            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                        </button>
+                        <span className="hidden sm:block text-[10px] text-[var(--text-secondary)] font-black uppercase tracking-widest bg-gray-100 dark:bg-white/5 px-4 py-2 rounded-xl">
                             {new Date().toLocaleDateString('uz-UZ')}
                         </span>
                     </div>

@@ -84,8 +84,8 @@ const Sidebar = ({ isOpen, onClose }) => {
     };
 
     return (
-        <div className={`fixed left-0 top-0 h-[100dvh] bg-[#1a1c2e] text-gray-300 flex flex-col shadow-xl z-[70] transition-transform duration-300 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 w-64`}>
-            <div className="p-6 border-b border-gray-700/50 flex items-center justify-between">
+        <div className={`fixed left-0 top-0 h-[100dvh] bg-[var(--bg-sidebar)] text-[var(--text-secondary)] flex flex-col shadow-xl z-[70] transition-all duration-300 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 w-64 border-r border-[var(--border-sidebar)]`}>
+            <div className="p-6 border-b border-[var(--border-sidebar)] flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center">
                         <Shirt className="text-white w-5 h-5" />
@@ -94,7 +94,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                 </div>
                 <button
                     onClick={onClose}
-                    className="md:hidden p-2 hover:bg-gray-800 rounded-lg text-gray-400"
+                    className="md:hidden p-2 hover:bg-gray-800 dark:hover:bg-white/5 rounded-lg text-gray-400"
                 >
                     <X size={20} />
                 </button>
@@ -106,16 +106,20 @@ const Sidebar = ({ isOpen, onClose }) => {
                         const isExpanded = expandedMenu === item.name;
                         const isActive = location.pathname === item.path;
 
+                        // Dynamic class helpers
+                        const activeClass = "bg-indigo-600 text-white shadow-lg shadow-indigo-600/20";
+                        const inactiveClass = "hover:bg-gray-100 dark:hover:bg-white/5 hover:text-[var(--text-primary)]";
+
                         return (
                             <li key={item.path || item.name}>
                                 {hasSubItems ? (
                                     <div className="space-y-1">
                                         <button
                                             onClick={() => setExpandedMenu(isExpanded ? null : item.name)}
-                                            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200 group ${isActive || isExpanded ? 'bg-indigo-600/10 text-white' : 'hover:bg-gray-800 hover:text-white'}`}
+                                            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200 group ${isActive || isExpanded ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400' : inactiveClass}`}
                                         >
                                             <div className="flex items-center gap-3">
-                                                <item.icon size={18} className={isActive || isExpanded ? 'text-indigo-400' : 'text-gray-400 group-hover:text-white'} />
+                                                <item.icon size={18} className={isActive || isExpanded ? 'text-indigo-500 dark:text-indigo-400' : 'text-gray-400 group-hover:text-indigo-500'} />
                                                 <span className="text-sm font-medium">{item.name}</span>
                                             </div>
                                             {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
@@ -131,12 +135,12 @@ const Sidebar = ({ isOpen, onClose }) => {
                                                             }}
                                                             className={({ isActive }) =>
                                                                 `flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 ${location.search.includes(sub.path.split('?')[1]) && location.pathname === '/ombor'
-                                                                    ? 'text-indigo-400 bg-indigo-500/5'
-                                                                    : 'text-gray-500 hover:text-white hover:bg-gray-800'
+                                                                    ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-500/10'
+                                                                    : 'text-gray-500 hover:text-[var(--text-primary)] hover:bg-gray-100 dark:hover:bg-white/5'
                                                                 }`
                                                             }
                                                         >
-                                                            <div className={`w-1 h-1 rounded-full ${location.search.includes(sub.path.split('?')[1]) && location.pathname === '/ombor' ? 'bg-indigo-400' : 'bg-gray-600'}`} />
+                                                            <div className={`w-1 h-1 rounded-full ${location.search.includes(sub.path.split('?')[1]) && location.pathname === '/ombor' ? 'bg-indigo-500' : 'bg-gray-400'}`} />
                                                             {sub.name}
                                                         </NavLink>
                                                     </li>
@@ -152,8 +156,8 @@ const Sidebar = ({ isOpen, onClose }) => {
                                         }}
                                         className={({ isActive }) =>
                                             `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${isActive
-                                                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
-                                                : 'hover:bg-gray-800 hover:text-white'
+                                                ? activeClass
+                                                : inactiveClass
                                             }`
                                         }
                                     >
@@ -166,14 +170,14 @@ const Sidebar = ({ isOpen, onClose }) => {
                     })}
                 </ul>
             </nav>
-            <div className="p-4 border-t border-gray-700/50 bg-[#141625]">
+            <div className="p-4 border-t border-[var(--border-sidebar)] bg-[var(--bg-sidebar-footer)]">
                 <div className="flex items-center justify-between px-2">
                     <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 font-bold uppercase">
+                        <div className="w-9 h-9 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-500 font-bold uppercase">
                             {profile?.full_name?.charAt(0) || 'A'}
                         </div>
                         <div>
-                            <p className="text-sm font-semibold text-white truncate w-24">{profile?.full_name || 'Admin'}</p>
+                            <p className="text-sm font-semibold text-[var(--text-primary)] truncate w-24">{profile?.full_name || 'Admin'}</p>
                             <p className="text-[10px] text-gray-500 uppercase tracking-widest">{profile?.role || 'Direktor'}</p>
                         </div>
                     </div>
