@@ -15,10 +15,10 @@ const TayyorMahsulotOmbori = ({ inventory, onRefresh, viewMode }) => {
         const query = searchTerm.toLowerCase();
         return (
             !searchTerm ||
-            item.item_name?.toLowerCase().includes(query) ||
-            item.color?.toLowerCase().includes(query) ||
-            item.color_code?.toLowerCase().includes(query) ||
-            item.batch_number?.toLowerCase().includes(query)
+            (item.item_name || '').toLowerCase().includes(query) ||
+            (item.color || '').toLowerCase().includes(query) ||
+            (item.color_code || '').toLowerCase().includes(query) ||
+            (item.batch_number || '').toLowerCase().includes(query)
         );
     });
 

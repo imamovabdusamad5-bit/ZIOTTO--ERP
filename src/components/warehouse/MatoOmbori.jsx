@@ -19,12 +19,12 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
         const query = searchTerm.toLowerCase();
         return (
             !searchTerm ||
-            item.item_name?.toLowerCase().includes(query) ||
-            item.color?.toLowerCase().includes(query) ||
-            item.color_code?.toLowerCase().includes(query) ||
-            item.material_types?.thread_type?.toLowerCase().includes(query) ||
-            item.material_types?.grammage?.toString().includes(query) ||
-            item.batch_number?.toLowerCase().includes(query)
+            (item.item_name || '').toLowerCase().includes(query) ||
+            (item.color || '').toLowerCase().includes(query) ||
+            (item.color_code || '').toLowerCase().includes(query) ||
+            (item.material_types?.thread_type || '').toLowerCase().includes(query) ||
+            (item.material_types?.grammage || '').toString().includes(query) ||
+            (item.batch_number || '').toLowerCase().includes(query)
         );
     });
 
