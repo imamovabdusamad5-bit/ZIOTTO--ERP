@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, ShoppingBag, Activity, TrendingUp, AlertCircle, CheckCircle, Package, Clock } from 'lucide-react';
+import { Users, ShoppingBag, Activity, TrendingUp, CircleAlert, CircleCheck, Package, Clock } from 'lucide-react';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     BarChart, Bar, Cell
@@ -8,7 +8,7 @@ import {
 const stats = [
     { title: 'Faol Modellar', value: '12', icon: ShoppingBag, color: 'bg-indigo-500', trend: '+2 yangi' },
     { title: 'Kunlik Ish (dona)', value: '1,450', icon: Activity, color: 'bg-emerald-500', trend: '85% unum' },
-    { title: 'Brak darajasi', value: '1.2%', icon: AlertCircle, color: 'bg-rose-500', trend: '-0.3% o\'tgan oydan' },
+    { title: 'Brak darajasi', value: '1.2%', icon: CircleAlert, color: 'bg-rose-500', trend: '-0.3% o\'tgan oydan' },
     { title: 'Tannarx (avg)', value: '$6.80', icon: TrendingUp, color: 'bg-amber-500', trend: 'Stabil' },
 ];
 
@@ -137,7 +137,7 @@ const Dashboard = () => {
                 <div className="bg-[#1a1c2e] rounded-3xl shadow-xl p-8 text-white relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
                     <div className="flex items-center gap-3 mb-6">
-                        <CheckCircle className="text-emerald-400" size={24} />
+                        <CircleCheck className="text-emerald-400" size={24} />
                         <h3 className="text-lg font-black">Tezkor Ma'lumot</h3>
                     </div>
                     <div className="space-y-6">
@@ -152,7 +152,7 @@ const Dashboard = () => {
                         </div>
                         <div className="flex items-start gap-4">
                             <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
-                                <AlertCircle size={20} className="text-amber-400" />
+                                <CircleAlert size={20} className="text-amber-400" />
                             </div>
                             <div>
                                 <p className="text-sm font-bold">Aksessuar tanqisligi (Alert)</p>

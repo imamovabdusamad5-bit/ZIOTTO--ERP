@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Save, FileText, Trash2, Layers, Scissors, Ruler, Activity, ChevronRight, ChevronDown, Shirt, X, Calculator, RefreshCw, AlertCircle, Edit3, Search, Image, Package } from 'lucide-react';
+import { Plus, Save, FileText, Trash2, Layers, Scissors, Ruler, Activity, ChevronRight, ChevronDown, Shirt, X, Calculator, RefreshCw, CircleAlert, Edit3, Search, Image, Package } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import ImageCropper from '../components/ImageCropper';
 
@@ -985,7 +985,7 @@ const Modelxona = () => {
                                             <h4 className="text-xl font-black text-white group-hover:text-indigo-400 transition-colors uppercase tracking-tight">{model.name}</h4>
                                             {model.notes?.length > 0 && (
                                                 <span className="flex items-center gap-2 bg-rose-500 text-white text-[9px] font-black px-3 py-1 rounded-full animate-pulse shadow-lg shadow-rose-500/20 uppercase tracking-widest">
-                                                    <AlertCircle size={10} /> {model.notes.length} Muhim
+                                                    <CircleAlert size={10} /> {model.notes.length} Muhim
                                                 </span>
                                             )}
                                         </div>

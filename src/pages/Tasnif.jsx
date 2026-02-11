@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
     Layers,
     CheckSquare,
-    XCircle,
+    CircleX,
     ArrowRight,
     Activity,
     Printer,
@@ -10,7 +10,7 @@ import {
     Shirt,
     Search,
     Clock,
-    CheckCircle2
+    CircleCheck
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 

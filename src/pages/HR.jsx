@@ -9,7 +9,7 @@ import {
     Camera,
     Edit3,
     Trash2,
-    CheckCircle2,
+    CircleCheck,
     Calendar,
     Phone,
     Briefcase,
@@ -456,7 +456,7 @@ const HR = () => {
                                                                     <button
                                                                         onClick={() => setCheckOutModalEmployee(emp)}
                                                                         className="px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white text-[9px] font-bold uppercase border border-white/5 transition-all flex items-center gap-1">
-                                                                        <CheckCircle2 size={10} /> Ketishni belgilash
+                                                                        <CircleCheck size={10} /> Ketishni belgilash
                                                                     </button>
                                                                 )}
                                                             </div>
@@ -703,7 +703,7 @@ const HR = () => {
                         <div className="p-10 border-b border-white/5 flex items-center justify-between">
                             <div className="flex items-center gap-4">
                                 <div className="w-14 h-14 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-500">
-                                    <CheckCircle2 size={28} />
+                                    <CircleCheck size={28} />
                                 </div>
                                 <div>
                                     <h3 className="text-xl font-black text-white tracking-tight">Ishni Yakunlash</h3>

@@ -4,8 +4,8 @@ import {
     Layers,
     Palette,
     Clock,
-    CheckCircle2,
-    AlertCircle,
+    CircleCheck,
+    CircleAlert,
     Search,
     Plus,
     Activity,
@@ -102,7 +102,7 @@ const Pechat = () => {
                         { id: 'plans', label: 'Rejalar', icon: Clock, color: 'text-white' },
                         { id: 'incoming', label: 'Kelganlar', icon: ArrowDownLeft, color: 'text-amber-500' },
                         { id: 'active', label: 'Jarayonda', icon: Activity, color: 'text-blue-500' },
-                        { id: 'completed', label: 'Tayyor', icon: CheckCircle2, color: 'text-emerald-500' },
+                        { id: 'completed', label: 'Tayyor', icon: CircleCheck, color: 'text-emerald-500' },
                     ].map(tab => (
                         <button
                             key={tab.id}
@@ -195,7 +195,7 @@ const Pechat = () => {
                                     onClick={() => handleAction(job, 'Completed')}
                                     className="w-full flex items-center justify-center gap-3 py-4 bg-emerald-600 text-white rounded-2xl text-[10px] font-black uppercase hover:bg-emerald-500 active:scale-95 transition-all shadow-xl shadow-emerald-500/20"
                                 >
-                                    <CheckCircle2 size={16} /> Yakunlash (Tikuvga)
+                                    <CircleCheck size={16} /> Yakunlash (Tikuvga)
                                 </button>
                             )}
                         </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bot, Send, X, Sparkles, MessageSquare, Minimize2, AlertTriangle } from 'lucide-react';
+import { Bot, Send, X, Sparkles, MessageSquare, Minimize2, TriangleAlert } from 'lucide-react';
 import { processUserMessage } from '../lib/ziyoAI';
 
 const ZiyoChat = () => {
@@ -183,7 +183,7 @@ const ZiyoChat = () => {
                     `}
                 >
                     <div className="absolute inset-0 rounded-[1.5rem] bg-white/20 blur-md group-hover:blur-lg transition-all opacity-0 group-hover:opacity-100"></div>
-                    {hasAlert ? <AlertTriangle className="text-white relative z-10" size={28} /> : <Bot className="text-white relative z-10" size={28} />}
+                    {hasAlert ? <TriangleAlert className="text-white relative z-10" size={28} /> : <Bot className="text-white relative z-10" size={28} />}
 
                     <span className="absolute -top-1 -right-1 flex h-3 w-3 sm:h-4 sm:w-4">
                         <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${hasAlert ? 'bg-yellow-400' : 'bg-red-400'} opacity-75`}></span>

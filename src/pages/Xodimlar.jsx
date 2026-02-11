@@ -7,12 +7,13 @@ import {
     Edit3,
     Save,
     X,
-    CheckCircle2,
-    MinusCircle,
+    Check,
+    CircleCheck,
+    CircleMinus,
     Copy,
     RefreshCw,
     Plus,
-    AlertCircle
+    CircleAlert
 } from 'lucide-react';
 
 const departments = [
@@ -279,11 +280,11 @@ const Xodimlar = () => {
                                                             <div className="flex items-center gap-2">
                                                                 {perm === 'full' ? (
                                                                     <span className="flex items-center gap-1.5 text-[9px] font-black text-green-500 uppercase">
-                                                                        <CheckCircle2 size={12} /> To'liq
+                                                                        <CircleCheck size={12} /> To'liq
                                                                     </span>
                                                                 ) : perm === 'read' ? (
                                                                     <span className="flex items-center gap-1.5 text-[9px] font-black text-amber-500 uppercase">
-                                                                        <AlertCircle size={12} /> Faqat ko'rish
+                                                                        <CircleAlert size={12} /> Faqat ko'rish
                                                                     </span>
                                                                 ) : (
                                                                     <span className="text-[9px] font-black text-gray-700 uppercase">Kirish yo'q</span>

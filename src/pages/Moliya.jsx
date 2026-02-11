@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Banknote, DollarSign, Wallet, Send, Users, Search, RefreshCw, CheckCircle2, X } from 'lucide-react';
+import { Banknote, DollarSign, Wallet, Send, Users, Search, RefreshCw, CircleCheck, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 const Moliya = () => {
@@ -193,7 +193,7 @@ const Moliya = () => {
                                         </td>
                                         <td className="px-10 py-6">
                                             <div className="flex items-center gap-2">
-                                                <CheckCircle2 size={14} className="text-emerald-500" />
+                                                <CircleCheck size={14} className="text-emerald-500" />
                                                 <span className="text-sm font-black text-white">{days} kun</span>
                                             </div>
                                         </td>

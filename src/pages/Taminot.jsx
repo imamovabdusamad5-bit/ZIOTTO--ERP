@@ -10,16 +10,16 @@ import {
     History,
     TrendingUp,
     MoreVertical,
-    CheckCircle2,
+    CircleCheck,
     Clock,
-    AlertTriangle,
+    TriangleAlert,
     Mail,
     Phone,
     MapPin,
     ArrowUpRight,
     ArrowDownLeft,
     X,
-    AlertCircle,
+    CircleAlert,
     Warehouse,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -119,7 +119,7 @@ const Taminot = () => {
                 {[
                     { label: 'Oylik Xarajat', value: '$12,450', icon: TrendingUp, color: 'text-green-500', bg: 'bg-green-500/10' },
                     { label: 'Faol Buyurtmalar', value: '8 ta', icon: Clock, color: 'text-amber-500', bg: 'bg-amber-500/10' },
-                    { label: 'Kamchiligi bor stok', value: '3 xil', icon: AlertCircle, color: 'text-rose-500', bg: 'bg-rose-500/10' },
+                    { label: 'Kamchiligi bor stok', value: '3 xil', icon: CircleAlert, color: 'text-rose-500', bg: 'bg-rose-500/10' },
                     { label: 'Hamkorlar', value: '24 ta', icon: Users, color: 'text-blue-500', bg: 'bg-blue-500/10' },
                 ].map((stat, i) => (
                     <div key={i} className="bg-[#161b22] border border-white/5 p-8 rounded-[2.5rem] shadow-xl group hover:border-blue-500/30 transition-all">
@@ -205,7 +205,7 @@ const Taminot = () => {
                                     </div>
                                     {item.stock < item.min && (
                                         <p className="text-[10px] font-bold text-rose-400 uppercase tracking-tighter flex items-center gap-1">
-                                            <AlertTriangle size={12} /> Minimal qoldiqdan kam!
+                                            <TriangleAlert size={12} /> Minimal qoldiqdan kam!
                                         </p>
                                     )}
                                 </div>

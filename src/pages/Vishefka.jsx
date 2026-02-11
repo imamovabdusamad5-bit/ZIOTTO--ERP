@@ -3,7 +3,7 @@ import {
     Activity,
     Layers,
     Clock,
-    CheckCircle2,
+    CircleCheck,
     Search,
     Plus,
     ArrowDownLeft,
@@ -81,7 +81,7 @@ const Vishefka = () => {
                     {[
                         { id: 'incoming', label: 'Kelganlar', icon: ArrowDownLeft, color: 'text-amber-500' },
                         { id: 'active', label: 'Jarayonda', icon: Scissors, color: 'text-blue-500' },
-                        { id: 'completed', label: 'Tayyor', icon: CheckCircle2, color: 'text-emerald-500' },
+                        { id: 'completed', label: 'Tayyor', icon: CircleCheck, color: 'text-emerald-500' },
                     ].map(tab => (
                         <button
                             key={tab.id}
@@ -143,7 +143,7 @@ const Vishefka = () => {
                                             onClick={() => handleAction(job, 'Completed')}
                                             className="w-full flex items-center justify-center gap-3 py-5 bg-emerald-600 text-white rounded-[2rem] text-[10px] font-black uppercase hover:bg-emerald-500 active:scale-95 transition-all shadow-xl shadow-emerald-500/20"
                                         >
-                                            <CheckCircle2 size={18} /> Tikuvga Yuborish (Tayyor)
+                                            <CircleCheck size={18} /> Tikuvga Yuborish (Tayyor)
                                         </button>
                                     ) : null}
                                 </div>

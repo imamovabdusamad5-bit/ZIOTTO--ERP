@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogIn, Mail, Lock, Activity, ShieldCheck, Shirt, X, AlertCircle } from 'lucide-react';
+import { LogIn, Mail, Lock, Activity, ShieldCheck, Shirt, X, CircleAlert } from 'lucide-react';
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -156,7 +156,7 @@ const Login = () => {
                             </button>
                         </div>
                         <div className="w-20 h-20 bg-amber-500/10 rounded-3xl flex items-center justify-center text-amber-500 mx-auto mb-8 shadow-inner">
-                            <AlertCircle size={40} />
+                            <CircleAlert size={40} />
                         </div>
                         <h3 className="text-2xl font-black text-white text-center mb-4 tracking-tight">Parolni tiklash</h3>
                         <p className="text-gray-400 text-center text-sm leading-relaxed mb-10 font-medium">

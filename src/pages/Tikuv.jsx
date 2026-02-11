@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Shirt, Timer, Play, CheckCircle2, Activity, X, UserCheck } from 'lucide-react';
+import { Users, Shirt, Timer, Play, CircleCheck, Activity, X, UserCheck } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 const Tikuv = () => {

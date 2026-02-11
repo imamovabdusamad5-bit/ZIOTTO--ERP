@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Scissors, Activity, AlertCircle, CheckCircle,
+    Scissors, Activity, CircleAlert, CircleCheck,
     Layers, Package, ChevronRight, ArrowUpRight,
     Search, Filter, Plus, ClipboardList, Ruler,
     History, TrendingUp, Printer, X, Trash2,
     ArrowDownLeft, ArrowRight,
-    CheckCircle2, Scale
+    Scale
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { insertCuttingActual } from '../services/cuttingService';
@@ -471,7 +471,7 @@ const Kesim = () => {
                     <div className="bg-[#161b22] border border-white/10 w-full max-w-lg rounded-[3.5rem] overflow-hidden shadow-4xl animate-in zoom-in-95 duration-300 relative">
                         <div className="p-10 border-b border-white/5 flex items-center justify-between">
                             <h3 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
-                                <CheckCircle2 className="text-emerald-500" />
+                                <CircleCheck className="text-emerald-500" />
                                 Matoni Qabul Qilish
                             </h3>
                             <button onClick={() => setShowConfirmModal(false)} className="text-gray-500 hover:text-white transition-colors">

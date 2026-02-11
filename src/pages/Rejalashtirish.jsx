@@ -3,7 +3,7 @@ import {
     ClipboardList, Calculator, Plus, Trash2, Save,
     Layers, ShoppingBag, Package, Palette, Ruler,
     Activity, ChevronDown, ChevronRight, FileText,
-    History, Shirt, RefreshCw, X, Settings2, Edit3, Clock, Download, CheckCircle2
+    History, Shirt, RefreshCw, X, Settings2, Edit3, Clock, Download, CircleCheck
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { exportComplexTable } from '../utils/ExcelExport';
@@ -1041,7 +1041,7 @@ const Rejalashtirish = () => {
                                             className="p-3 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white rounded-xl transition-all"
                                             title="Tasdiqlash"
                                         >
-                                            <CheckCircle2 size={16} />
+                                            <CircleCheck size={16} />
                                         </button>
                                     )}
                                     <button
