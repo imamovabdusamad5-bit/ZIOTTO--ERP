@@ -7,7 +7,7 @@ import {
     Shirt,
     ClipboardList,
     Warehouse,
-    CheckCircle,
+    CircleCheck,
     Package,
     Users,
     Banknote,
@@ -45,7 +45,7 @@ const menuItems = [
     { path: '/pechat', name: 'Pechat & Naqsh', icon: Printer, roles: ['admin', 'printing'] },
     { path: '/vishefka', name: 'Vishefka', icon: Scissors, roles: ['admin', 'printing'] }, // Use Scissors as placeholder or Activity
     { path: '/tikuv', name: 'Tikuv', icon: Shirt, roles: ['admin', 'sewing'] },
-    { path: '/otk', name: 'OTK (Sifat)', icon: CheckCircle, roles: ['admin', 'otk'] },
+    { path: '/otk', name: 'OTK (Sifat)', icon: CircleCheck, roles: ['admin', 'otk'] },
     { path: '/dazmol', name: 'Dazmol & Qadoq', icon: Package, roles: ['admin', 'ironing'] },
     { path: '/hr', name: 'HR (Kadrlar)', icon: Users, roles: ['admin', 'planning', 'director', 'hr_manager', 'tikuv', 'bichuv'] },
     { path: '/xodimlar', name: 'Xodimlar & Huquqlar', icon: ShieldCheck, roles: ['admin', 'planning'] },

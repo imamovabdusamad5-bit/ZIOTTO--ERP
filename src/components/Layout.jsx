@@ -1,5 +1,5 @@
 import { useTheme } from '../context/ThemeContext';
-import { Activity, Menu, CheckCircle, Eye, EyeOff, History, RotateCcw, Sun, Moon } from 'lucide-react';
+import { Activity, Menu, CircleCheck, Eye, EyeOff, History, RotateCcw, Sun, Moon } from 'lucide-react';
 import Sidebar from './Sidebar';
 
 const Layout = () => {
@@ -200,7 +200,7 @@ const Layout = () => {
                                                     className="p-2 bg-gray-50 hover:bg-green-50 text-gray-300 hover:text-green-600 rounded-lg transition-all ml-auto shrink-0"
                                                     title="Tanishdim (Yashirish)"
                                                 >
-                                                    <CheckCircle size={20} />
+                                                    <CircleCheck size={20} />
                                                 </button>
                                             </div>
                                         ))}
