@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-    Package, Search, Plus, History, ArrowDownCircle,
+    Package, Search, Plus, History, CircleArrowDown,
     ArrowUpRight, Trash2, X
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
@@ -299,7 +299,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                         <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-8 sticky top-0 bg-[var(--bg-card)] z-10 pt-2">
                             <div className="flex items-center gap-4">
                                 <div className="p-3 bg-purple-600 rounded-2xl text-white shadow-lg shadow-purple-600/30">
-                                    <ArrowDownCircle size={28} />
+                                    <CircleArrowDown size={28} />
                                 </div>
                                 <div>
                                     <h3 className="text-2xl font-black text-[var(--text-primary)] tracking-tight">Aksessuar Kirim</h3>

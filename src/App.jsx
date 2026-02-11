@@ -65,4 +65,4 @@ function App() {
 
 export default App;
 
-// Force redeploy - v1.1
+// Force redeploy - v1.2 (Fixed Lucide Import Crash)

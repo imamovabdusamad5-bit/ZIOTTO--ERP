@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
-    Warehouse, Search, Plus, History, ArrowDownCircle,
-    ArrowUpRight, ScrollText, QrCode, Printer, Trash2, CheckCircle2
+    Warehouse, Search, Plus, History, CircleArrowDown,
+    ArrowUpRight, ScrollText, QrCode, Printer, Trash2, CircleCheck
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
@@ -469,7 +469,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                         <div className="p-8 border-b border-white/5 flex justify-between items-center sticky top-0 bg-[#0f172a]/95 backdrop-blur-md z-10 rounded-t-[3rem]">
                             <div>
                                 <h3 className="text-2xl font-black text-white tracking-tight flex items-center gap-4">
-                                    <div className="p-3 bg-indigo-600 rounded-2xl text-white shadow-lg shadow-indigo-600/30"><ArrowDownCircle size={24} /></div>
+                                    <div className="p-3 bg-indigo-600 rounded-2xl text-white shadow-lg shadow-indigo-600/30"><CircleArrowDown size={24} /></div>
                                     <span className="bg-gradient-to-r from-white via-indigo-100 to-slate-400 bg-clip-text text-transparent">Yangi Mato Kirimi</span>
                                 </h3>
                                 <p className="text-[11px] text-indigo-300/60 font-black uppercase tracking-widest mt-2 ml-[3.25rem]">Omborga yangi mato qabul qilish</p>
@@ -671,7 +671,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                 {itemRolls.length > 0 && (
                                     <div className="bg-rose-500/5 border border-rose-500/10 p-6 rounded-3xl">
                                         <h4 className="flex items-center gap-2 text-rose-400 font-black uppercase text-xs tracking-widest mb-4">
-                                            <CheckCircle2 size={16} /> Poylarni Tanlash (Qulay)
+                                            <CircleCheck size={16} /> Poylarni Tanlash (Qulay)
                                         </h4>
                                         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-48 overflow-y-auto custom-scrollbar pr-2">
                                             {itemRolls.map(roll => (

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-    CheckCircle2, Search, Truck, ShoppingCart, Tag, Plus, ArrowDownCircle, X
+    CircleCheck, Search, Truck, ShoppingCart, Tag, Plus, CircleArrowDown, X
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
@@ -368,7 +368,7 @@ const TayyorMahsulotOmbori = ({ inventory, onRefresh, viewMode }) => {
                         <div className="p-8 border-b border-[var(--border-color)] flex justify-between items-center bg-[var(--bg-card)] sticky top-0 z-10">
                             <div>
                                 <h3 className="text-2xl font-black text-[var(--text-primary)] flex items-center gap-3">
-                                    <ArrowDownCircle size={28} className="text-emerald-500" />
+                                    <CircleArrowDown size={28} className="text-emerald-500" />
                                     <span className="bg-gradient-to-r from-[var(--text-primary)] to-slate-400 bg-clip-text text-transparent">Yangi Kirim</span>
                                 </h3>
                                 <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase mt-1 ml-10 tracking-wider">Tayyor mahsulotni omborga olish</p>

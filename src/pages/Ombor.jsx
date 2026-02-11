@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
-    Warehouse, Package, CheckCircle2, AlertTriangle, Layers,
+    Warehouse, Package, CircleCheck, TriangleAlert, Layers,
     History, Plus
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -140,8 +140,8 @@ const Ombor = () => {
     const genericStats = [
         { label: 'Jami Mato', value: (inventory || []).filter(i => i.category === 'Mato').reduce((a, b) => a + (Number(b.quantity) || 0), 0).toFixed(1), unit: 'kg', icon: Layers, color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20' },
         { label: 'Aksessuarlar', value: (inventory || []).filter(i => i.category === 'Aksessuar').reduce((a, b) => a + (Number(b.quantity) || 0), 0), unit: 'dona', icon: Package, color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/20' },
-        { label: 'Tayyor Mahsulot', value: (inventory || []).filter(i => i.category === 'Tayyor Mahsulot').reduce((a, b) => a + (Number(b.quantity) || 0), 0), unit: 'dona', icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
-        { label: 'Zaxira Kam', value: (inventory || []).filter(i => Number(i.quantity || 0) < 5).length, unit: 'tur', icon: AlertTriangle, color: 'text-rose-400', bg: 'bg-rose-500/10', border: 'border-rose-500/20' }
+        { label: 'Tayyor Mahsulot', value: (inventory || []).filter(i => i.category === 'Tayyor Mahsulot').reduce((a, b) => a + (Number(b.quantity) || 0), 0), unit: 'dona', icon: CircleCheck, color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
+        { label: 'Zaxira Kam', value: (inventory || []).filter(i => Number(i.quantity || 0) < 5).length, unit: 'tur', icon: TriangleAlert, color: 'text-rose-400', bg: 'bg-rose-500/10', border: 'border-rose-500/20' }
     ];
 
     // Determine what to show based on Tab
@@ -176,7 +176,7 @@ const Ombor = () => {
             label: i.label,
             value: i.value,
             unit: i.unit || 'dona',
-            icon: CheckCircle2, // Changed from Package to CheckCircle2 per original
+            icon: CircleCheck, // Changed from Package to CircleCheck per original
             color: i.isLow ? 'text-rose-500' : 'text-emerald-400',
             bg: i.isLow ? 'bg-rose-500/10' : 'bg-emerald-500/10',
             border: i.isLow ? 'border-rose-500/20' : 'border-emerald-500/20',
