@@ -118,10 +118,11 @@ const Ombor = () => {
         const map = new Map();
 
         filtered.forEach(item => {
+            if (!item) return;
             const name = item.item_name || 'Noma\'lum';
-            const current = map.get(name) || { quantity: 0, unit: item.unit, count: 0 };
+            const current = map.get(name) || { quantity: 0, unit: item.unit || 'dona', count: 0 };
             map.set(name, {
-                quantity: current.quantity + (Number(item.quantity) || 0),
+                quantity: current.quantity + (typeof item.quantity === 'number' ? item.quantity : parseFloat(item.quantity) || 0),
                 unit: item.unit || current.unit,
                 count: current.count + 1
             });
@@ -303,13 +304,13 @@ const Ombor = () => {
                         )}
                         {activeTab === 'So\'rovlar' && (
                             <MaterialRequests
-                                requests={requests}
+                                requests={requests || []}
                                 onRefresh={fetchInitialData}
                                 viewMode={viewMode}
                             />
                         )}
                         {activeTab === 'Tarix' && (
-                            <OmborTarix logs={logs} viewMode={viewMode} />
+                            <OmborTarix logs={logs || []} viewMode={viewMode} />
                         )}
                     </>
                 )}
