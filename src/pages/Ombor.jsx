@@ -114,7 +114,7 @@ const Ombor = () => {
 
     // --- AGGREGATION LOGIC ---
     const getAggregatedItems = (category) => {
-        const filtered = inventory.filter(i => i.category?.toLowerCase() === category.toLowerCase() || i.category === category);
+        const filtered = (inventory || []).filter(i => i.category?.toLowerCase() === category.toLowerCase() || i.category === category);
         const map = new Map();
 
         filtered.forEach(item => {
@@ -137,10 +137,10 @@ const Ombor = () => {
 
     // Generic Stats for History/Overview
     const genericStats = [
-        { label: 'Jami Mato', value: inventory.filter(i => i.category === 'Mato').reduce((a, b) => a + (Number(b.quantity) || 0), 0).toFixed(1), unit: 'kg', icon: Layers, color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20' },
-        { label: 'Aksessuarlar', value: inventory.filter(i => i.category === 'Aksessuar').reduce((a, b) => a + (Number(b.quantity) || 0), 0), unit: 'dona', icon: Package, color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/20' },
-        { label: 'Tayyor Mahsulot', value: inventory.filter(i => i.category === 'Tayyor Mahsulot').reduce((a, b) => a + (Number(b.quantity) || 0), 0), unit: 'dona', icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
-        { label: 'Zaxira Kam', value: inventory.filter(i => Number(i.quantity || 0) < 5).length, unit: 'tur', icon: AlertTriangle, color: 'text-rose-400', bg: 'bg-rose-500/10', border: 'border-rose-500/20' }
+        { label: 'Jami Mato', value: (inventory || []).filter(i => i.category === 'Mato').reduce((a, b) => a + (Number(b.quantity) || 0), 0).toFixed(1), unit: 'kg', icon: Layers, color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20' },
+        { label: 'Aksessuarlar', value: (inventory || []).filter(i => i.category === 'Aksessuar').reduce((a, b) => a + (Number(b.quantity) || 0), 0), unit: 'dona', icon: Package, color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/20' },
+        { label: 'Tayyor Mahsulot', value: (inventory || []).filter(i => i.category === 'Tayyor Mahsulot').reduce((a, b) => a + (Number(b.quantity) || 0), 0), unit: 'dona', icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
+        { label: 'Zaxira Kam', value: (inventory || []).filter(i => Number(i.quantity || 0) < 5).length, unit: 'tur', icon: AlertTriangle, color: 'text-rose-400', bg: 'bg-rose-500/10', border: 'border-rose-500/20' }
     ];
 
     // Determine what to show based on Tab
@@ -278,25 +278,25 @@ const Ombor = () => {
                     <>
                         {activeTab === 'Mato' && (
                             <MatoOmbori
-                                inventory={inventory.filter(i => i.category?.toLowerCase() === 'mato')}
-                                references={references.filter(r => r.type === 'Mato')}
-                                orders={orders}
+                                inventory={(inventory || []).filter(i => i.category?.toLowerCase() === 'mato')}
+                                references={(references || []).filter(r => r.type === 'Mato')}
+                                orders={orders || []}
                                 onRefresh={fetchInitialData}
                                 viewMode={viewMode}
                             />
                         )}
                         {activeTab === 'Aksessuar' && (
                             <AksessuarOmbori
-                                inventory={inventory.filter(i => i.category?.toLowerCase() === 'aksessuar')}
-                                references={references}
-                                orders={orders}
+                                inventory={(inventory || []).filter(i => i.category?.toLowerCase() === 'aksessuar')}
+                                references={references || []}
+                                orders={orders || []}
                                 onRefresh={fetchInitialData}
                                 viewMode={viewMode}
                             />
                         )}
                         {activeTab === 'Tayyor Mahsulot' && (
                             <TayyorMahsulotOmbori
-                                inventory={inventory.filter(i => i.category?.toLowerCase() === 'tayyor mahsulot')}
+                                inventory={(inventory || []).filter(i => i.category?.toLowerCase() === 'tayyor mahsulot')}
                                 onRefresh={fetchInitialData}
                                 viewMode={viewMode}
                             />
