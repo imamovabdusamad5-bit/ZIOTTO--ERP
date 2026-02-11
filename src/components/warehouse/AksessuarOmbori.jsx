@@ -318,7 +318,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                     onChange={(e) => setInboundData({ ...inboundData, selected_material_name: e.target.value })}
                                 >
                                     <option value="" className="bg-[var(--bg-card)] text-[var(--text-secondary)]">Tanlang...</option>
-                                    {[...new Set(references.filter(r => r.type === 'Aksessuar').map(r => r.name))].map(n => (
+                                    {[...new Set((references || []).filter(r => r.type === 'Aksessuar').map(r => r.name))].map(n => (
                                         <option key={n} value={n} className="bg-[var(--bg-card)] text-[var(--text-primary)]">{n}</option>
                                     ))}
                                 </select>

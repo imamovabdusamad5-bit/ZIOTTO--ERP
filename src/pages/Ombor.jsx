@@ -118,7 +118,7 @@ const Ombor = () => {
         const map = new Map();
 
         filtered.forEach(item => {
-            const name = item.item_name;
+            const name = item.item_name || 'Noma\'lum';
             const current = map.get(name) || { quantity: 0, unit: item.unit, count: 0 };
             map.set(name, {
                 quantity: current.quantity + (Number(item.quantity) || 0),
@@ -254,7 +254,7 @@ const Ombor = () => {
                         <div key={idx} className={`bg-[var(--bg-card)] backdrop-blur-3xl p-6 rounded-[3rem] border ${stat.border || 'border-[var(--border-color)]'} shadow-2xl hover:-translate-y-1 transition-all flex items-center justify-between relative group min-w-[250px]`}>
                             <div>
                                 <p className={`text-[10px] font-black uppercase tracking-[0.2em] mb-2 ${stat.isLow ? 'text-rose-500' : 'text-[var(--text-secondary)]'}`}>
-                                    {stat.label.length > 20 ? stat.label.substring(0, 20) + '...' : stat.label}
+                                    {(stat.label || '').length > 20 ? (stat.label || '').substring(0, 20) + '...' : (stat.label || 'Noma\'lum')}
                                 </p>
                                 <div className="flex items-baseline gap-1">
                                     <h3 className={`text-3xl font-black ${stat.isLow ? 'text-rose-500' : 'text-[var(--text-primary)]'}`}>{stat.value}</h3>

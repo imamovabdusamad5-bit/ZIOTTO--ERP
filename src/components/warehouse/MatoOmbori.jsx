@@ -488,7 +488,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                         onChange={e => setInboundData({ ...inboundData, selected_material_name: e.target.value, reference_id: '' })}
                                     >
                                         <option value="" className="bg-slate-900 text-slate-500">Tanlang...</option>
-                                        {[...new Set(references.filter(r => r.type === 'Mato').map(r => r.name))].map(n => (
+                                        {[...new Set((references || []).filter(r => r.type === 'Mato').map(r => r.name))].map(n => (
                                             <option key={n} value={n} className="bg-slate-900 text-white">{n}</option>
                                         ))}
                                     </select>
@@ -503,7 +503,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                         onChange={e => setInboundData({ ...inboundData, reference_id: e.target.value })}
                                     >
                                         <option value="" className="bg-[#161b22]">Tanlang...</option>
-                                        {references
+                                        {(references || [])
                                             .filter(r => r.name === inboundData.selected_material_name)
                                             .map(r => <option key={r.id} value={r.id} className="bg-slate-900">{r.thread_type} - {r.grammage}gr</option>)}
                                     </select>
