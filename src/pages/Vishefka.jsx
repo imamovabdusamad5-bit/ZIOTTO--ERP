@@ -72,12 +72,12 @@ const Vishefka = () => {
                         <Activity size={32} />
                     </div>
                     <div>
-                        <h2 className="text-3xl font-black text-white tracking-tight">Vishefka (Kashtachilik)</h2>
-                        <p className="text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px] mt-1">Kashta va naqsh bo'limi</p>
+                        <h2 className="text-3xl font-black text-[var(--text-primary)] tracking-tight">Vishefka (Kashtachilik)</h2>
+                        <p className="text-[var(--text-secondary)] font-bold uppercase tracking-[0.2em] text-[10px] mt-1">Kashta va naqsh bo'limi</p>
                     </div>
                 </div>
 
-                <div className="flex bg-[#161b22] p-1.5 rounded-2xl border border-white/5">
+                <div className="flex bg-[var(--bg-sidebar-footer)] p-1.5 rounded-2xl border border-[var(--border-color)]">
                     {[
                         { id: 'incoming', label: 'Kelganlar', icon: ArrowDownLeft, color: 'text-amber-500' },
                         { id: 'active', label: 'Jarayonda', icon: Scissors, color: 'text-blue-500' },
@@ -86,7 +86,7 @@ const Vishefka = () => {
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'bg-white/10 text-white shadow-xl' : 'text-gray-500 hover:text-gray-300'
+                            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'bg-[var(--bg-card)] text-[var(--text-primary)] shadow-xl' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                                 }`}
                         >
                             <tab.icon size={14} className={activeTab === tab.id ? tab.color : ''} />
@@ -97,13 +97,13 @@ const Vishefka = () => {
             </div>
 
             {/* Content List */}
-            <div className="bg-[#161b22] border border-white/5 rounded-[3rem] overflow-hidden shadow-2xl">
+            <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-[3rem] overflow-hidden shadow-2xl">
                 <div className="p-10">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {loading ? (
                             <div className="col-span-full py-20 text-center"><Clock className="animate-spin mx-auto text-pink-500" /></div>
                         ) : bundles.map((job) => (
-                            <div key={job.id} className="bg-white/5 border border-white/5 p-8 rounded-[3.5rem] shadow-xl relative overflow-hidden group hover:border-pink-500/30 transition-all">
+                            <div key={job.id} className="bg-[var(--bg-body)] border border-[var(--border-color)] p-8 rounded-[3.5rem] shadow-xl relative overflow-hidden group hover:border-pink-500/30 transition-all">
                                 <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform">
                                     <Activity size={120} />
                                 </div>
@@ -117,16 +117,16 @@ const Vishefka = () => {
                                             {activeTab === 'incoming' ? 'Qabul kutilmoqda' : 'Faol'}
                                         </span>
                                     </div>
-                                    <h3 className="text-2xl font-black text-white mb-2 tracking-tight uppercase">{job.production_orders?.models?.name}</h3>
-                                    <p className="text-gray-500 font-bold mb-8 uppercase text-[10px] tracking-[0.2em]">{job.color} | {job.size}</p>
+                                    <h3 className="text-2xl font-black text-[var(--text-primary)] mb-2 tracking-tight uppercase">{job.production_orders?.models?.name}</h3>
+                                    <p className="text-[var(--text-secondary)] font-bold mb-8 uppercase text-[10px] tracking-[0.2em]">{job.color} | {job.size}</p>
 
                                     <div className="grid grid-cols-2 gap-8 mb-10">
                                         <div>
-                                            <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-1">Miqdor</p>
-                                            <p className="text-xl font-black text-white">{job.quantity} <span className="text-xs text-gray-500">dona</span></p>
+                                            <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-1">Miqdor</p>
+                                            <p className="text-xl font-black text-[var(--text-primary)]">{job.quantity} <span className="text-xs text-[var(--text-secondary)]">dona</span></p>
                                         </div>
                                         <div>
-                                            <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-1">Bo'lim</p>
+                                            <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-1">Bo'lim</p>
                                             <p className="text-xl font-black text-pink-500">Vishefka</p>
                                         </div>
                                     </div>
@@ -152,8 +152,8 @@ const Vishefka = () => {
                     </div>
 
                     {!loading && bundles.length === 0 && (
-                        <div className="py-20 text-center bg-white/2 rounded-[3rem] border-2 border-dashed border-white/5">
-                            <p className="text-gray-500 font-bold uppercase tracking-widest text-xs">Hozircha ishlar yo'q</p>
+                        <div className="py-20 text-center bg-[var(--bg-body)] rounded-[3rem] border-2 border-dashed border-[var(--border-color)]">
+                            <p className="text-[var(--text-secondary)] font-bold uppercase tracking-widest text-xs">Hozircha ishlar yo'q</p>
                         </div>
                     )}
                 </div>

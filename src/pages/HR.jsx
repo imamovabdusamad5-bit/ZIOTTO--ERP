@@ -7,13 +7,14 @@ import {
     Plus,
     Search,
     Camera,
-    Edit3,
+    Pencil,
     Trash2,
     CircleCheck,
     Calendar,
     Phone,
     Briefcase,
-    X
+    X,
+    ArrowUpRight
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
@@ -43,6 +44,14 @@ const HR = () => {
 
     const [checkOutModalEmployee, setCheckOutModalEmployee] = useState(null);
     const [checkOutReason, setCheckOutReason] = useState('');
+    const [attModalEmployee, setAttModalEmployee] = useState(null);
+    const [attFormData, setAttFormData] = useState({
+        status: 'Keldi',
+        late_minutes: '',
+        reason: '',
+        efficiency: '90%'
+    });
+
 
     // Fetch employees and attendance data
     useEffect(() => {
@@ -90,6 +99,38 @@ const HR = () => {
         }
     };
 
+    const handleSaveAttendance = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            const now = new Date();
+            const record = {
+                profile_id: attModalEmployee.id,
+                date: now.toISOString().split('T')[0],
+                check_in: attFormData.status === 'Keldi' || attFormData.status === 'Kechikdi' ? now.toISOString() : null,
+                status: attFormData.status === 'Keldi' ? 'present' :
+                    attFormData.status === 'Kechikdi' ? 'late' : 'absent',
+                late_minutes: attFormData.status === 'Kechikdi' ? Number(attFormData.late_minutes) : 0,
+                reason: attFormData.reason,
+                efficiency: Number(attFormData.efficiency) || 90
+            };
+
+            const { error } = await supabase.from('attendance').upsert(record); // Upsert handles updates for same day if needed
+            if (error) throw error;
+
+            setAttModalEmployee(null);
+            setAttFormData({ status: 'Keldi', late_minutes: '', reason: '', efficiency: '90%' });
+            fetchEmployees();
+            alert('Davomat saqlandi!');
+
+        } catch (err) {
+            alert('Xatolik: ' + err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
     const handleSaveCheckOut = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -116,10 +157,39 @@ const HR = () => {
         }
     };
 
+    const handleAddEmployee = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        // Implement add employee logic here
+        // Usually involves supabase.auth.signUp if you want them to have login, 
+        // or just inserting into 'profiles' if they are managed users.
+        // For brevity, let's assume direct insert into 'profiles' is handling it via triggers or manual insert
+        // But 'profiles' is typically linked to auth.users.
+        // If this is a simple HR record without login, you might need a different table or logic.
+        // Assuming current logic just wants to alert success for now based on snippet context.
+        alert("Yangi xodim qo'shish funksiyasi hali to'liq integratsiya qilinmagan.");
+        setLoading(false);
+        setShowAddModal(false);
+    };
+
+    const handlePhotoSelect = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setNewEmployee({
+                ...newEmployee,
+                preview: URL.createObjectURL(file)
+                // In real app, upload file to storage here or on save
+            });
+        }
+    };
+
     // Calculate attendance stats
     const today = new Date().toISOString().split('T')[0];
     const todayAttendance = attendance.filter(a => a.date === today);
     const effectivePresent = todayAttendance.filter(a => a.check_in).length;
+    const effectiveAbsent = todayAttendance.filter(a => a.status === 'absent').length; // Simplification
+    const lateCount = todayAttendance.filter(a => a.status === 'late').length;
+
     const totalCount = employees.length;
 
     // Helper to format time
@@ -138,29 +208,29 @@ const HR = () => {
                         <Users size={32} />
                     </div>
                     <div>
-                        <h2 className="text-3xl font-black text-white tracking-tight">HR & Kadrlar</h2>
-                        <p className="text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px] mt-1">Xodimlar, Davomat (Keldi/Ketdi) va Izohlar</p>
+                        <h2 className="text-3xl font-black text-[var(--text-primary)] tracking-tight">HR & Kadrlar</h2>
+                        <p className="text-[var(--text-secondary)] font-bold uppercase tracking-[0.2em] text-[10px] mt-1">Xodimlar, Davomat (Keldi/Ketdi) va Izohlar</p>
                     </div>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-4">
                     {/* View Mode Toggles */}
-                    <div className="flex bg-white/5 p-1 rounded-2xl border border-white/5">
+                    <div className="flex bg-[var(--bg-sidebar-footer)] p-1 rounded-2xl border border-[var(--border-color)]">
                         <button
                             onClick={() => setViewMode('daily')}
-                            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${viewMode === 'daily' ? 'bg-emerald-600 text-white shadow-lg' : 'text-gray-500 hover:text-white'}`}
+                            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${viewMode === 'daily' ? 'bg-emerald-600 text-white shadow-lg' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
                         >
                             Kunlik
                         </button>
                         <button
                             onClick={() => setViewMode('weekly')}
-                            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${viewMode === 'weekly' ? 'bg-emerald-600 text-white shadow-lg' : 'text-gray-500 hover:text-white'}`}
+                            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${viewMode === 'weekly' ? 'bg-emerald-600 text-white shadow-lg' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
                         >
                             Haftalik
                         </button>
                         <button
                             onClick={() => setViewMode('monthly')}
-                            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${viewMode === 'monthly' ? 'bg-emerald-600 text-white shadow-lg' : 'text-gray-500 hover:text-white'}`}
+                            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${viewMode === 'monthly' ? 'bg-emerald-600 text-white shadow-lg' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
                         >
                             Oylik
                         </button>
@@ -168,11 +238,11 @@ const HR = () => {
 
                     <div className="flex gap-3">
                         <div className="relative">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" size={18} />
                             <input
                                 type="text"
                                 placeholder="Xodim qidirish..."
-                                className="bg-[#161b22] border border-white/5 rounded-2xl pl-12 pr-6 py-4 text-sm text-white focus:border-emerald-500 outline-none w-64 transition-all"
+                                className="bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl pl-12 pr-6 py-4 text-sm text-[var(--text-primary)] focus:border-emerald-500 outline-none w-64 transition-all"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
@@ -201,47 +271,46 @@ const HR = () => {
                         Cheklangan ruxsat: {profile.permissions.managed_depts.join(', ')}
                     </div>
                 )}
-                <div className="ml-auto text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">
+                <div className="ml-auto text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-[0.2em]">
                     Jami ko'rilmoqda: {employees.length} nafar
                 </div>
             </div>
 
-            {/* Attendance Stats */}
             {/* Attendance Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* 1. Jami Xodimlar */}
                 <div
                     onClick={() => setSelectedStat('total')}
-                    className="bg-[#161b22] border border-white/5 p-8 rounded-[2.5rem] shadow-xl relative overflow-hidden group cursor-pointer hover:border-indigo-500/30 transition-all"
+                    className="bg-[var(--bg-card)] border border-[var(--border-color)] p-8 rounded-[2.5rem] shadow-xl relative overflow-hidden group cursor-pointer hover:border-indigo-500/30 transition-all"
                 >
-                    <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:scale-110 transition-transform text-white">
+                    <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:scale-110 transition-transform text-[var(--text-primary)]">
                         <Users size={80} />
                     </div>
-                    <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4">Jami Xodimlar</p>
-                    <p className="text-4xl font-black text-white">{employees.length}</p>
+                    <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em] mb-4">Jami Xodimlar</p>
+                    <p className="text-4xl font-black text-[var(--text-primary)]">{employees.length}</p>
                     <div className="mt-4 flex items-center gap-2">
                         <span className="text-xs font-bold text-indigo-500">Barchasi</span>
-                        <span className="text-[10px] text-gray-600 font-bold uppercase tracking-tighter">Ro'yxatni ko'rish</span>
+                        <span className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-tighter">Ro'yxatni ko'rish</span>
                     </div>
                 </div>
 
                 {/* 2. Ishda (Jami) */}
                 <div
                     onClick={() => setSelectedStat('present')}
-                    className="bg-[#161b22] border border-white/5 p-8 rounded-[2.5rem] shadow-xl relative overflow-hidden group border-b-4 border-b-emerald-500 cursor-pointer hover:border-emerald-500/30 transition-all"
+                    className="bg-[var(--bg-card)] border border-[var(--border-color)] p-8 rounded-[2.5rem] shadow-xl relative overflow-hidden group border-b-4 border-b-emerald-500 cursor-pointer hover:border-emerald-500/30 transition-all"
                 >
                     <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:scale-110 transition-transform text-emerald-500">
                         <UserCheck size={80} />
                     </div>
                     <p className="text-[10px] font-black text-emerald-500/50 uppercase tracking-[0.2em] mb-4">Ishda (Jami)</p>
-                    <p className="text-4xl font-black text-white">
+                    <p className="text-4xl font-black text-[var(--text-primary)]">
                         {effectivePresent}
                     </p>
                     <div className="mt-4 flex items-center gap-2">
                         <span className="text-xs font-bold text-emerald-400">
                             {totalCount > 0 ? Math.round((effectivePresent / totalCount) * 100) : 0}%
                         </span>
-                        <div className="flex-1 bg-white/5 h-1.5 rounded-full overflow-hidden">
+                        <div className="flex-1 bg-[var(--bg-body)] h-1.5 rounded-full overflow-hidden">
                             <div className="bg-emerald-500 h-full" style={{ width: `${totalCount > 0 ? (effectivePresent / totalCount) * 100 : 0}%` }}></div>
                         </div>
                     </div>
@@ -250,13 +319,13 @@ const HR = () => {
                 {/* 3. Kelmadi */}
                 <div
                     onClick={() => setSelectedStat('absent')}
-                    className="bg-[#161b22] border border-white/5 p-8 rounded-[2.5rem] shadow-xl relative overflow-hidden group cursor-pointer hover:border-rose-500/30 transition-all border-b-4 border-b-rose-500/50"
+                    className="bg-[var(--bg-card)] border border-[var(--border-color)] p-8 rounded-[2.5rem] shadow-xl relative overflow-hidden group cursor-pointer hover:border-rose-500/30 transition-all border-b-4 border-b-rose-500/50"
                 >
                     <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:scale-110 transition-transform text-rose-500">
                         <UserX size={80} />
                     </div>
                     <p className="text-[10px] font-black text-rose-500/50 uppercase tracking-[0.2em] mb-4">Kelmadi</p>
-                    <p className="text-4xl font-black text-white">
+                    <p className="text-4xl font-black text-[var(--text-primary)]">
                         {effectiveAbsent}
                     </p>
                     <div className="mt-4 flex items-center gap-2 text-rose-500 text-[10px] font-bold uppercase tracking-widest">
@@ -267,13 +336,13 @@ const HR = () => {
                 {/* 4. Kechikkanlar */}
                 <div
                     onClick={() => setSelectedStat('late')}
-                    className="bg-[#161b22] border border-white/5 p-8 rounded-[2.5rem] shadow-xl relative overflow-hidden group cursor-pointer hover:border-amber-500/30 transition-all border-b-4 border-b-amber-500/50"
+                    className="bg-[var(--bg-card)] border border-[var(--border-color)] p-8 rounded-[2.5rem] shadow-xl relative overflow-hidden group cursor-pointer hover:border-amber-500/30 transition-all border-b-4 border-b-amber-500/50"
                 >
                     <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:scale-110 transition-transform text-amber-500">
                         <Clock size={80} />
                     </div>
                     <p className="text-[10px] font-black text-amber-500/50 uppercase tracking-[0.2em] mb-4">Kechikkanlar</p>
-                    <p className="text-4xl font-black text-white">
+                    <p className="text-4xl font-black text-[var(--text-primary)]">
                         {lateCount}
                     </p>
                     <div className="mt-4 flex items-center gap-2 text-amber-500 text-[10px] font-bold uppercase tracking-widest">
@@ -284,11 +353,11 @@ const HR = () => {
 
             {/* Attendance Details Modal */}
             {selectedStat && (
-                <div className="fixed inset-0 z-[101] flex items-center justify-center p-4 sm:p-6 bg-black/90 backdrop-blur-xl animate-in fade-in duration-300">
-                    <div className="bg-[#161b22] border border-white/10 w-full max-w-4xl max-h-[90vh] rounded-[3rem] overflow-hidden shadow-4xl animate-in zoom-in-95 duration-300 flex flex-col">
-                        <div className="p-8 sm:p-10 border-b border-white/5 flex items-center justify-between">
+                <div className="fixed inset-0 z-[101] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-xl animate-in fade-in duration-300">
+                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-4xl max-h-[90vh] rounded-[3rem] overflow-hidden shadow-4xl animate-in zoom-in-95 duration-300 flex flex-col">
+                        <div className="p-8 sm:p-10 border-b border-[var(--border-color)] flex items-center justify-between">
                             <div>
-                                <h3 className="text-2xl font-black text-white tracking-tight flex items-center gap-3 capitalize">
+                                <h3 className="text-2xl font-black text-[var(--text-primary)] tracking-tight flex items-center gap-3 capitalize">
                                     {selectedStat === 'total' ? <Users className="text-indigo-500" /> :
                                         selectedStat === 'present' ? <UserCheck className="text-emerald-500" /> :
                                             selectedStat === 'absent' ? <UserX className="text-rose-500" /> :
@@ -298,11 +367,11 @@ const HR = () => {
                                             selectedStat === 'absent' ? "Kelmaganlar" :
                                                 "Kechikkanlar"}
                                 </h3>
-                                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">
+                                <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest mt-1">
                                     {viewMode === 'daily' ? "Bugungi" : viewMode === 'weekly' ? "Haftalik" : "Oylik"} hisobot ro'yxati
                                 </p>
                             </div>
-                            <button onClick={() => setSelectedStat(null)} className="p-4 bg-white/5 text-gray-500 hover:text-white rounded-2xl transition-all">
+                            <button onClick={() => setSelectedStat(null)} className="p-4 bg-[var(--bg-body)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-2xl transition-all">
                                 <X size={24} />
                             </button>
                         </div>
@@ -324,14 +393,14 @@ const HR = () => {
                                     .map(emp => {
                                         const att = attendance.find(a => a.profile_id === emp.id);
                                         return (
-                                            <div key={emp.id} className="bg-white/5 border border-white/5 p-6 rounded-3xl flex items-center justify-between group hover:border-white/10 transition-all">
+                                            <div key={emp.id} className="bg-[var(--bg-body)] border border-[var(--border-color)] p-6 rounded-3xl flex items-center justify-between group hover:border-emerald-500/20 transition-all">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 bg-black/40 rounded-2xl border border-white/10 flex items-center justify-center text-white font-black overflow-hidden shadow-inner">
+                                                    <div className="w-12 h-12 bg-[var(--input-bg)] rounded-2xl border border-[var(--border-color)] flex items-center justify-center text-[var(--text-primary)] font-black overflow-hidden shadow-inner">
                                                         {emp.photo_url ? <img src={emp.photo_url} alt="" className="w-full h-full object-cover" /> : emp.full_name?.charAt(0)}
                                                     </div>
                                                     <div>
-                                                        <p className="font-black text-white">{emp.full_name}</p>
-                                                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{emp.department} • {emp.role}</p>
+                                                        <p className="font-black text-[var(--text-primary)]">{emp.full_name}</p>
+                                                        <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest">{emp.department} • {emp.role}</p>
                                                     </div>
                                                 </div>
 
@@ -339,24 +408,24 @@ const HR = () => {
                                                     {selectedStat === 'present' && (
                                                         <div className="text-right">
                                                             <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Kelgan vaqti</p>
-                                                            <p className="text-sm font-mono text-white">{att?.check_in ? new Date(att.check_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}</p>
+                                                            <p className="text-sm font-mono text-[var(--text-primary)]">{att?.check_in ? new Date(att.check_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}</p>
                                                         </div>
                                                     )}
                                                     {selectedStat === 'absent' && (
                                                         <div className="text-right">
                                                             <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest">Sababi</p>
-                                                            <p className="text-sm font-bold text-gray-300">{att?.reason || "Sababsiz"}</p>
+                                                            <p className="text-sm font-bold text-[var(--text-secondary)]">{att?.reason || "Sababsiz"}</p>
                                                         </div>
                                                     )}
                                                     {selectedStat === 'late' && (
                                                         <div className="text-right">
                                                             <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest">Kechikkan</p>
-                                                            <p className="text-sm font-black text-white">{att?.late_minutes || 0} daqiqa</p>
+                                                            <p className="text-sm font-black text-[var(--text-primary)]">{att?.late_minutes || 0} daqiqa</p>
                                                         </div>
                                                     )}
                                                     <div className="text-right">
                                                         <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest">Samaradorlik</p>
-                                                        <p className="text-sm font-black text-white">{att?.efficiency || emp.efficiency || '90%'}</p>
+                                                        <p className="text-sm font-black text-[var(--text-primary)]">{att?.efficiency || emp.efficiency || '90%'}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -375,10 +444,10 @@ const HR = () => {
                                     return true;
                                 }).length === 0 && (
                                         <div className="py-20 text-center">
-                                            <div className="w-20 h-20 bg-white/5 rounded-[2rem] flex items-center justify-center mx-auto text-gray-600 mb-4">
+                                            <div className="w-20 h-20 bg-[var(--bg-body)] rounded-[2rem] flex items-center justify-center mx-auto text-[var(--text-secondary)] mb-4">
                                                 <Search size={32} />
                                             </div>
-                                            <p className="text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px]">Ma'lumot topilmadi</p>
+                                            <p className="text-[var(--text-secondary)] font-bold uppercase tracking-[0.2em] text-[10px]">Ma'lumot topilmadi</p>
                                         </div>
                                     )}
                             </div>
@@ -388,18 +457,18 @@ const HR = () => {
             )}
 
             {/* Employee Matrix */}
-            <div className="bg-[#161b22] border border-white/5 rounded-[3rem] overflow-hidden shadow-2xl">
+            <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-[3rem] overflow-hidden shadow-2xl">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-white/5">
+                        <thead className="bg-[var(--bg-sidebar-footer)]">
                             <tr>
-                                <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Foydalanuvchi</th>
-                                <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Davomat (Keldi / Ketdi)</th>
-                                <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Izoh (Sabab)</th>
-                                <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Amallar</th>
+                                <th className="px-10 py-6 text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">Foydalanuvchi</th>
+                                <th className="px-10 py-6 text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">Davomat (Keldi / Ketdi)</th>
+                                <th className="px-10 py-6 text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">Izoh (Sabab)</th>
+                                <th className="px-10 py-6 text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest text-right">Amallar</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody className="divide-y divide-[var(--border-color)]">
                             {loading ? (
                                 <tr>
                                     <td colSpan="4" className="py-20 text-center"><Clock className="animate-spin mx-auto text-emerald-500" /></td>
@@ -410,22 +479,22 @@ const HR = () => {
                                     const att = attendance.find(a => a.profile_id === emp.id);
 
                                     return (
-                                        <tr key={emp.id} className="hover:bg-white/5 transition-all group">
+                                        <tr key={emp.id} className="hover:bg-[var(--bg-body)] transition-all group">
                                             <td className="px-10 py-6">
                                                 <div className="flex items-center gap-4">
                                                     <div className="relative">
-                                                        <div className="w-14 h-14 bg-white/5 rounded-2xl border border-white/10 flex items-center justify-center text-emerald-500 font-black text-xl overflow-hidden shadow-inner">
+                                                        <div className="w-14 h-14 bg-[var(--input-bg)] rounded-2xl border border-[var(--border-color)] flex items-center justify-center text-emerald-500 font-black text-xl overflow-hidden shadow-inner">
                                                             {emp.photo_url ? (
                                                                 <img src={emp.photo_url} alt="" className="w-full h-full object-cover" />
                                                             ) : (
                                                                 emp.full_name?.charAt(0) || 'U'
                                                             )}
                                                         </div>
-                                                        <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-[#161b22] ${emp.status ? 'bg-emerald-500' : 'bg-rose-500'}`}></div>
+                                                        <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-[var(--bg-card)] ${emp.status ? 'bg-emerald-500' : 'bg-rose-500'}`}></div>
                                                     </div>
                                                     <div>
-                                                        <p className="text-lg font-black text-white tracking-tight">{emp.full_name || emp.username}</p>
-                                                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{emp.department || 'Bo\'limsiz'} • {emp.role}</p>
+                                                        <p className="text-lg font-black text-[var(--text-primary)] tracking-tight">{emp.full_name || emp.username}</p>
+                                                        <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest">{emp.department || 'Bo\'limsiz'} • {emp.role}</p>
                                                     </div>
                                                 </div>
                                             </td>
@@ -440,7 +509,7 @@ const HR = () => {
                                                                 {att.status === 'present' ? 'KELDI' :
                                                                     att.status === 'late' ? 'KECHIKDI' : 'KELMADI'}
                                                             </span>
-                                                            {att.check_in && <span className="text-white font-mono text-xs">{formatTime(att.check_in)}</span>}
+                                                            {att.check_in && <span className="text-[var(--text-primary)] font-mono text-xs">{formatTime(att.check_in)}</span>}
                                                         </div>
 
                                                         {att.status !== 'absent' && (
@@ -450,12 +519,12 @@ const HR = () => {
                                                                         <span className="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border bg-purple-500/10 text-purple-400 border-purple-500/20">
                                                                             KETDI
                                                                         </span>
-                                                                        <span className="text-gray-400 font-mono text-xs">{formatTime(att.check_out)}</span>
+                                                                        <span className="text-[var(--text-secondary)] font-mono text-xs">{formatTime(att.check_out)}</span>
                                                                     </>
                                                                 ) : (
                                                                     <button
                                                                         onClick={() => setCheckOutModalEmployee(emp)}
-                                                                        className="px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white text-[9px] font-bold uppercase border border-white/5 transition-all flex items-center gap-1">
+                                                                        className="px-3 py-1 rounded-lg bg-[var(--bg-body)] hover:bg-[var(--bg-sidebar-footer)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-[9px] font-bold uppercase border border-[var(--border-color)] transition-all flex items-center gap-1">
                                                                         <CircleCheck size={10} /> Ketishni belgilash
                                                                     </button>
                                                                 )}
@@ -463,28 +532,31 @@ const HR = () => {
                                                         )}
                                                     </div>
                                                 ) : (
-                                                    <span className="text-[10px] text-gray-600 font-bold uppercase">Ma'lumot yo'q</span>
+                                                    <span className="text-[10px] text-[var(--text-secondary)] font-bold uppercase">Ma'lumot yo'q</span>
                                                 )}
                                             </td>
                                             <td className="px-10 py-6">
                                                 {att?.reason ? (
-                                                    <p className="text-xs font-medium text-gray-300 max-w-[200px]">{att.reason}</p>
+                                                    <p className="text-xs font-medium text-[var(--text-secondary)] max-w-[200px]">{att.reason}</p>
                                                 ) : (
-                                                    <span className="text-gray-700 text-[10px] uppercase font-bold">-</span>
+                                                    <span className="text-[var(--text-secondary)] text-[10px] uppercase font-bold">-</span>
                                                 )}
                                             </td>
                                             <td className="px-10 py-6 text-right">
                                                 <div className="inline-flex items-center justify-end gap-3">
                                                     {!att ? (
                                                         <button
-                                                            onClick={() => setAttModalEmployee(emp)}
+                                                            onClick={() => {
+                                                                setAttModalEmployee(emp);
+                                                                setAttFormData({ status: 'Keldi', late_minutes: '', reason: '', efficiency: '90%' });
+                                                            }}
                                                             className="px-5 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg shadow-emerald-600/20"
                                                         >
                                                             Davomat +
                                                         </button>
                                                     ) : (
-                                                        <button className="p-3 bg-white/5 text-gray-500 rounded-xl hover:bg-emerald-600 hover:text-white transition-all">
-                                                            <Edit3 size={16} />
+                                                        <button className="p-3 bg-[var(--bg-body)] text-[var(--text-secondary)] rounded-xl hover:bg-emerald-600 hover:text-white transition-all">
+                                                            <Pencil size={16} />
                                                         </button>
                                                     )}
                                                 </div>
@@ -499,15 +571,15 @@ const HR = () => {
 
             {/* Add Employee Modal */}
             {showAddModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl animate-in fade-in duration-300">
-                    <div className="bg-[#161b22] border border-white/10 w-full max-w-2xl rounded-[3rem] overflow-hidden shadow-4xl animate-in zoom-in-95 duration-300 relative">
-                        <div className="p-10 border-b border-white/5 flex items-center justify-between">
-                            <h3 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl animate-in fade-in duration-300">
+                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-2xl rounded-[3rem] overflow-hidden shadow-4xl animate-in zoom-in-95 duration-300 relative">
+                        <div className="p-10 border-b border-[var(--border-color)] flex items-center justify-between">
+                            <h3 className="text-2xl font-black text-[var(--text-primary)] tracking-tight flex items-center gap-3">
                                 <Users className="text-emerald-500" />
                                 Yangi Xodim Qo'shish
                             </h3>
-                            <button onClick={() => setShowAddModal(false)} className="text-gray-500 hover:text-white transition-colors">
-                                <Clock className="rotate-45" size={24} />
+                            <button onClick={() => setShowAddModal(false)} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+                                <Plus className="rotate-45" size={24} />
                             </button>
                         </div>
 
@@ -515,7 +587,7 @@ const HR = () => {
                             {/* Photo Upload Placeholder */}
                             <div className="md:col-span-2 flex justify-center mb-4">
                                 <div className="relative group" onClick={() => document.getElementById('emp-photo').click()}>
-                                    <div className="w-32 h-32 bg-white/5 rounded-[2rem] border-2 border-dashed border-white/10 flex flex-col items-center justify-center text-gray-500 group-hover:border-emerald-500 group-hover:text-emerald-500 transition-all cursor-pointer overflow-hidden">
+                                    <div className="w-32 h-32 bg-[var(--bg-body)] rounded-[2rem] border-2 border-dashed border-[var(--border-color)] flex flex-col items-center justify-center text-[var(--text-secondary)] group-hover:border-emerald-500 group-hover:text-emerald-500 transition-all cursor-pointer overflow-hidden">
                                         {newEmployee.preview ? (
                                             <img src={newEmployee.preview} alt="Profile" className="w-full h-full object-cover" />
                                         ) : (
@@ -539,9 +611,9 @@ const HR = () => {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Foydalanuvchi ismi</label>
+                                <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Foydalanuvchi ismi</label>
                                 <input
-                                    className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-emerald-500 transition-all font-bold"
+                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all font-bold"
                                     placeholder="Masalan: ALISHER123"
                                     value={newEmployee.username}
                                     onChange={(e) => setNewEmployee({ ...newEmployee, username: e.target.value.toUpperCase() })}
@@ -549,9 +621,9 @@ const HR = () => {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Unikal Kod (Maxsus)</label>
+                                <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Unikal Kod (Maxsus)</label>
                                 <input
-                                    className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-emerald-500 transition-all font-mono font-bold"
+                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all font-mono font-bold"
                                     placeholder="9999"
                                     value={newEmployee.unique_code}
                                     onChange={(e) => setNewEmployee({ ...newEmployee, unique_code: e.target.value })}
@@ -559,10 +631,10 @@ const HR = () => {
                             </div>
 
                             <div className="space-y-2 md:col-span-2">
-                                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">FOYDALANUVCHI TO'LIQ ISMI</label>
+                                <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">FOYDALANUVCHI TO'LIQ ISMI</label>
                                 <input
                                     required
-                                    className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-emerald-500 transition-all font-bold text-lg"
+                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all font-bold text-lg"
                                     placeholder="F.I.SH"
                                     value={newEmployee.full_name}
                                     onChange={(e) => setNewEmployee({ ...newEmployee, full_name: e.target.value })}
@@ -570,19 +642,19 @@ const HR = () => {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Lavozimi</label>
+                                <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Lavozimi</label>
                                 <input
                                     required
-                                    className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-emerald-500 transition-all font-bold"
+                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all font-bold"
                                     value={newEmployee.role}
                                     onChange={(e) => setNewEmployee({ ...newEmployee, role: e.target.value })}
                                 />
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">BO'LIMI</label>
+                                <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">BO'LIMI</label>
                                 <input
-                                    className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-emerald-500 transition-all font-bold"
+                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all font-bold"
                                     placeholder="Masalan: Tikuv"
                                     value={newEmployee.department}
                                     onChange={(e) => setNewEmployee({ ...newEmployee, department: e.target.value })}
@@ -590,11 +662,11 @@ const HR = () => {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Telefon Raqami</label>
+                                <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Telefon Raqami</label>
                                 <input
                                     required
                                     placeholder="+998"
-                                    className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-emerald-500 transition-all font-mono"
+                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all font-mono"
                                     value={newEmployee.phone}
                                     onChange={(e) => setNewEmployee({ ...newEmployee, phone: e.target.value })}
                                 />
@@ -612,26 +684,26 @@ const HR = () => {
             )}
             {/* Attendance Recording Modal */}
             {attModalEmployee && (
-                <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-black/90 backdrop-blur-2xl animate-in fade-in duration-300">
-                    <div className="bg-[#161b22] border border-white/10 w-full max-w-lg rounded-[3.5rem] overflow-hidden shadow-4xl animate-in zoom-in-95 duration-300">
-                        <div className="p-10 border-b border-white/5 flex items-center justify-between">
+                <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl animate-in fade-in duration-300">
+                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-lg rounded-[3.5rem] overflow-hidden shadow-4xl animate-in zoom-in-95 duration-300">
+                        <div className="p-10 border-b border-[var(--border-color)] flex items-center justify-between">
                             <div className="flex items-center gap-4">
                                 <div className="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-500">
                                     <Clock size={28} />
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-black text-white tracking-tight">Davomatni Qayd Etish</h3>
-                                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">{attModalEmployee.full_name}</p>
+                                    <h3 className="text-xl font-black text-[var(--text-primary)] tracking-tight">Davomatni Qayd Etish</h3>
+                                    <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest mt-1">{attModalEmployee.full_name}</p>
                                 </div>
                             </div>
-                            <button onClick={() => setAttModalEmployee(null)} className="text-gray-500 hover:text-white transition-colors">
+                            <button onClick={() => setAttModalEmployee(null)} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
                                 <Plus className="rotate-45" size={24} />
                             </button>
                         </div>
 
                         <form onSubmit={handleSaveAttendance} className="p-10 space-y-8">
                             <div className="space-y-4">
-                                <label className="text-[10px] font-black text-white uppercase tracking-widest ml-1">Bugungi Holati</label>
+                                <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Bugungi Holati</label>
                                 <div className="grid grid-cols-3 gap-3">
                                     {['Keldi', 'Kechikdi', 'Kelmadi'].map(status => (
                                         <button
@@ -640,7 +712,7 @@ const HR = () => {
                                             onClick={() => setAttFormData({ ...attFormData, status })}
                                             className={`py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border ${attFormData.status === status
                                                 ? 'bg-emerald-600 text-white border-emerald-500 shadow-lg shadow-emerald-500/20'
-                                                : 'bg-white/5 text-gray-500 border-white/5 hover:border-white/10'
+                                                : 'bg-[var(--bg-body)] text-[var(--text-secondary)] border-[var(--border-color)] hover:border-[var(--text-secondary)]'
                                                 }`}
                                         >
                                             {status}
@@ -651,10 +723,10 @@ const HR = () => {
 
                             {attFormData.status === 'Kechikdi' && (
                                 <div className="space-y-2 animate-in slide-in-from-top-4 duration-300">
-                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Kechikkan vaqti (daqiqa)</label>
+                                    <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Kechikkan vaqti (daqiqa)</label>
                                     <input
                                         type="number"
-                                        className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-emerald-500 transition-all font-black text-lg"
+                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all font-black text-lg"
                                         value={attFormData.late_minutes}
                                         onChange={(e) => setAttFormData({ ...attFormData, late_minutes: e.target.value })}
                                         placeholder="0"
@@ -664,9 +736,9 @@ const HR = () => {
 
                             {(attFormData.status === 'Kechikdi' || attFormData.status === 'Kelmadi') && (
                                 <div className="space-y-2 animate-in slide-in-from-top-4 duration-300">
-                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Sababi</label>
+                                    <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Sababi</label>
                                     <textarea
-                                        className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-emerald-500 transition-all font-bold min-h-[100px] resize-none"
+                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all font-bold min-h-[100px] resize-none"
                                         value={attFormData.reason}
                                         onChange={(e) => setAttFormData({ ...attFormData, reason: e.target.value })}
                                         placeholder="Sababini yozing..."
@@ -675,10 +747,10 @@ const HR = () => {
                             )}
 
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Samaradorlik (%)</label>
+                                <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Samaradorlik (%)</label>
                                 <input
                                     type="number"
-                                    className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-emerald-500 transition-all font-black"
+                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all font-black"
                                     value={attFormData.efficiency}
                                     onChange={(e) => setAttFormData({ ...attFormData, efficiency: e.target.value })}
                                 />
@@ -698,33 +770,33 @@ const HR = () => {
 
             {/* Check Out Modal */}
             {checkOutModalEmployee && (
-                <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-black/90 backdrop-blur-2xl animate-in fade-in duration-300">
-                    <div className="bg-[#161b22] border border-white/10 w-full max-w-lg rounded-[3.5rem] overflow-hidden shadow-4xl animate-in zoom-in-95 duration-300">
-                        <div className="p-10 border-b border-white/5 flex items-center justify-between">
+                <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl animate-in fade-in duration-300">
+                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-lg rounded-[3.5rem] overflow-hidden shadow-4xl animate-in zoom-in-95 duration-300">
+                        <div className="p-10 border-b border-[var(--border-color)] flex items-center justify-between">
                             <div className="flex items-center gap-4">
                                 <div className="w-14 h-14 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-500">
                                     <CircleCheck size={28} />
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-black text-white tracking-tight">Ishni Yakunlash</h3>
-                                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">{checkOutModalEmployee.full_name}</p>
+                                    <h3 className="text-xl font-black text-[var(--text-primary)] tracking-tight">Ishni Yakunlash</h3>
+                                    <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest mt-1">{checkOutModalEmployee.full_name}</p>
                                 </div>
                             </div>
-                            <button onClick={() => setCheckOutModalEmployee(null)} className="text-gray-500 hover:text-white transition-colors">
+                            <button onClick={() => setCheckOutModalEmployee(null)} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
                                 <Plus className="rotate-45" size={24} />
                             </button>
                         </div>
 
                         <form onSubmit={handleSaveCheckOut} className="p-10 space-y-8">
-                            <div className="bg-white/5 p-6 rounded-2xl border border-white/5 text-center">
-                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-2">Hozirgi Vaqt</p>
-                                <p className="text-3xl font-black text-white font-mono">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                            <div className="bg-[var(--bg-body)] p-6 rounded-2xl border border-[var(--border-color)] text-center">
+                                <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest mb-2">Hozirgi Vaqt</p>
+                                <p className="text-3xl font-black text-[var(--text-primary)] font-mono">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Izoh / Sabab (Ixtiyoriy)</label>
+                                <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Izoh / Sabab (Ixtiyoriy)</label>
                                 <textarea
-                                    className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-emerald-500 transition-all font-bold min-h-[100px] resize-none"
+                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all font-bold min-h-[100px] resize-none"
                                     value={checkOutReason}
                                     onChange={(e) => setCheckOutReason(e.target.value)}
                                     placeholder="Masalan: Uyga erta ketishga ruxsat oldim..."

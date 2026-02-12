@@ -87,16 +87,16 @@ const Moliya = () => {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h2 className="text-3xl font-black text-white tracking-tight">Moliya Bo'limi</h2>
-                    <p className="text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px] mt-1">Oylik maosh hisob-kitobi va to'lovlar</p>
+                    <h2 className="text-3xl font-black text-[var(--text-primary)] tracking-tight">Moliya Bo'limi</h2>
+                    <p className="text-[var(--text-secondary)] font-bold uppercase tracking-[0.2em] text-[10px] mt-1">Oylik maosh hisob-kitobi va to'lovlar</p>
                 </div>
                 <div className="flex gap-4">
                     <div className="relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" size={18} />
                         <input
                             type="text"
                             placeholder="Xodim qidirish..."
-                            className="bg-[#161b22] border border-white/5 rounded-2xl pl-12 pr-6 py-4 text-sm text-white focus:border-blue-500 outline-none w-64 transition-all"
+                            className="bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl pl-12 pr-6 py-4 text-sm text-[var(--text-primary)] focus:border-blue-500 outline-none w-64 transition-all"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -117,90 +117,90 @@ const Moliya = () => {
                     </div>
                 </div>
 
-                <div className="bg-[#161b22] p-8 rounded-[2.5rem] border border-white/5 shadow-2xl relative overflow-hidden group">
+                <div className="bg-[var(--bg-card)] p-8 rounded-[2.5rem] border border-[var(--border-color)] shadow-2xl relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:scale-110 transition-transform text-orange-500">
                         <Wallet size={80} />
                     </div>
                     <div className="relative z-10">
-                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">To'lanishi Kerak</p>
-                        <p className="text-3xl font-black text-white">{formatMoney(totalBudget * 0.4)}</p>
+                        <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-4">To'lanishi Kerak</p>
+                        <p className="text-3xl font-black text-[var(--text-primary)]">{formatMoney(totalBudget * 0.4)}</p>
                         <p className="text-[10px] text-orange-500/50 font-bold uppercase tracking-widest mt-2">Tasdiqlanmagan to'lovlar</p>
                     </div>
                 </div>
 
-                <div className="bg-[#161b22] p-8 rounded-[2.5rem] border border-white/5 shadow-2xl relative overflow-hidden group">
+                <div className="bg-[var(--bg-card)] p-8 rounded-[2.5rem] border border-[var(--border-color)] shadow-2xl relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:scale-110 transition-transform text-purple-500">
                         <Banknote size={80} />
                     </div>
                     <div className="relative z-10">
-                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">O'rtacha Maosh</p>
-                        <p className="text-3xl font-black text-white">{formatMoney(employees.length ? totalBudget / employees.length : 0)}</p>
+                        <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-4">O'rtacha Maosh</p>
+                        <p className="text-3xl font-black text-[var(--text-primary)]">{formatMoney(employees.length ? totalBudget / employees.length : 0)}</p>
                         <p className="text-[10px] text-purple-500/50 font-bold uppercase tracking-widest mt-2">Bir xodimga</p>
                     </div>
                 </div>
             </div>
 
             {/* Payroll Table */}
-            <div className="bg-[#161b22] rounded-[3rem] shadow-2xl border border-white/5 overflow-hidden">
-                <div className="px-10 py-8 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+            <div className="bg-[var(--bg-card)] rounded-[3rem] shadow-2xl border border-[var(--border-color)] overflow-hidden">
+                <div className="px-10 py-8 border-b border-[var(--border-color)] flex items-center justify-between bg-[var(--bg-body)]">
                     <div>
-                        <h3 className="text-xl font-black text-white tracking-tight">Maosh Jadvali</h3>
-                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">Hozirgi oy bo'yicha hisob-kitoblar</p>
+                        <h3 className="text-xl font-black text-[var(--text-primary)] tracking-tight">Maosh Jadvali</h3>
+                        <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest mt-1">Hozirgi oy bo'yicha hisob-kitoblar</p>
                     </div>
-                    <button onClick={fetchFinanceData} className="p-4 bg-white/5 text-gray-400 hover:text-white rounded-2xl transition-all">
+                    <button onClick={fetchFinanceData} className="p-4 bg-[var(--bg-card)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-2xl transition-all border border-[var(--border-color)]">
                         <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
                     </button>
                 </div>
 
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-white/2">
+                        <thead className="bg-[var(--bg-body)]">
                             <tr>
-                                <th className="px-10 py-6 text-[10px] font-black text-gray-500 uppercase tracking-widest">Xodim</th>
-                                <th className="px-10 py-6 text-[10px] font-black text-gray-500 uppercase tracking-widest">Bo'lim / Tur</th>
-                                <th className="px-10 py-6 text-[10px] font-black text-gray-500 uppercase tracking-widest">Davomat (Kun)</th>
-                                <th className="px-10 py-6 text-[10px] font-black text-gray-500 uppercase tracking-widest">Ishbay (Dona)</th>
-                                <th className="px-10 py-6 text-[10px] font-black text-gray-500 uppercase tracking-widest text-right">Jami Maosh</th>
-                                <th className="px-10 py-6 text-[10px] font-black text-gray-500 uppercase tracking-widest text-right">Amal</th>
+                                <th className="px-10 py-6 text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">Xodim</th>
+                                <th className="px-10 py-6 text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">Bo'lim / Tur</th>
+                                <th className="px-10 py-6 text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">Davomat (Kun)</th>
+                                <th className="px-10 py-6 text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">Ishbay (Dona)</th>
+                                <th className="px-10 py-6 text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest text-right">Jami Maosh</th>
+                                <th className="px-10 py-6 text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest text-right">Amal</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody className="divide-y divide-[var(--border-color)]">
                             {loading ? (
-                                <tr><td colSpan="6" className="py-20 text-center text-gray-500 font-bold">Yuklanmoqda...</td></tr>
+                                <tr><td colSpan="6" className="py-20 text-center text-[var(--text-secondary)] font-bold">Yuklanmoqda...</td></tr>
                             ) : filteredEmployees.map((emp) => {
                                 const salary = calculateSalary(emp.id);
                                 const days = attendance.filter(a => a.profile_id === emp.id && a.status !== 'absent').length;
                                 const workCount = productionLogs.filter(l => l.user_name === emp.username).length;
 
                                 return (
-                                    <tr key={emp.id} className="hover:bg-white/5 transition-all group">
+                                    <tr key={emp.id} className="hover:bg-[var(--bg-body)] transition-all group">
                                         <td className="px-10 py-6">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-12 h-12 bg-white/5 rounded-2xl border border-white/10 flex items-center justify-center text-blue-500 font-black text-lg shadow-inner">
+                                                <div className="w-12 h-12 bg-[var(--bg-body)] rounded-2xl border border-[var(--border-color)] flex items-center justify-center text-blue-500 font-black text-lg shadow-inner">
                                                     {emp.full_name?.charAt(0)}
                                                 </div>
                                                 <div>
-                                                    <p className="font-black text-white">{emp.full_name}</p>
-                                                    <p className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">@{emp.username}</p>
+                                                    <p className="font-black text-[var(--text-primary)]">{emp.full_name}</p>
+                                                    <p className="text-[9px] text-[var(--text-secondary)] font-bold uppercase tracking-widest">@{emp.username}</p>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-10 py-6">
                                             <div className="flex flex-col gap-1">
-                                                <span className="text-white font-black text-xs uppercase tracking-widest">{emp.department || 'Bo\'limsiz'}</span>
-                                                <span className="text-[10px] text-gray-500 font-bold">Ishbay + Oylik</span>
+                                                <span className="text-[var(--text-primary)] font-black text-xs uppercase tracking-widest">{emp.department || 'Bo\'limsiz'}</span>
+                                                <span className="text-[10px] text-[var(--text-secondary)] font-bold">Ishbay + Oylik</span>
                                             </div>
                                         </td>
                                         <td className="px-10 py-6">
                                             <div className="flex items-center gap-2">
                                                 <CircleCheck size={14} className="text-emerald-500" />
-                                                <span className="text-sm font-black text-white">{days} kun</span>
+                                                <span className="text-sm font-black text-[var(--text-primary)]">{days} kun</span>
                                             </div>
                                         </td>
                                         <td className="px-10 py-6">
                                             <div className="flex items-center gap-2">
                                                 <RefreshCw size={14} className="text-blue-500" />
-                                                <span className="text-sm font-black text-white">{workCount} ta</span>
+                                                <span className="text-sm font-black text-[var(--text-primary)]">{workCount} ta</span>
                                             </div>
                                         </td>
                                         <td className="px-10 py-6 text-right">
@@ -212,7 +212,7 @@ const Moliya = () => {
                                                     setSelectedEmployee(emp);
                                                     setShowPaymentModal(true);
                                                 }}
-                                                className="bg-white/5 hover:bg-emerald-600 hover:text-white text-gray-300 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-white/5"
+                                                className="bg-[var(--bg-body)] hover:bg-emerald-600 hover:text-white text-[var(--text-secondary)] px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-[var(--border-color)]"
                                             >
                                                 To'lash
                                             </button>
@@ -227,20 +227,20 @@ const Moliya = () => {
 
             {/* Payment Modal */}
             {showPaymentModal && selectedEmployee && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl animate-in fade-in duration-300">
-                    <div className="bg-[#161b22] border border-white/10 w-full max-w-lg rounded-[3.5rem] overflow-hidden shadow-4xl animate-in zoom-in-95 duration-300">
-                        <div className="p-10 border-b border-white/5 flex items-center justify-between">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl animate-in fade-in duration-300">
+                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-lg rounded-[3.5rem] overflow-hidden shadow-4xl animate-in zoom-in-95 duration-300">
+                        <div className="p-10 border-b border-[var(--border-color)] flex items-center justify-between">
                             <div>
-                                <h3 className="text-2xl font-black text-white tracking-tight">To'lovni Tasdiqlash</h3>
-                                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">{selectedEmployee.full_name}</p>
+                                <h3 className="text-2xl font-black text-[var(--text-primary)] tracking-tight">To'lovni Tasdiqlash</h3>
+                                <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest mt-1">{selectedEmployee.full_name}</p>
                             </div>
-                            <button onClick={() => setShowPaymentModal(false)} className="text-gray-500 hover:text-white">
+                            <button onClick={() => setShowPaymentModal(false)} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
                                 <X size={24} />
                             </button>
                         </div>
                         <div className="p-10 space-y-8">
-                            <div className="bg-white/5 p-8 rounded-[2rem] border border-white/10 text-center">
-                                <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">To'lanadigan Summa</p>
+                            <div className="bg-[var(--bg-body)] p-8 rounded-[2rem] border border-[var(--border-color)] text-center">
+                                <p className="text-[10px] text-[var(--text-secondary)] font-black uppercase tracking-widest mb-2">To'lanadigan Summa</p>
                                 <p className="text-4xl font-black text-emerald-500">{formatMoney(calculateSalary(selectedEmployee.id))}</p>
                             </div>
 
@@ -261,4 +261,3 @@ const Moliya = () => {
 };
 
 export default Moliya;
-

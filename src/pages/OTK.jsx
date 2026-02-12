@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle, XOctagon, RefreshCcw, User } from 'lucide-react';
+import { CircleCheck, OctagonX, RefreshCcw, User } from 'lucide-react';
 
 
 import { supabase } from '../lib/supabase';
@@ -62,7 +62,7 @@ const OTK = () => {
                 <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="p-2 bg-green-100 text-green-600 rounded-lg">
-                            <CheckCircle size={20} />
+                            <CircleCheck size={20} />
                         </div>
                         <h3 className="font-semibold text-gray-700">Qabul Qilindi</h3>
                     </div>
@@ -73,7 +73,7 @@ const OTK = () => {
                 <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="p-2 bg-red-100 text-red-600 rounded-lg">
-                            <XOctagon size={20} />
+                            <OctagonX size={20} />
                         </div>
                         <h3 className="font-semibold text-gray-700">Nuqson (Brak)</h3>
                     </div>

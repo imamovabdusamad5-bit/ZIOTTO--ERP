@@ -36,30 +36,30 @@ const Dashboard = () => {
             {/* Top Stats */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {stats.map((stat, index) => (
-                    <div key={index} className="bg-white rounded-3xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
+                    <div key={index} className="bg-[var(--bg-card)] rounded-3xl shadow-sm p-6 border border-[var(--border-color)] hover:shadow-md transition-shadow">
                         <div className="flex items-center justify-between mb-4">
                             <div className={`p-3 rounded-2xl text-white ${stat.color} shadow-lg shadow-opacity-20`}>
                                 <stat.icon size={22} />
                             </div>
-                            <span className="text-[10px] font-bold text-gray-400 bg-gray-50 px-2 py-1 rounded-lg uppercase">
+                            <span className="text-[10px] font-bold text-[var(--text-secondary)] bg-[var(--bg-body)] px-2 py-1 rounded-lg uppercase">
                                 {stat.trend}
                             </span>
                         </div>
-                        <p className="text-sm font-medium text-gray-500">{stat.title}</p>
-                        <h3 className="text-2xl font-black text-[#1a1c2e] tracking-tight">{stat.value}</h3>
+                        <p className="text-sm font-medium text-[var(--text-secondary)]">{stat.title}</p>
+                        <h3 className="text-2xl font-black text-[var(--text-primary)] tracking-tight">{stat.value}</h3>
                     </div>
                 ))}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Production Trend Chart */}
-                <div className="lg:col-span-2 bg-white rounded-3xl shadow-sm p-8 border border-gray-100">
+                <div className="lg:col-span-2 bg-[var(--bg-card)] rounded-3xl shadow-sm p-8 border border-[var(--border-color)]">
                     <div className="flex items-center justify-between mb-8">
                         <div>
-                            <h3 className="text-lg font-black text-[#1a1c2e]">Ishlab Chiqarish Trendi</h3>
-                            <p className="text-sm text-gray-400">Oxirgi 7 kundagi kiyim tikish hajmi</p>
+                            <h3 className="text-lg font-black text-[var(--text-primary)]">Ishlab Chiqarish Trendi</h3>
+                            <p className="text-sm text-[var(--text-secondary)]">Oxirgi 7 kundagi kiyim tikish hajmi</p>
                         </div>
-                        <button className="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-xl">Batafsil</button>
+                        <button className="text-xs font-bold text-indigo-500 bg-indigo-500/10 px-3 py-1.5 rounded-xl hover:bg-indigo-500/20 transition-all">Batafsil</button>
                     </div>
                     <div className="h-72">
                         <ResponsiveContainer width="100%" height="100%">
@@ -70,11 +70,11 @@ const Dashboard = () => {
                                         <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
                                 <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} dy={10} />
                                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
                                 <Tooltip
-                                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                                    contentStyle={{ borderRadius: '16px', border: '1px solid var(--border-color)', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}
                                 />
                                 <Area type="monotone" dataKey="qty" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorQty)" />
                             </AreaChart>
@@ -83,15 +83,15 @@ const Dashboard = () => {
                 </div>
 
                 {/* Production Progress Bar Chart */}
-                <div className="bg-white rounded-3xl shadow-sm p-8 border border-gray-100">
-                    <h3 className="text-lg font-black text-[#1a1c2e] mb-2">Bo'limlar Holati</h3>
-                    <p className="text-sm text-gray-400 mb-8">Navbatda turgan ish hajmi</p>
+                <div className="bg-[var(--bg-card)] rounded-3xl shadow-sm p-8 border border-[var(--border-color)]">
+                    <h3 className="text-lg font-black text-[var(--text-primary)] mb-2">Bo'limlar Holati</h3>
+                    <p className="text-sm text-[var(--text-secondary)] mb-8">Navbatda turgan ish hajmi</p>
                     <div className="h-72">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={productionData} layout="vertical">
                                 <XAxis type="number" hide />
-                                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 11, fontWeight: 'bold', fill: '#1a1c2e' }} width={80} />
-                                <Tooltip cursor={{ fill: 'transparent' }} />
+                                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 11, fontWeight: 'bold', fill: '#94a3b8' }} width={80} />
+                                <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ backgroundColor: 'var(--bg-card)', borderRadius: '12px', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }} />
                                 <Bar dataKey="value" radius={[0, 10, 10, 0]} barSize={20}>
                                     {productionData.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={entry.color} />
@@ -105,12 +105,12 @@ const Dashboard = () => {
 
             {/* Bottom Section: Active Tasks & Recent History */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-white rounded-3xl shadow-sm p-8 border border-gray-100">
+                <div className="bg-[var(--bg-card)] rounded-3xl shadow-sm p-8 border border-[var(--border-color)]">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl">
+                        <div className="p-2 bg-indigo-500/10 text-indigo-500 rounded-xl">
                             <Clock size={20} />
                         </div>
-                        <h3 className="text-lg font-black text-[#1a1c2e]">Hozirgi Vazifalar</h3>
+                        <h3 className="text-lg font-black text-[var(--text-primary)]">Hozirgi Vazifalar</h3>
                     </div>
                     <div className="space-y-4">
                         {[
@@ -118,23 +118,23 @@ const Dashboard = () => {
                             { model: 'T-Shirt Classic', step: 'Pechatda', qty: 1200, progress: 30, color: 'bg-amber-500' },
                             { model: 'Sweatshirt Basic', step: 'Kesimda', qty: 800, progress: 90, color: 'bg-indigo-500' },
                         ].map((task, idx) => (
-                            <div key={idx} className="p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
+                            <div key={idx} className="p-4 bg-[var(--bg-body)] rounded-2xl border border-[var(--border-color)]">
                                 <div className="flex justify-between items-center mb-2">
-                                    <span className="text-sm font-bold text-gray-800">{task.model}</span>
-                                    <span className="text-[10px] font-black uppercase text-indigo-600 tracking-wider bg-indigo-50 px-2 py-0.5 rounded-md">{task.step}</span>
+                                    <span className="text-sm font-bold text-[var(--text-primary)]">{task.model}</span>
+                                    <span className="text-[10px] font-black uppercase text-indigo-500 tracking-wider bg-indigo-500/10 px-2 py-0.5 rounded-md">{task.step}</span>
                                 </div>
                                 <div className="flex items-center gap-4">
-                                    <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                    <div className="flex-1 h-1.5 bg-[var(--border-color)] rounded-full overflow-hidden">
                                         <div className={`h-full ${task.color} rounded-full`} style={{ width: `${task.progress}%` }}></div>
                                     </div>
-                                    <span className="text-xs font-bold text-gray-500">{task.qty} dona</span>
+                                    <span className="text-xs font-bold text-[var(--text-secondary)]">{task.qty} dona</span>
                                 </div>
                             </div>
                         ))}
                     </div>
                 </div>
 
-                <div className="bg-[#1a1c2e] rounded-3xl shadow-xl p-8 text-white relative overflow-hidden">
+                <div className="bg-[var(--bg-card)] rounded-3xl shadow-xl p-8 text-[var(--text-primary)] relative overflow-hidden border border-[var(--border-color)]">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
                     <div className="flex items-center gap-3 mb-6">
                         <CircleCheck className="text-emerald-400" size={24} />
@@ -142,24 +142,24 @@ const Dashboard = () => {
                     </div>
                     <div className="space-y-6">
                         <div className="flex items-start gap-4">
-                            <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+                            <div className="w-10 h-10 rounded-2xl bg-[var(--bg-hover)] flex items-center justify-center shrink-0">
                                 <Package size={20} className="text-indigo-300" />
                             </div>
                             <div>
                                 <p className="text-sm font-bold">Mato zaxirasi yetarli</p>
-                                <p className="text-xs text-indigo-200/60 mt-1">Ertangi kunlik reja uchun barcha matolar omborda mavjud.</p>
+                                <p className="text-xs text-[var(--text-muted)] mt-1">Ertangi kunlik reja uchun barcha matolar omborda mavjud.</p>
                             </div>
                         </div>
                         <div className="flex items-start gap-4">
-                            <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+                            <div className="w-10 h-10 rounded-2xl bg-[var(--bg-hover)] flex items-center justify-center shrink-0">
                                 <CircleAlert size={20} className="text-amber-400" />
                             </div>
                             <div>
                                 <p className="text-sm font-bold">Aksessuar tanqisligi (Alert)</p>
-                                <p className="text-xs text-indigo-200/60 mt-1">'Model-K' uchun tugmalar 2 kundan keyin keladi.</p>
+                                <p className="text-xs text-[var(--text-muted)] mt-1">'Model-K' uchun tugmalar 2 kundan keyin keladi.</p>
                             </div>
                         </div>
-                        <button className="w-full bg-indigo-600 py-3 rounded-2xl font-bold text-sm hover:bg-indigo-500 transition-colors mt-4">
+                        <button className="w-full bg-indigo-600 py-3 rounded-2xl font-bold text-sm hover:bg-indigo-500 transition-colors mt-4 text-white">
                             To'liq Hisobotni Ko'rish
                         </button>
                     </div>

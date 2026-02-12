@@ -4,7 +4,7 @@ import {
     Users,
     ShieldAlert,
     Key,
-    Edit3,
+    Pencil,
     Save,
     X,
     Check,
@@ -347,7 +347,7 @@ const Xodimlar = () => {
                                                 onClick={() => handleEdit(user)}
                                                 className="p-4 bg-white/5 text-gray-500 rounded-2xl hover:bg-indigo-600 hover:text-white hover:scale-110 transition-all border border-white/5"
                                             >
-                                                <Edit3 size={20} />
+                                                <Pencil size={20} />
                                             </button>
                                         )}
                                     </td>

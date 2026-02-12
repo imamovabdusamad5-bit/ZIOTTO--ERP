@@ -92,14 +92,14 @@ const Pechat = () => {
                         <Printer size={32} />
                     </div>
                     <div>
-                        <h2 className="text-3xl font-black text-white tracking-tight">Pechat & Naqsh</h2>
-                        <p className="text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px] mt-1">Bosma ishlov berish bo'limi</p>
+                        <h2 className="text-3xl font-black text-[var(--text-primary)] tracking-tight">Pechat & Naqsh</h2>
+                        <p className="text-[var(--text-secondary)] font-bold uppercase tracking-[0.2em] text-[10px] mt-1">Bosma ishlov berish bo'limi</p>
                     </div>
                 </div>
 
-                <div className="flex bg-[#161b22] p-1.5 rounded-2xl border border-white/5">
+                <div className="flex bg-[var(--bg-sidebar-footer)] p-1.5 rounded-2xl border border-[var(--border-color)]">
                     {[
-                        { id: 'plans', label: 'Rejalar', icon: Clock, color: 'text-white' },
+                        { id: 'plans', label: 'Rejalar', icon: Clock, color: 'text-[var(--text-primary)]' },
                         { id: 'incoming', label: 'Kelganlar', icon: ArrowDownLeft, color: 'text-amber-500' },
                         { id: 'active', label: 'Jarayonda', icon: Activity, color: 'text-blue-500' },
                         { id: 'completed', label: 'Tayyor', icon: CircleCheck, color: 'text-emerald-500' },
@@ -107,7 +107,7 @@ const Pechat = () => {
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'bg-white/10 text-white shadow-xl' : 'text-gray-500 hover:text-gray-300'
+                            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'bg-[var(--bg-card)] text-[var(--text-primary)] shadow-xl' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                                 }`}
                         >
                             <tab.icon size={14} className={activeTab === tab.id ? tab.color : ''} />
@@ -122,22 +122,22 @@ const Pechat = () => {
                 {activeTab === 'plans' ? (
                     // PLANS VIEW
                     orders.map(order => (
-                        <div key={order.id} className="bg-[#161b22] border border-white/5 p-8 rounded-[2.5rem] shadow-xl hover:border-purple-500/30 transition-all opacity-75 grayscale hover:grayscale-0 hover:opacity-100">
+                        <div key={order.id} className="bg-[var(--bg-card)] border border-[var(--border-color)] p-8 rounded-[2.5rem] shadow-xl hover:border-purple-500/30 transition-all opacity-75 grayscale hover:grayscale-0 hover:opacity-100">
                             <div className="flex justify-between items-start mb-6">
                                 <div>
-                                    <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-white/10 text-white">
+                                    <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-[var(--bg-body)] text-[var(--text-primary)] border border-[var(--border-color)]">
                                         Rejalashtirilgan
                                     </span>
-                                    <h3 className="text-xl font-black text-white mt-3 tracking-tight uppercase">{order.models?.name}</h3>
-                                    <p className="text-xs font-mono font-bold text-gray-500 mt-1">Order # {order.order_number}</p>
+                                    <h3 className="text-xl font-black text-[var(--text-primary)] mt-3 tracking-tight uppercase">{order.models?.name}</h3>
+                                    <p className="text-xs font-mono font-bold text-[var(--text-secondary)] mt-1">Order # {order.order_number}</p>
                                 </div>
                             </div>
                             <div className="space-y-4">
-                                <div className="flex justify-between items-center text-xs font-bold text-gray-500">
+                                <div className="flex justify-between items-center text-xs font-bold text-[var(--text-secondary)]">
                                     <span>Jami:</span>
-                                    <span className="text-white">{order.total_quantity} dona</span>
+                                    <span className="text-[var(--text-primary)]">{order.total_quantity} dona</span>
                                 </div>
-                                <div className="flex justify-between items-center text-xs font-bold text-gray-500">
+                                <div className="flex justify-between items-center text-xs font-bold text-[var(--text-secondary)]">
                                     <span>Muddat:</span>
                                     <span className="text-purple-400">{new Date(order.deadline).toLocaleDateString()}</span>
                                 </div>
@@ -149,7 +149,7 @@ const Pechat = () => {
                     loading ? (
                         <div className="col-span-full py-20 text-center"><Clock className="animate-spin mx-auto text-purple-500" /></div>
                     ) : bundles.map((job) => (
-                        <div key={job.id} className="bg-[#161b22] border border-white/5 p-8 rounded-[2.5rem] shadow-xl hover:shadow-2xl hover:border-purple-500/30 transition-all group relative overflow-hidden">
+                        <div key={job.id} className="bg-[var(--bg-card)] border border-[var(--border-color)] p-8 rounded-[2.5rem] shadow-xl hover:shadow-2xl hover:border-purple-500/30 transition-all group relative overflow-hidden">
                             <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:scale-110 transition-transform">
                                 <Palette size={80} />
                             </div>
@@ -161,21 +161,21 @@ const Pechat = () => {
                                         }`}>
                                         {activeTab === 'incoming' ? 'Qabul kutilmoqda' : activeTab === 'active' ? 'Ishlanmoqda' : 'Tugallandi'}
                                     </span>
-                                    <h3 className="text-xl font-black text-white mt-3 tracking-tight uppercase">{job.production_orders?.models?.name}</h3>
-                                    <p className="text-xs font-mono font-bold text-gray-500 mt-1"># {job.bundle_number}</p>
+                                    <h3 className="text-xl font-black text-[var(--text-primary)] mt-3 tracking-tight uppercase">{job.production_orders?.models?.name}</h3>
+                                    <p className="text-xs font-mono font-bold text-[var(--text-secondary)] mt-1"># {job.bundle_number}</p>
                                 </div>
                             </div>
 
                             <div className="space-y-4 mb-8">
-                                <div className="flex justify-between items-center text-xs font-bold text-gray-500">
+                                <div className="flex justify-between items-center text-xs font-bold text-[var(--text-secondary)]">
                                     <span>Miqdor:</span>
-                                    <span className="text-white">{job.quantity} dona</span>
+                                    <span className="text-[var(--text-primary)]">{job.quantity} dona</span>
                                 </div>
-                                <div className="flex justify-between items-center text-xs font-bold text-gray-500">
+                                <div className="flex justify-between items-center text-xs font-bold text-[var(--text-secondary)]">
                                     <span>Rang:</span>
                                     <span className="text-purple-400">{job.color}</span>
                                 </div>
-                                <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+                                <div className="w-full bg-[var(--bg-body)] h-2 rounded-full overflow-hidden border border-[var(--border-color)]">
                                     <div className={`h-full transition-all duration-1000 ${activeTab === 'incoming' ? 'w-0' : activeTab === 'active' ? 'w-1/2 bg-blue-500' : 'w-full bg-emerald-500'
                                         }`}></div>
                                 </div>
@@ -203,8 +203,8 @@ const Pechat = () => {
                 )}
 
                 {!loading && ((activeTab === 'plans' && orders.length === 0) || (activeTab !== 'plans' && bundles.length === 0)) && (
-                    <div className="col-span-full py-20 text-center bg-white/5 rounded-[3rem] border-2 border-dashed border-white/5">
-                        <p className="text-gray-500 font-bold uppercase tracking-widest text-xs">Ma'lumot topilmadi</p>
+                    <div className="col-span-full py-20 text-center bg-[var(--bg-card)] rounded-[3rem] border-2 border-dashed border-[var(--border-color)]">
+                        <p className="text-[var(--text-secondary)] font-bold uppercase tracking-widest text-xs">Ma'lumot topilmadi</p>
                     </div>
                 )}
             </div>

@@ -133,7 +133,7 @@ const TayyorMahsulotOmbori = ({ inventory, onRefresh, viewMode }) => {
     };
 
     return (
-        <div className="space-y-6 animate-in fade-in duration-500">
+        <div className="space-y-6">
             {/* Header */}
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-[var(--bg-card)] p-6 rounded-[3rem] border border-[var(--border-color)] shadow-2xl backdrop-blur-3xl">
                 <div className="relative w-full md:w-96 group">
@@ -270,8 +270,8 @@ const TayyorMahsulotOmbori = ({ inventory, onRefresh, viewMode }) => {
             )}
             {/* SALE MODAL */}
             {showSaleModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/50 backdrop-blur-xl animate-in fade-in duration-300">
-                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-lg rounded-[3rem] overflow-hidden animate-in zoom-in-95 duration-200 shadow-2xl shadow-emerald-900/20 relative backdrop-blur-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl">
+                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-lg rounded-[3rem] overflow-hidden shadow-2xl shadow-emerald-900/20 relative backdrop-blur-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
                         <div className="p-8 border-b border-[var(--border-color)] bg-[var(--bg-card)] sticky top-0 z-10">
                             <button onClick={() => setShowSaleModal(false)} className="absolute top-4 right-4 p-3 rounded-2xl bg-[var(--bg-body)] hover:bg-rose-500/20 text-[var(--text-secondary)] hover:text-rose-500 transition-all border border-[var(--border-color)]"><X size={20} /></button>
                             <h3 className="text-2xl font-black text-[var(--text-primary)] flex items-center gap-4">
@@ -298,7 +298,7 @@ const TayyorMahsulotOmbori = ({ inventory, onRefresh, viewMode }) => {
                                 <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1 mb-2 block">1. Mijoz Nomi</label>
                                 <input
                                     required
-                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 focus:bg-[var(--input-focus-bg)] transition-all font-bold placeholder-[var(--text-secondary)] shadow-inner"
+                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all font-bold placeholder-[var(--text-secondary)] shadow-inner"
                                     placeholder="Masalan: ABDULLOH SAVDO..."
                                     value={saleData.client_name}
                                     onChange={e => setSaleData({ ...saleData, client_name: e.target.value })}
@@ -312,7 +312,7 @@ const TayyorMahsulotOmbori = ({ inventory, onRefresh, viewMode }) => {
                                     <input
                                         required
                                         type="number"
-                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 focus:bg-[var(--input-focus-bg)] transition-all font-black text-2xl placeholder-[var(--text-secondary)] shadow-inner"
+                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all font-black text-2xl placeholder-[var(--text-secondary)] shadow-inner"
                                         placeholder="0"
                                         value={saleData.quantity}
                                         onChange={e => setSaleData({ ...saleData, quantity: e.target.value })}
@@ -322,7 +322,7 @@ const TayyorMahsulotOmbori = ({ inventory, onRefresh, viewMode }) => {
                                     <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1 mb-2 block">3. Narxi (Opt, $)</label>
                                     <input
                                         type="number"
-                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 focus:bg-[var(--input-focus-bg)] transition-all font-black text-xl placeholder-[var(--text-secondary)] shadow-inner"
+                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all font-black text-xl placeholder-[var(--text-secondary)] shadow-inner"
                                         placeholder="$0.00"
                                         value={saleData.price}
                                         onChange={e => setSaleData({ ...saleData, price: e.target.value })}
@@ -334,7 +334,7 @@ const TayyorMahsulotOmbori = ({ inventory, onRefresh, viewMode }) => {
                                 <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1 mb-2 block">4. Qo'shimcha Izoh</label>
                                 <textarea
                                     rows="2"
-                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 focus:bg-[var(--input-focus-bg)] transition-all font-bold placeholder-[var(--text-secondary)] resize-none shadow-inner"
+                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all font-bold placeholder-[var(--text-secondary)] resize-none shadow-inner"
                                     placeholder="Yuk xati raqami yoki mashina nomeri..."
                                     value={saleData.notes}
                                     onChange={e => setSaleData({ ...saleData, notes: e.target.value })}
@@ -363,8 +363,8 @@ const TayyorMahsulotOmbori = ({ inventory, onRefresh, viewMode }) => {
 
             {/* KIRIM MODAL */}
             {showKirimModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/50 backdrop-blur-xl animate-in fade-in duration-300">
-                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-lg rounded-[3rem] overflow-hidden animate-in zoom-in-95 duration-200 relative shadow-4xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl">
+                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-lg rounded-[3rem] overflow-hidden relative shadow-4xl max-h-[90vh] overflow-y-auto custom-scrollbar">
                         <div className="p-8 border-b border-[var(--border-color)] flex justify-between items-center bg-[var(--bg-card)] sticky top-0 z-10">
                             <div>
                                 <h3 className="text-2xl font-black text-[var(--text-primary)] flex items-center gap-3">
@@ -380,26 +380,26 @@ const TayyorMahsulotOmbori = ({ inventory, onRefresh, viewMode }) => {
                         <form onSubmit={handleKirim} className="p-8 space-y-6">
                             <div>
                                 <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1 mb-2 block">Model Nomi</label>
-                                <input required className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 focus:bg-[var(--input-focus-bg)] transition-all font-bold uppercase shadow-inner" value={kirimData.item_name} onChange={e => setKirimData({ ...kirimData, item_name: e.target.value })} />
+                                <input required className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all font-bold uppercase shadow-inner" value={kirimData.item_name} onChange={e => setKirimData({ ...kirimData, item_name: e.target.value })} />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1 mb-2 block">Rangi</label>
-                                    <input required className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 focus:bg-[var(--input-focus-bg)] transition-all font-bold uppercase shadow-inner" value={kirimData.color} onChange={e => setKirimData({ ...kirimData, color: e.target.value })} />
+                                    <input required className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all font-bold uppercase shadow-inner" value={kirimData.color} onChange={e => setKirimData({ ...kirimData, color: e.target.value })} />
                                 </div>
                                 <div>
                                     <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1 mb-2 block">Artikul (Code)</label>
-                                    <input className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 focus:bg-[var(--input-focus-bg)] transition-all font-bold uppercase shadow-inner" value={kirimData.color_code} onChange={e => setKirimData({ ...kirimData, color_code: e.target.value })} />
+                                    <input className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all font-bold uppercase shadow-inner" value={kirimData.color_code} onChange={e => setKirimData({ ...kirimData, color_code: e.target.value })} />
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1 mb-2 block">Miqdor</label>
-                                    <input required type="number" className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 focus:bg-[var(--input-focus-bg)] transition-all font-black text-2xl shadow-inner" value={kirimData.quantity} onChange={e => setKirimData({ ...kirimData, quantity: e.target.value })} />
+                                    <input required type="number" className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all font-black text-2xl shadow-inner" value={kirimData.quantity} onChange={e => setKirimData({ ...kirimData, quantity: e.target.value })} />
                                 </div>
                                 <div>
                                     <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1 mb-2 block">O'lchov Birligi</label>
-                                    <select className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 focus:bg-[var(--input-focus-bg)] transition-all font-bold uppercase appearance-none cursor-pointer shadow-inner" value={kirimData.unit} onChange={e => setKirimData({ ...kirimData, unit: e.target.value })}>
+                                    <select className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all font-bold uppercase appearance-none cursor-pointer shadow-inner" value={kirimData.unit} onChange={e => setKirimData({ ...kirimData, unit: e.target.value })}>
                                         <option value="dona" className="bg-[var(--bg-card)]">Dona</option>
                                         <option value="kg" className="bg-[var(--bg-card)]">Kg</option>
                                         <option value="metr" className="bg-[var(--bg-card)]">Metr</option>

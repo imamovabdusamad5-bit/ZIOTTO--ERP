@@ -257,12 +257,12 @@ const Kesim = () => {
                         <Scissors size={32} />
                     </div>
                     <div>
-                        <h2 className="text-3xl font-black text-white tracking-tight">Kesim Bo'limi</h2>
-                        <p className="text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px] mt-1">Bichish va detallar hisobi</p>
+                        <h2 className="text-3xl font-black text-[var(--text-primary)] tracking-tight">Kesim Bo'limi</h2>
+                        <p className="text-[var(--text-secondary)] font-bold uppercase tracking-[0.2em] text-[10px] mt-1">Bichish va detallar hisobi</p>
                     </div>
                 </div>
 
-                <div className="flex bg-[#161b22] p-1.5 rounded-2xl border border-white/5">
+                <div className="flex bg-[var(--bg-sidebar-footer)] p-1.5 rounded-2xl border border-[var(--border-color)]">
                     {[
                         { id: 'orders', label: 'Buyurtmalar', icon: ClipboardList, color: 'text-rose-500' },
                         { id: 'requests', label: 'Mato So\'rovlari', icon: Package, color: 'text-blue-500' },
@@ -270,7 +270,7 @@ const Kesim = () => {
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'bg-white/10 text-white shadow-xl' : 'text-gray-500 hover:text-gray-300'
+                            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'bg-[var(--bg-card)] text-[var(--text-primary)] shadow-xl' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                                 }`}
                         >
                             <tab.icon size={14} className={activeTab === tab.id ? tab.color : ''} />
@@ -289,26 +289,26 @@ const Kesim = () => {
                         const progress = (orderBundlesCount / order.total_quantity) * 100;
 
                         return (
-                            <div key={order.id} className="bg-[#161b22] rounded-[2.5rem] border border-white/5 overflow-hidden hover:border-rose-500/30 transition-all group shadow-2xl">
+                            <div key={order.id} className="bg-[var(--bg-card)] rounded-[2.5rem] border border-[var(--border-color)] overflow-hidden hover:border-rose-500/30 transition-all group shadow-2xl">
                                 <div className="p-8 space-y-6">
                                     <div className="flex justify-between items-start">
                                         <div>
                                             <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest bg-rose-500/10 px-3 py-1 rounded-full">{order.status}</span>
-                                            <h3 className="mt-4 text-2xl font-black text-white leading-tight group-hover:text-rose-400 transition-colors uppercase">{order.models?.name}</h3>
-                                            <p className="text-[10px] font-mono font-bold text-gray-500 mt-1 tracking-widest"># {order.order_number}</p>
+                                            <h3 className="mt-4 text-2xl font-black text-[var(--text-primary)] leading-tight group-hover:text-rose-400 transition-colors uppercase">{order.models?.name}</h3>
+                                            <p className="text-[10px] font-mono font-bold text-[var(--text-secondary)] mt-1 tracking-widest"># {order.order_number}</p>
                                         </div>
-                                        <div className="p-4 bg-white/5 rounded-2xl text-center border border-white/5">
-                                            <div className="text-xl font-black text-white">{order.total_quantity}</div>
-                                            <div className="text-[9px] font-bold text-gray-500 uppercase leading-none mt-1">Jami</div>
+                                        <div className="p-4 bg-[var(--bg-body)] rounded-2xl text-center border border-[var(--border-color)]">
+                                            <div className="text-xl font-black text-[var(--text-primary)]">{order.total_quantity}</div>
+                                            <div className="text-[9px] font-bold text-[var(--text-secondary)] uppercase leading-none mt-1">Jami</div>
                                         </div>
                                     </div>
 
                                     <div className="space-y-4">
-                                        <div className="flex justify-between text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                                        <div className="flex justify-between text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">
                                             <span>Progress</span>
                                             <span>{Math.round(progress)}%</span>
                                         </div>
-                                        <div className="w-full bg-white/5 h-2.5 rounded-full overflow-hidden">
+                                        <div className="w-full bg-[var(--bg-body)] h-2.5 rounded-full overflow-hidden">
                                             <div className="bg-rose-500 h-full rounded-full transition-all duration-1000" style={{ width: `${progress}%` }}></div>
                                         </div>
                                     </div>
@@ -320,7 +320,7 @@ const Kesim = () => {
                                                 fetchMatchingInventory();
                                                 setShowFabricModal(true);
                                             }}
-                                            className="flex items-center justify-center gap-2 py-4 bg-white/5 text-gray-300 border border-white/5 rounded-2xl text-[10px] font-black uppercase hover:bg-white/10 active:scale-95 transition-all"
+                                            className="flex items-center justify-center gap-2 py-4 bg-[var(--bg-body)] text-[var(--text-secondary)] border border-[var(--border-color)] rounded-2xl text-[10px] font-black uppercase hover:bg-[var(--bg-sidebar-footer)] active:scale-95 transition-all"
                                         >
                                             <ArrowUpRight size={14} className="text-rose-500" /> Mato So'rash
                                         </button>
@@ -355,23 +355,23 @@ const Kesim = () => {
                     })}
                 </div>
             ) : (
-                <div className="bg-[#161b22] border border-white/5 rounded-[3rem] overflow-hidden shadow-2xl">
+                <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-[3rem] overflow-hidden shadow-2xl">
                     <table className="w-full text-left">
-                        <thead className="bg-white/5">
+                        <thead className="bg-[var(--bg-body)]">
                             <tr>
-                                <th className="px-10 py-6 text-[10px] font-black text-gray-500 uppercase tracking-widest">Sana / ID</th>
-                                <th className="px-10 py-6 text-[10px] font-black text-gray-500 uppercase tracking-widest">Mato</th>
-                                <th className="px-10 py-6 text-[10px] font-black text-gray-500 uppercase tracking-widest">Miqdor (Kutilgan | Berilgan)</th>
-                                <th className="px-10 py-6 text-[10px] font-black text-gray-500 uppercase tracking-widest">Holat</th>
-                                <th className="px-10 py-6 text-[10px] font-black text-gray-500 uppercase tracking-widest text-right">Amal</th>
+                                <th className="px-10 py-6 text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">Sana / ID</th>
+                                <th className="px-10 py-6 text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">Mato</th>
+                                <th className="px-10 py-6 text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">Miqdor (Kutilgan | Berilgan)</th>
+                                <th className="px-10 py-6 text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">Holat</th>
+                                <th className="px-10 py-6 text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest text-right">Amal</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody className="divide-y divide-[var(--border-color)]">
                             {requests.map(req => (
-                                <tr key={req.id} className="hover:bg-white/5 transition-all group">
+                                <tr key={req.id} className="hover:bg-[var(--bg-body)] transition-all group">
                                     <td className="px-10 py-6">
-                                        <p className="text-sm font-black text-white">{new Date(req.created_at).toLocaleDateString()}</p>
-                                        <p className="text-[10px] font-mono text-gray-600 uppercase">REQ-{req.id.slice(0, 5)}</p>
+                                        <p className="text-sm font-black text-[var(--text-primary)]">{new Date(req.created_at).toLocaleDateString()}</p>
+                                        <p className="text-[10px] font-mono text-[var(--text-secondary)] uppercase">REQ-{req.id.slice(0, 5)}</p>
                                     </td>
                                     <td className="px-10 py-6">
                                         <div className="flex items-center gap-3">
@@ -379,15 +379,15 @@ const Kesim = () => {
                                                 <Package size={20} />
                                             </div>
                                             <div>
-                                                <p className="text-sm font-black text-white uppercase">{req.inventory?.item_name}</p>
-                                                <p className="text-[10px] font-bold text-gray-500 uppercase">{req.inventory?.color}</p>
+                                                <p className="text-sm font-black text-[var(--text-primary)] uppercase">{req.inventory?.item_name}</p>
+                                                <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase">{req.inventory?.color}</p>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="px-10 py-6">
                                         <div className="flex items-center gap-3">
-                                            <span className="text-sm font-black text-white">{req.requested_qty} {req.inventory?.unit}</span>
-                                            <ArrowRight size={14} className="text-gray-600" />
+                                            <span className="text-sm font-black text-[var(--text-primary)]">{req.requested_qty} {req.inventory?.unit}</span>
+                                            <ArrowRight size={14} className="text-[var(--text-secondary)]" />
                                             <span className="text-sm font-black text-blue-500">{req.issued_qty || '---'} {req.inventory?.unit}</span>
                                         </div>
                                     </td>
@@ -421,23 +421,23 @@ const Kesim = () => {
 
             {/* Request Modal */}
             {showFabricModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl animate-in fade-in duration-300">
-                    <div className="bg-[#161b22] border border-white/10 w-full max-w-lg rounded-[3.5rem] overflow-hidden shadow-4xl animate-in zoom-in-95 duration-300 relative">
-                        <div className="p-10 border-b border-white/5 flex items-center justify-between">
-                            <h3 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl animate-in fade-in duration-300">
+                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-lg rounded-[3.5rem] overflow-hidden shadow-4xl animate-in zoom-in-95 duration-300 relative">
+                        <div className="p-10 border-b border-[var(--border-color)] flex items-center justify-between">
+                            <h3 className="text-2xl font-black text-[var(--text-primary)] tracking-tight flex items-center gap-3">
                                 <ArrowUpRight className="text-rose-500" />
                                 Mato So'rovnomasi
                             </h3>
-                            <button onClick={() => setShowFabricModal(false)} className="text-gray-500 hover:text-white transition-colors">
+                            <button onClick={() => setShowFabricModal(false)} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
                                 <X size={24} />
                             </button>
                         </div>
                         <form onSubmit={handleCreateRequest} className="p-10 space-y-6">
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Matoni Tanlang</label>
+                                <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Matoni Tanlang</label>
                                 <select
                                     required
-                                    className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-rose-500 transition-all font-bold"
+                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-rose-500 transition-all font-bold"
                                     value={fabricRequest.inventory_id}
                                     onChange={(e) => setFabricRequest({ ...fabricRequest, inventory_id: e.target.value })}
                                 >
@@ -448,11 +448,11 @@ const Kesim = () => {
                                 </select>
                             </div>
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Kerakli Miqdor (kg)</label>
+                                <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Kerakli Miqdor (kg)</label>
                                 <input
                                     required
                                     type="number"
-                                    className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-rose-500 transition-all font-black text-2xl"
+                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-rose-500 transition-all font-black text-2xl"
                                     value={fabricRequest.quantity}
                                     onChange={(e) => setFabricRequest({ ...fabricRequest, quantity: e.target.value })}
                                 />
@@ -467,36 +467,36 @@ const Kesim = () => {
 
             {/* Confirm Receipt Modal */}
             {showConfirmModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl animate-in fade-in duration-300">
-                    <div className="bg-[#161b22] border border-white/10 w-full max-w-lg rounded-[3.5rem] overflow-hidden shadow-4xl animate-in zoom-in-95 duration-300 relative">
-                        <div className="p-10 border-b border-white/5 flex items-center justify-between">
-                            <h3 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl animate-in fade-in duration-300">
+                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-lg rounded-[3.5rem] overflow-hidden shadow-4xl animate-in zoom-in-95 duration-300 relative">
+                        <div className="p-10 border-b border-[var(--border-color)] flex items-center justify-between">
+                            <h3 className="text-2xl font-black text-[var(--text-primary)] tracking-tight flex items-center gap-3">
                                 <CircleCheck className="text-emerald-500" />
                                 Matoni Qabul Qilish
                             </h3>
-                            <button onClick={() => setShowConfirmModal(false)} className="text-gray-500 hover:text-white transition-colors">
+                            <button onClick={() => setShowConfirmModal(false)} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
                                 <X size={24} />
                             </button>
                         </div>
                         <form onSubmit={handleConfirmReceipt} className="p-10 space-y-6">
-                            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest text-center">Omborchi tomonidan berilgan miqdor: <span className="text-white text-lg ml-2">{selectedRequest?.issued_qty} kg</span></p>
+                            <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-widest text-center">Omborchi tomonidan berilgan miqdor: <span className="text-[var(--text-primary)] text-lg ml-2">{selectedRequest?.issued_qty} kg</span></p>
 
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Haqiqiy Olingan Miqdor (kg)</label>
+                                <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Haqiqiy Olingan Miqdor (kg)</label>
                                 <input
                                     required
                                     type="number"
                                     step="0.01"
-                                    className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-emerald-500 transition-all font-black text-2xl"
+                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all font-black text-2xl"
                                     value={confirmData.received_qty}
                                     onChange={(e) => setConfirmData({ ...confirmData, received_qty: e.target.value })}
                                 />
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Izoh (Agarda farq bo'lsa)</label>
+                                <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Izoh (Agarda farq bo'lsa)</label>
                                 <textarea
-                                    className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-emerald-500 transition-all font-bold min-h-[100px]"
+                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all font-bold min-h-[100px]"
                                     value={confirmData.notes}
                                     onChange={(e) => setConfirmData({ ...confirmData, notes: e.target.value })}
                                     placeholder="Farq sababini yozing..."
@@ -513,32 +513,32 @@ const Kesim = () => {
 
             {/* Cut Results Modal */}
             {showCutModal && (
-                <div className="fixed inset-0 bg-black/90 backdrop-blur-xl z-[100] flex items-center justify-center p-6">
-                    <div className="bg-[#161b22] border border-white/10 rounded-[4rem] w-full max-w-2xl shadow-4xl animate-in zoom-in-95 duration-300 max-h-[90vh] overflow-hidden flex flex-col">
-                        <div className="p-10 border-b border-white/5 flex items-center justify-between">
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-xl z-[100] flex items-center justify-center p-6">
+                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-[4rem] w-full max-w-2xl shadow-4xl animate-in zoom-in-95 duration-300 max-h-[90vh] overflow-hidden flex flex-col">
+                        <div className="p-10 border-b border-[var(--border-color)] flex items-center justify-between">
                             <div>
-                                <h3 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
+                                <h3 className="text-2xl font-black text-[var(--text-primary)] tracking-tight flex items-center gap-3">
                                     <Scissors className="text-rose-500" />
                                     Bichilgan Detallar Hisoboti
                                 </h3>
-                                <p className="text-gray-500 text-[10px] font-black uppercase tracking-widest mt-1"># {selectedOrder?.order_number} - {selectedOrder?.models?.name}</p>
+                                <p className="text-[var(--text-secondary)] text-[10px] font-black uppercase tracking-widest mt-1"># {selectedOrder?.order_number} - {selectedOrder?.models?.name}</p>
                             </div>
-                            <button onClick={() => setShowCutModal(false)} className="w-12 h-12 rounded-full hover:bg-white/5 transition-all flex items-center justify-center text-gray-500 text-2xl font-light"><X size={24} /></button>
+                            <button onClick={() => setShowCutModal(false)} className="w-12 h-12 rounded-full hover:bg-[var(--bg-body)] transition-all flex items-center justify-center text-[var(--text-secondary)] text-2xl font-light"><X size={24} /></button>
                         </div>
 
                         <form onSubmit={handleRecordCut} className="flex-1 overflow-y-auto p-10 space-y-8">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 {cutData.map((row, idx) => (
-                                    <div key={idx} className="bg-white/2 p-6 rounded-[2.5rem] border border-white/5 flex items-center justify-between group hover:bg-white/5 transition-all">
+                                    <div key={idx} className="bg-[var(--bg-body)] p-6 rounded-[2.5rem] border border-[var(--border-color)] flex items-center justify-between group hover:bg-[var(--bg-sidebar-footer)] transition-all">
                                         <div className="flex flex-col">
                                             <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1">{row.color}</span>
-                                            <span className="text-lg font-black text-white">{row.size}</span>
+                                            <span className="text-lg font-black text-[var(--text-primary)]">{row.size}</span>
                                         </div>
                                         <div className="w-24">
                                             <input
                                                 type="number"
                                                 placeholder="0"
-                                                className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-2xl focus:border-rose-500 outline-none font-black text-rose-500 text-center"
+                                                className="w-full px-4 py-3 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl focus:border-rose-500 outline-none font-black text-rose-500 text-center"
                                                 value={row.quantity}
                                                 onChange={e => {
                                                     const updated = [...cutData];
@@ -559,7 +559,7 @@ const Kesim = () => {
                                 >
                                     {loading ? 'Bajarilmoqda...' : 'Hisobotni Tasdiqlash & Yuborish'}
                                 </button>
-                                <p className="text-center text-[10px] text-gray-600 font-bold uppercase tracking-widest mt-4">Detallar avtomatik ravishda Tasnif bo'limiga o'tadi</p>
+                                <p className="text-center text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest mt-4">Detallar avtomatik ravishda Tasnif bo'limiga o'tadi</p>
                             </div>
                         </form>
                     </div>
@@ -568,59 +568,59 @@ const Kesim = () => {
 
             {/* ACTUAL USAGE MODAL */}
             {showActualModal && (
-                <div className="fixed inset-0 z-[101] flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl animate-in fade-in duration-300">
-                    <div className="bg-[#161b22] border border-white/10 w-full max-w-4xl rounded-[3.5rem] overflow-hidden shadow-4xl animate-in zoom-in-95 duration-300 flex flex-col md:flex-row h-[80vh]">
+                <div className="fixed inset-0 z-[101] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl animate-in fade-in duration-300">
+                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-4xl rounded-[3.5rem] overflow-hidden shadow-4xl animate-in zoom-in-95 duration-300 flex flex-col md:flex-row h-[80vh]">
 
                         {/* INPUT FORM SIDE */}
-                        <div className="w-full md:w-1/3 bg-[#0d1117] p-8 border-r border-white/5 flex flex-col">
+                        <div className="w-full md:w-1/3 bg-[var(--bg-body)] p-8 border-r border-[var(--border-color)] flex flex-col">
                             <div className="mb-6">
-                                <h3 className="text-xl font-black text-white tracking-tight flex items-center gap-2">
+                                <h3 className="text-xl font-black text-[var(--text-primary)] tracking-tight flex items-center gap-2">
                                     <Scale className="text-blue-500" size={20} />
                                     Yangi Kiritish
                                 </h3>
-                                <p className="text-[10px] text-gray-500 font-bold uppercase mt-1">Faktik sarfni kiriting</p>
+                                <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase mt-1">Faktik sarfni kiriting</p>
                             </div>
 
                             <form onSubmit={handleSaveActual} className="space-y-4 flex-1 overflow-y-auto pr-2 custom-scrollbar">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Rulon ID / Shtrixkod</label>
+                                    <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Rulon ID / Shtrixkod</label>
                                     <input
                                         required
                                         type="text"
                                         placeholder="M-2024-..."
-                                        className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white outline-none focus:border-blue-500 transition-all font-bold text-sm"
+                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-[var(--text-primary)] outline-none focus:border-blue-500 transition-all font-bold text-sm"
                                         value={actualData.roll_id}
                                         onChange={(e) => setActualData({ ...actualData, roll_id: e.target.value })}
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Haqiqiy Og'irlik (kg)</label>
+                                    <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Haqiqiy Og'irlik (kg)</label>
                                     <input
                                         required
                                         type="number"
                                         step="0.01"
-                                        className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white outline-none focus:border-blue-500 transition-all font-black text-xl"
+                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-[var(--text-primary)] outline-none focus:border-blue-500 transition-all font-black text-xl"
                                         value={actualData.actual_weight_kg}
                                         onChange={(e) => setActualData({ ...actualData, actual_weight_kg: e.target.value })}
                                     />
                                 </div>
                                 <div className="grid grid-cols-2 gap-3">
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Qavatlar</label>
+                                        <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Qavatlar</label>
                                         <input
                                             required
                                             type="number"
-                                            className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white outline-none focus:border-blue-500 transition-all font-bold text-sm"
+                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-[var(--text-primary)] outline-none focus:border-blue-500 transition-all font-bold text-sm"
                                             value={actualData.layer_count}
                                             onChange={(e) => setActualData({ ...actualData, layer_count: e.target.value })}
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Lekal (m)</label>
+                                        <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Lekal (m)</label>
                                         <input
                                             type="number"
                                             step="0.01"
-                                            className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white outline-none focus:border-blue-500 transition-all font-bold text-sm"
+                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-[var(--text-primary)] outline-none focus:border-blue-500 transition-all font-bold text-sm"
                                             value={actualData.lay_length_meters}
                                             onChange={(e) => setActualData({ ...actualData, lay_length_meters: e.target.value })}
                                         />
@@ -633,29 +633,29 @@ const Kesim = () => {
                         </div>
 
                         {/* HISTORY & STATS SIDE */}
-                        <div className="w-full md:w-2/3 p-8 flex flex-col bg-[#161b22] relative">
-                            <button onClick={() => setShowActualModal(false)} className="absolute top-6 right-6 text-gray-500 hover:text-white transition-colors">
+                        <div className="w-full md:w-2/3 p-8 flex flex-col bg-[var(--bg-card)] relative">
+                            <button onClick={() => setShowActualModal(false)} className="absolute top-6 right-6 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
                                 <X size={24} />
                             </button>
 
                             <div className="mb-6 pr-8">
-                                <h3 className="text-xl font-black text-white tracking-tight">Kirim Tarixi va Tahlil</h3>
+                                <h3 className="text-xl font-black text-[var(--text-primary)] tracking-tight">Kirim Tarixi va Tahlil</h3>
                                 <div className="flex gap-4 mt-4">
-                                    <div className="bg-white/5 rounded-2xl p-4 min-w-[120px]">
-                                        <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Jami Fakt (kg)</p>
-                                        <p className="text-2xl font-black text-white mt-1">{stats.totalActual.toFixed(2)}</p>
+                                    <div className="bg-[var(--bg-body)] rounded-2xl p-4 min-w-[120px]">
+                                        <p className="text-[10px] text-[var(--text-secondary)] font-black uppercase tracking-widest">Jami Fakt (kg)</p>
+                                        <p className="text-2xl font-black text-[var(--text-primary)] mt-1">{stats.totalActual.toFixed(2)}</p>
                                     </div>
-                                    <div className="bg-white/5 rounded-2xl p-4 min-w-[120px]">
-                                        <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Normativ (kg)</p>
+                                    <div className="bg-[var(--bg-body)] rounded-2xl p-4 min-w-[120px]">
+                                        <p className="text-[10px] text-[var(--text-secondary)] font-black uppercase tracking-widest">Normativ (kg)</p>
                                         <p className="text-2xl font-black text-blue-500 mt-1">
                                             {selectedOrder?.normative_consumption ? selectedOrder.normative_consumption.toFixed(2) : '---'}
                                         </p>
                                     </div>
-                                    <div className={`bg-white/5 rounded-2xl p-4 min-w-[120px] border ${selectedOrder?.normative_consumption && stats.totalActual > selectedOrder.normative_consumption
+                                    <div className={`bg-[var(--bg-body)] rounded-2xl p-4 min-w-[120px] border ${selectedOrder?.normative_consumption && stats.totalActual > selectedOrder.normative_consumption
                                         ? 'border-red-500/50 bg-red-500/10'
                                         : 'border-emerald-500/50 bg-emerald-500/10'
                                         }`}>
-                                        <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Farq</p>
+                                        <p className="text-[10px] text-[var(--text-secondary)] font-black uppercase tracking-widest">Farq</p>
                                         <p className={`text-2xl font-black mt-1 ${selectedOrder?.normative_consumption && stats.totalActual > selectedOrder.normative_consumption
                                             ? 'text-red-500'
                                             : 'text-emerald-500'
@@ -669,32 +669,32 @@ const Kesim = () => {
                                 </div>
                             </div>
 
-                            <div className="flex-1 overflow-hidden bg-black/20 rounded-3xl border border-white/5">
+                            <div className="flex-1 overflow-hidden bg-[var(--bg-body)] rounded-3xl border border-[var(--border-color)]">
                                 <div className="overflow-y-auto h-full custom-scrollbar">
                                     <table className="w-full text-left border-collapse">
-                                        <thead className="bg-white/5 sticky top-0 backdrop-blur-md">
+                                        <thead className="bg-[var(--bg-sidebar-footer)] sticky top-0 backdrop-blur-md">
                                             <tr>
-                                                <th className="p-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">Sana</th>
-                                                <th className="p-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">Rulon ID</th>
-                                                <th className="p-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">Kg</th>
-                                                <th className="p-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">Lekal</th>
+                                                <th className="p-4 text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">Sana</th>
+                                                <th className="p-4 text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">Rulon ID</th>
+                                                <th className="p-4 text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">Kg</th>
+                                                <th className="p-4 text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">Lekal</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-white/5">
+                                        <tbody className="divide-y divide-[var(--border-color)]">
                                             {actualsHistory.map((item) => (
-                                                <tr key={item.id} className="hover:bg-white/5 transition-colors">
-                                                    <td className="p-4 text-xs font-bold text-gray-400 font-mono">
+                                                <tr key={item.id} className="hover:bg-[var(--bg-sidebar-footer)] transition-colors">
+                                                    <td className="p-4 text-xs font-bold text-[var(--text-secondary)] font-mono">
                                                         {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} <br />
                                                         <span className="text-[10px] opacity-50">{new Date(item.created_at).toLocaleDateString()}</span>
                                                     </td>
-                                                    <td className="p-4 text-xs font-bold text-white">{item.roll_id}</td>
+                                                    <td className="p-4 text-xs font-bold text-[var(--text-primary)]">{item.roll_id}</td>
                                                     <td className="p-4 text-sm font-black text-blue-400">{item.actual_weight_kg}</td>
-                                                    <td className="p-4 text-xs font-bold text-gray-400">{item.lay_length_meters}m ({item.layer_count} qavat)</td>
+                                                    <td className="p-4 text-xs font-bold text-[var(--text-secondary)]">{item.lay_length_meters}m ({item.layer_count} qavat)</td>
                                                 </tr>
                                             ))}
                                             {actualsHistory.length === 0 && (
                                                 <tr>
-                                                    <td colSpan="4" className="p-8 text-center text-xs text-gray-600 font-bold uppercase tracking-widest">
+                                                    <td colSpan="4" className="p-8 text-center text-xs text-[var(--text-secondary)] font-bold uppercase tracking-widest">
                                                         Hozircha ma'lumot yo'q
                                                     </td>
                                                 </tr>

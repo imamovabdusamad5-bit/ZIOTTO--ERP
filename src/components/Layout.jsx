@@ -1,3 +1,6 @@
+import React, { useState, useEffect } from 'react';
+import { useLocation, Outlet } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
 import { useTheme } from '../context/ThemeContext';
 import { Activity, Menu, CircleCheck, Eye, EyeOff, History, RotateCcw, Sun, Moon } from 'lucide-react';
 import Sidebar from './Sidebar';

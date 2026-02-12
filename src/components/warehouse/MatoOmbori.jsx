@@ -464,57 +464,57 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
 
             {/* INBOUND MODAL */}
             {showInboundModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#020617]/90 backdrop-blur-xl animate-in fade-in duration-300">
-                    <div className="bg-[#0f172a] border border-white/10 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[3rem] shadow-2xl shadow-indigo-900/40 animate-in zoom-in-95 duration-300 relative custom-scrollbar">
-                        <div className="p-8 border-b border-white/5 flex justify-between items-center sticky top-0 bg-[#0f172a]/95 backdrop-blur-md z-10 rounded-t-[3rem]">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl">
+                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[3rem] shadow-2xl shadow-indigo-900/20 relative custom-scrollbar">
+                        <div className="p-8 border-b border-[var(--border-color)] flex justify-between items-center sticky top-0 bg-[var(--bg-card)]/95 backdrop-blur-md z-10 rounded-t-[3rem]">
                             <div>
-                                <h3 className="text-2xl font-black text-white tracking-tight flex items-center gap-4">
+                                <h3 className="text-2xl font-black text-[var(--text-primary)] tracking-tight flex items-center gap-4">
                                     <div className="p-3 bg-indigo-600 rounded-2xl text-white shadow-lg shadow-indigo-600/30"><CircleArrowDown size={24} /></div>
-                                    <span className="bg-gradient-to-r from-white via-indigo-100 to-slate-400 bg-clip-text text-transparent">Yangi Mato Kirimi</span>
+                                    <span className="bg-gradient-to-r from-[var(--text-primary)] via-indigo-400 to-indigo-600 bg-clip-text text-transparent">Yangi Mato Kirimi</span>
                                 </h3>
-                                <p className="text-[11px] text-indigo-300/60 font-black uppercase tracking-widest mt-2 ml-[3.25rem]">Omborga yangi mato qabul qilish</p>
+                                <p className="text-[11px] text-[var(--text-secondary)] font-black uppercase tracking-widest mt-2 ml-[3.25rem]">Omborga yangi mato qabul qilish</p>
                             </div>
-                            <button onClick={() => setShowInboundModal(false)} className="p-3 rounded-2xl bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-500 transition-all border border-white/5"><Trash2 className="rotate-45" size={20} /></button>
+                            <button onClick={() => setShowInboundModal(false)} className="p-3 rounded-2xl bg-[var(--bg-body)] hover:bg-rose-500/10 text-[var(--text-secondary)] hover:text-rose-500 transition-all border border-[var(--border-color)]"><Trash2 className="rotate-45" size={20} /></button>
                         </div>
 
                         <form onSubmit={handleKirim} className="p-10 space-y-8">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Mato Nomi</label>
+                                    <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1 mb-2 block">Mato Nomi</label>
                                     <select
                                         required
-                                        className="w-full bg-[#020617] border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-indigo-500 focus:bg-[#020617] transition-all font-bold appearance-none cursor-pointer placeholder-slate-500 shadow-inner"
+                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-indigo-500 transition-all font-bold appearance-none cursor-pointer placeholder-[var(--text-muted)] shadow-inner"
                                         value={inboundData.selected_material_name}
                                         onChange={e => setInboundData({ ...inboundData, selected_material_name: e.target.value, reference_id: '' })}
                                     >
-                                        <option value="" className="bg-slate-900 text-slate-500">Tanlang...</option>
+                                        <option value="" className="bg-[var(--bg-card)] text-[var(--text-muted)]">Tanlang...</option>
                                         {[...new Set((references || []).filter(r => r.type === 'Mato').map(r => r.name))].map(n => (
-                                            <option key={n} value={n} className="bg-slate-900 text-white">{n}</option>
+                                            <option key={n} value={n} className="bg-[var(--bg-card)] text-[var(--text-primary)]">{n}</option>
                                         ))}
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Turi va Grammaj</label>
+                                    <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1 mb-2 block">Turi va Grammaj</label>
                                     <select
                                         required
                                         disabled={!inboundData.selected_material_name}
-                                        className="w-full bg-[#020617] border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-indigo-500 transition-all font-bold appearance-none cursor-pointer disabled:opacity-50 placeholder-gray-500 shadow-inner"
+                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-indigo-500 transition-all font-bold appearance-none cursor-pointer disabled:opacity-50 placeholder-[var(--text-muted)] shadow-inner"
                                         value={inboundData.reference_id}
                                         onChange={e => setInboundData({ ...inboundData, reference_id: e.target.value })}
                                     >
-                                        <option value="" className="bg-[#161b22]">Tanlang...</option>
+                                        <option value="" className="bg-[var(--bg-card)]">Tanlang...</option>
                                         {(references || [])
                                             .filter(r => r.name === inboundData.selected_material_name)
-                                            .map(r => <option key={r.id} value={r.id} className="bg-slate-900">{r.thread_type} - {r.grammage}gr</option>)}
+                                            .map(r => <option key={r.id} value={r.id} className="bg-[var(--bg-card)]">{r.thread_type} - {r.grammage}gr</option>)}
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Rangi</label>
+                                    <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1 mb-2 block">Rangi</label>
                                     <input
                                         required
                                         type="text"
                                         placeholder="Mato rangi..."
-                                        className="w-full bg-[#020617] border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-indigo-500 focus:bg-[#020617] transition-all font-bold uppercase placeholder-slate-600 shadow-inner"
+                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-indigo-500 transition-all font-bold uppercase placeholder-[var(--text-muted)] shadow-inner"
                                         value={inboundData.color}
                                         onChange={e => setInboundData({ ...inboundData, color: e.target.value })}
                                     />
@@ -523,22 +523,22 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
 
                             <div className="grid grid-cols-2 gap-6">
                                 <div>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Partiya №</label>
+                                    <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1 mb-2 block">Partiya №</label>
                                     <input
                                         required
                                         type="text"
                                         placeholder="Partiya raqami"
-                                        className="w-full bg-[#020617] border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-indigo-500 focus:bg-[#020617] transition-all font-black uppercase text-lg placeholder-slate-600 shadow-inner"
+                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-indigo-500 transition-all font-black uppercase text-lg placeholder-[var(--text-muted)] shadow-inner"
                                         value={inboundData.batch_number}
                                         onChange={e => setInboundData({ ...inboundData, batch_number: e.target.value })}
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Rang Kodi (ID)</label>
+                                    <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1 mb-2 block">Rang Kodi (ID)</label>
                                     <input
                                         type="text"
                                         placeholder="Rang kodi (ixtiyoriy)"
-                                        className="w-full bg-[#020617] border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-indigo-500 focus:bg-[#020617] transition-all font-bold uppercase placeholder-slate-600 shadow-inner"
+                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-indigo-500 transition-all font-bold uppercase placeholder-[var(--text-muted)] shadow-inner"
                                         value={inboundData.color_code}
                                         onChange={e => setInboundData({ ...inboundData, color_code: e.target.value })}
                                     />
@@ -546,18 +546,18 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                             </div>
 
                             {/* Rolls */}
-                            <div className="bg-white/[0.02] p-8 rounded-[2.5rem] border border-white/5">
+                            <div className="bg-[var(--bg-body)] p-8 rounded-[2.5rem] border border-[var(--border-color)]">
                                 <div className="flex justify-between items-center mb-6">
                                     <h4 className="font-black uppercase text-xs text-indigo-400 tracking-widest flex items-center gap-2"><ScrollText size={16} /> Poylar (O'ramlar)</h4>
                                     <button type="button" onClick={() => setInboundData({ ...inboundData, rolls: [...inboundData.rolls, { weight: '' }] })} className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase transition-all shadow-lg shadow-indigo-600/20 hover:bg-indigo-500">+ Poy Qo'shish</button>
                                 </div>
                                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                     {inboundData.rolls.map((r, i) => (
-                                        <div key={i} className="relative group animate-in zoom-in-50 duration-300">
+                                        <div key={i} className="relative group">
                                             <div className="absolute inset-0 bg-indigo-500/5 rounded-2xl blur-sm group-hover:bg-indigo-500/10 transition-all"></div>
                                             <input
                                                 type="number"
-                                                className="relative w-full py-4 text-center font-black bg-[#020617] border border-white/10 rounded-2xl focus:border-indigo-500 outline-none text-white text-lg transition-all shadow-inner group-hover:border-indigo-500/30"
+                                                className="relative w-full py-4 text-center font-black bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl focus:border-indigo-500 outline-none text-[var(--text-primary)] text-lg transition-all shadow-inner group-hover:border-indigo-500/30"
                                                 placeholder="kg"
                                                 value={r.weight}
                                                 onChange={e => {
@@ -571,18 +571,18 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                 const newRolls = inboundData.rolls.filter((_, idx) => idx !== i);
                                                 const total = newRolls.reduce((s, r) => s + (Number(r.weight) || 0), 0);
                                                 setInboundData({ ...inboundData, rolls: newRolls, quantity: total.toFixed(2) });
-                                            }} className="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full w-7 h-7 flex items-center justify-center text-[10px] font-black border-4 border-[#0F172A] hover:scale-110 transition-transform shadow-lg z-10 hover:bg-rose-600">×</button>
+                                            }} className="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full w-7 h-7 flex items-center justify-center text-[10px] font-black border-4 border-[var(--bg-body)] hover:scale-110 transition-transform shadow-lg z-10 hover:bg-rose-600">×</button>
                                         </div>
                                     ))}
                                     {inboundData.rolls.length === 0 && (
-                                        <div className="col-span-full py-8 text-center text-slate-600 text-[10px] font-bold uppercase tracking-widest border border-dashed border-white/10 rounded-2xl">
+                                        <div className="col-span-full py-8 text-center text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-widest border border-dashed border-[var(--border-color)] rounded-2xl">
                                             Hozircha poylar yo'q
                                         </div>
                                     )}
                                 </div>
-                                <div className="mt-8 flex items-end justify-end gap-3 border-t border-white/5 pt-6">
-                                    <span className="text-xs font-black uppercase text-slate-500 tracking-widest mb-1">Jami Og'irlik:</span>
-                                    <span className="text-4xl font-black text-white leading-none tracking-tight">{inboundData.quantity || 0} <span className="text-lg text-slate-600">kg</span></span>
+                                <div className="mt-8 flex items-end justify-end gap-3 border-t border-[var(--border-color)] pt-6">
+                                    <span className="text-xs font-black uppercase text-[var(--text-secondary)] tracking-widest mb-1">Jami Og'irlik:</span>
+                                    <span className="text-4xl font-black text-[var(--text-primary)] leading-none tracking-tight">{inboundData.quantity || 0} <span className="text-lg text-[var(--text-secondary)]">kg</span></span>
                                 </div>
                             </div>
 
@@ -594,30 +594,30 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
 
             {/* ROLLS DETAIL MODAL */}
             {showRollsModal && selectedItem && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#020617]/90 backdrop-blur-xl animate-in fade-in duration-300">
-                    <div className="bg-[#0f172a] border border-white/10 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[3rem] shadow-2xl shadow-indigo-900/40 animate-in zoom-in-95 duration-300 relative custom-scrollbar">
-                        <div className="p-8 border-b border-white/5 flex justify-between items-center sticky top-0 bg-[#0f172a]/95 backdrop-blur-md z-10 rounded-t-[3rem]">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl">
+                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[3rem] shadow-2xl shadow-indigo-900/20 relative custom-scrollbar">
+                        <div className="p-8 border-b border-[var(--border-color)] flex justify-between items-center sticky top-0 bg-[var(--bg-card)]/95 backdrop-blur-md z-10 rounded-t-[3rem]">
                             <div>
                                 <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-indigo-500/20 rounded-xl text-indigo-400"><QrCode size={20} /></div>
-                                    <h3 className="text-xl font-black text-white tracking-tight">QR Kodlar va Poylar</h3>
+                                    <div className="p-2 bg-indigo-500/10 text-indigo-400 rounded-xl border border-indigo-500/20"><QrCode size={20} /></div>
+                                    <h3 className="text-xl font-black text-[var(--text-primary)] tracking-tight">QR Kodlar va Poylar</h3>
                                 </div>
-                                <p className="text-[11px] text-slate-500 font-bold uppercase tracking-widest mt-1 ml-11">{selectedItem.item_name} - {selectedItem.color}</p>
+                                <p className="text-[11px] text-[var(--text-secondary)] font-bold uppercase tracking-widest mt-1 ml-11">{selectedItem.item_name} - {selectedItem.color}</p>
                             </div>
-                            <button onClick={() => setShowRollsModal(false)} className="p-3 rounded-2xl bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-500 transition-all border border-white/5"><Trash2 className="rotate-45" size={20} /></button>
+                            <button onClick={() => setShowRollsModal(false)} className="p-3 rounded-2xl bg-[var(--bg-body)] hover:bg-rose-500/10 text-[var(--text-secondary)] hover:text-rose-500 transition-all border border-[var(--border-color)]"><Trash2 className="rotate-45" size={20} /></button>
                         </div>
                         <div className="p-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                             {itemRolls.length === 0 ? (
                                 <div className="col-span-full text-center py-10 text-slate-500 italic">Hech qanday poy topilmadi</div>
                             ) : (
                                 itemRolls.map(roll => (
-                                    <div key={roll.id} className="bg-[#020617]/50 border border-white/5 p-6 rounded-3xl flex flex-col items-center gap-4 hover:border-indigo-500/30 transition-all group">
+                                    <div key={roll.id} className="bg-[var(--bg-body)] border border-[var(--border-color)] p-6 rounded-3xl flex flex-col items-center gap-4 hover:border-indigo-500/30 transition-all group shadow-lg">
                                         <div className="bg-white p-2 rounded-xl">
                                             <img src={generateQRUrl(JSON.stringify({ id: roll.id, w: roll.weight }))} alt="QR" className="w-32 h-32 object-contain mix-blend-multiply" />
                                         </div>
                                         <div className="text-center w-full">
-                                            <div className="text-white font-black text-lg">{roll.weight} kg</div>
-                                            <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">{roll.roll_number}</div>
+                                            <div className="text-[var(--text-primary)] font-black text-lg">{roll.weight} kg</div>
+                                            <div className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest font-bold">{roll.roll_number}</div>
                                             <div className={`text-[10px] uppercase font-bold mt-1 ${roll.status === 'used' ? 'text-rose-500' : 'text-emerald-500'}`}>{roll.status === 'used' ? 'Ishlatilgan' : 'Omborda'}</div>
                                         </div>
                                         <button
@@ -636,33 +636,33 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
 
             {/* OUTBOUND MODAL */}
             {showOutboundModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#020617]/90 backdrop-blur-xl animate-in fade-in duration-300">
-                    <div className="bg-[#0f172a] border border-white/10 w-full max-w-2xl rounded-[3rem] shadow-2xl shadow-rose-900/20 animate-in zoom-in-95 duration-300 relative max-h-[90vh] overflow-hidden flex flex-col">
-                        <div className="p-8 border-b border-white/5 flex justify-between items-center sticky top-0 bg-[#0f172a] z-10 shrink-0">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl">
+                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-2xl rounded-[3rem] shadow-2xl shadow-rose-900/20 relative max-h-[90vh] overflow-hidden flex flex-col">
+                        <div className="p-8 border-b border-[var(--border-color)] flex justify-between items-center sticky top-0 bg-[var(--bg-card)] z-10 shrink-0">
                             <div className="flex items-center gap-4">
                                 <div className="p-3 bg-rose-500 rounded-2xl text-white shadow-lg shadow-rose-500/30">
                                     <ArrowUpRight size={28} />
                                 </div>
                                 <div>
-                                    <h3 className="text-2xl font-black text-white tracking-tight">Ombordan Chiqim</h3>
-                                    <p className="text-[11px] text-rose-300/60 font-black uppercase tracking-widest mt-1">Matoni ishlab chiqarishga berish</p>
+                                    <h3 className="text-2xl font-black text-[var(--text-primary)] tracking-tight">Ombordan Chiqim</h3>
+                                    <p className="text-[11px] text-[var(--text-secondary)] font-black uppercase tracking-widest mt-1">Matoni ishlab chiqarishga berish</p>
                                 </div>
                             </div>
-                            <button onClick={() => setShowOutboundModal(false)} className="p-3 rounded-2xl bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-500 transition-all border border-white/5"><Trash2 className="rotate-45" size={20} /></button>
+                            <button onClick={() => setShowOutboundModal(false)} className="p-3 rounded-2xl bg-[var(--bg-body)] hover:bg-rose-500/10 text-[var(--text-secondary)] hover:text-rose-500 transition-all border border-[var(--border-color)]"><Trash2 className="rotate-45" size={20} /></button>
                         </div>
 
                         <div className="overflow-y-auto custom-scrollbar p-8 space-y-8 flex-1">
                             <form id="outboundForm" onSubmit={handleChiqim} className="space-y-6">
                                 <div>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Qaysi Buyurtma Uchun? (Optional)</label>
+                                    <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1 mb-2 block">Qaysi Buyurtma Uchun? (Optional)</label>
                                     <select
-                                        className="w-full bg-[#020617] border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-rose-500 focus:bg-[#020617] transition-all font-bold appearance-none cursor-pointer shadow-inner"
+                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-rose-500 transition-all font-bold appearance-none cursor-pointer shadow-inner"
                                         value={outboundData.order_id}
                                         onChange={e => setOutboundData({ ...outboundData, order_id: e.target.value })}
                                     >
-                                        <option value="" className="bg-slate-900 text-slate-400">Tanlanmagan (Umumiy chiqim)</option>
+                                        <option value="" className="bg-[var(--bg-card)] text-[var(--text-secondary)]">Tanlanmagan (Umumiy chiqim)</option>
                                         {orders.map(o => (
-                                            <option key={o.id} value={o.id} className="bg-slate-900">Order #{o.order_number} - {o.models?.name}</option>
+                                            <option key={o.id} value={o.id} className="bg-[var(--bg-card)]">Order #{o.order_number} - {o.models?.name}</option>
                                         ))}
                                     </select>
                                 </div>
@@ -690,7 +690,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                     }}
                                                     className={`p-3 rounded-xl border cursor-pointer transition-all flex flex-col items-center justify-center text-center ${outboundData.selected_rolls.find(r => r.id === roll.id)
                                                         ? 'bg-rose-500 text-white border-rose-500 shadow-lg shadow-rose-500/20'
-                                                        : 'bg-[#020617] text-slate-400 border-white/10 hover:border-rose-500/30'
+                                                        : 'bg-[var(--bg-body)] text-[var(--text-secondary)] border-[var(--border-color)] hover:border-rose-500/30'
                                                         }`}
                                                 >
                                                     <span className="font-black text-sm">{roll.weight} kg</span>
@@ -703,23 +703,23 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
 
 
                                 <div>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Chiqim Miqdori (kg)</label>
+                                    <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1 mb-2 block">Chiqim Miqdori (kg)</label>
                                     <input
                                         required
                                         type="number"
                                         step="0.01"
-                                        className="w-full bg-[#020617] border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-rose-500 focus:bg-[#020617] transition-all font-black text-2xl placeholder-slate-600 shadow-inner"
+                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-rose-500 transition-all font-black text-2xl placeholder-[var(--text-muted)] shadow-inner"
                                         value={outboundData.quantity}
                                         onChange={e => setOutboundData({ ...outboundData, quantity: e.target.value })}
                                         placeholder="0.00"
                                     />
-                                    <p className="text-[10px] text-slate-500 mt-2 ml-1">* Agar poylar tanlangan bo'lsa, avtomatik hisoblanadi.</p>
+                                    <p className="text-[10px] text-[var(--text-secondary)] mt-2 ml-1">* Agar poylar tanlangan bo'lsa, avtomatik hisoblanadi.</p>
                                 </div>
 
                                 <div>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Sabab / Qayerga</label>
+                                    <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1 mb-2 block">Sabab / Qayerga</label>
                                     <textarea
-                                        className="w-full bg-[#020617] border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-rose-500 focus:bg-[#020617] transition-all font-bold placeholder-slate-600 shadow-inner resize-none h-24"
+                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-rose-500 transition-all font-bold placeholder-[var(--text-muted)] shadow-inner resize-none h-24"
                                         value={outboundData.reason}
                                         onChange={e => setOutboundData({ ...outboundData, reason: e.target.value })}
                                         placeholder="Masalan: Kesim bo'limiga"
@@ -727,9 +727,9 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                 </div>
                             </form>
                         </div>
-                        <div className="p-8 border-t border-white/5 bg-[#0f172a] shrink-0">
+                        <div className="p-8 border-t border-[var(--border-color)] bg-[var(--bg-card)] shrink-0">
                             <div className="flex gap-3">
-                                <button type="button" onClick={() => setShowOutboundModal(false)} className="flex-1 py-4 bg-white/5 hover:bg-white/10 text-slate-400 rounded-2xl font-bold uppercase text-[10px] tracking-widest transition-all">Bekor qilish</button>
+                                <button type="button" onClick={() => setShowOutboundModal(false)} className="flex-1 py-4 bg-[var(--bg-body)] hover:bg-[var(--bg-card-hover)] text-[var(--text-secondary)] rounded-2xl font-bold uppercase text-[10px] tracking-widest transition-all">Bekor qilish</button>
                                 <button type="submit" form="outboundForm" className="flex-[2] py-4 bg-rose-600 hover:bg-rose-500 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-rose-600/30 transition-all active:scale-95">Chiqimni Tasdiqlash</button>
                             </div>
                         </div>

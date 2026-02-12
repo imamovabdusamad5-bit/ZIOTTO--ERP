@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { LogIn, Mail, Lock, Activity, ShieldCheck, Shirt, X, CircleAlert } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -12,6 +13,7 @@ const Login = () => {
     const [showForgotModal, setShowForgotModal] = useState(false);
     const { login } = useAuth();
     const navigate = useNavigate();
+    const { theme } = useTheme();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -30,7 +32,7 @@ const Login = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#0d1117] flex items-center justify-center p-4 relative overflow-hidden font-sans">
+        <div className="min-h-screen bg-[var(--bg-body)] flex items-center justify-center p-4 relative overflow-hidden font-sans transition-colors duration-300">
             {/* Background Decorations */}
             <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-600/5 blur-[120px] rounded-full"></div>
             <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-600/5 blur-[120px] rounded-full"></div>
@@ -41,26 +43,26 @@ const Login = () => {
                     <div className="inline-flex items-center justify-center w-24 h-24 bg-indigo-600 rounded-[2rem] shadow-2xl shadow-indigo-600/30 mb-6 rotate-3 transform hover:rotate-0 transition-transform duration-500">
                         <Shirt size={48} className="text-white" />
                     </div>
-                    <h1 className="text-4xl font-black text-white tracking-tighter flex items-center justify-center gap-2">
+                    <h1 className="text-4xl font-black text-[var(--text-primary)] tracking-tighter flex items-center justify-center gap-2">
                         ZIOTTO <span className="bg-indigo-600/20 text-indigo-500 px-3 py-1 rounded-xl">ERP</span>
                     </h1>
-                    <p className="text-gray-500 text-[10px] font-black mt-3 uppercase tracking-[0.3em]">To'qimachilik Boshqaruv Tizimi</p>
+                    <p className="text-[var(--text-secondary)] text-[10px] font-black mt-3 uppercase tracking-[0.3em]">To'qimachilik Boshqaruv Tizimi</p>
                 </div>
 
                 {/* Login Card */}
-                <div className="bg-[#161b22]/80 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] p-10 shadow-3xl shadow-black/50 animate-in fade-in zoom-in-95 duration-500 relative overflow-hidden">
+                <div className="bg-[var(--bg-card)]/80 backdrop-blur-2xl border border-[var(--border-color)] rounded-[2.5rem] p-10 shadow-3xl shadow-black/5 animate-in fade-in zoom-in-95 duration-500 relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-600 to-transparent opacity-50"></div>
 
                     <form onSubmit={handleSubmit} className="space-y-8">
                         <div className="space-y-3">
-                            <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] ml-2">Foydalanuvchi Ismi</label>
+                            <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em] ml-2">Foydalanuvchi Ismi</label>
                             <div className="relative group">
-                                <Shirt className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-indigo-500 transition-colors" size={20} />
+                                <Shirt className="absolute left-5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] group-focus-within:text-indigo-500 transition-colors" size={20} />
                                 <input
                                     required
                                     type="text"
                                     placeholder="Ismingizni kiriting"
-                                    className="w-full bg-black/40 border border-white/5 rounded-2xl py-4.5 pl-14 pr-5 text-white placeholder:text-gray-700 outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/5 transition-all font-bold uppercase tracking-wider"
+                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl py-4.5 pl-14 pr-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/5 transition-all font-bold uppercase tracking-wider"
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
                                 />
@@ -68,21 +70,21 @@ const Login = () => {
                         </div>
 
                         <div className="space-y-3">
-                            <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] ml-2">Maxsus Kod (Parol)</label>
+                            <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em] ml-2">Maxsus Kod (Parol)</label>
                             <div className="relative group">
-                                <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-indigo-500 transition-colors" size={20} />
+                                <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] group-focus-within:text-indigo-500 transition-colors" size={20} />
                                 <input
                                     required
                                     type={showPassword ? "text" : "password"}
                                     placeholder="••••••••"
-                                    className="w-full bg-black/40 border border-white/5 rounded-2xl py-4.5 pl-14 pr-14 text-white placeholder:text-gray-700 outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/5 transition-all font-mono text-xl tracking-widest leading-none"
+                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl py-4.5 pl-14 pr-14 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/5 transition-all font-mono text-xl tracking-widest leading-none"
                                     value={code}
                                     onChange={(e) => setCode(e.target.value)}
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-600 hover:text-white transition-colors p-1"
+                                    className="absolute right-5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors p-1"
                                 >
                                     {showPassword ? <Activity size={18} className="text-indigo-500" /> : <ShieldCheck size={18} />}
                                 </button>
@@ -105,11 +107,11 @@ const Login = () => {
                                         defaultChecked
                                         className="peer sr-only"
                                     />
-                                    <div className="w-5 h-5 bg-black/40 border border-white/10 rounded-lg group-hover:border-indigo-500/50 transition-all peer-checked:bg-indigo-600 peer-checked:border-indigo-600 flex items-center justify-center">
+                                    <div className="w-5 h-5 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-lg group-hover:border-indigo-500/50 transition-all peer-checked:bg-indigo-600 peer-checked:border-indigo-600 flex items-center justify-center">
                                         <div className="w-2 h-2 bg-white rounded-full opacity-0 peer-checked:opacity-100 transition-opacity"></div>
                                     </div>
                                 </div>
-                                <span className="text-[11px] text-gray-500 font-bold group-hover:text-gray-300 transition-colors uppercase tracking-widest">Meni eslab qol</span>
+                                <span className="text-[11px] text-[var(--text-secondary)] font-bold group-hover:text-[var(--text-primary)] transition-colors uppercase tracking-widest">Meni eslab qol</span>
                             </label>
                             <button
                                 type="button"
@@ -138,35 +140,35 @@ const Login = () => {
                 </div>
 
                 {/* Footer Info */}
-                <div className="mt-12 flex items-center justify-center gap-8 text-gray-700">
-                    <div className="flex items-center gap-2 grayscale hover:grayscale-0 transition-all hover:text-gray-400">
+                <div className="mt-12 flex items-center justify-center gap-8 text-[var(--text-secondary)]">
+                    <div className="flex items-center gap-2 grayscale hover:grayscale-0 transition-all hover:text-[var(--text-primary)]">
                         <ShieldCheck size={16} />
                         <span className="text-[10px] font-black uppercase tracking-[0.4em]">ZIOTTO ERP v2.0</span>
                     </div>
                 </div>
             </div>
 
-            {/* Forgot Password Modal - FIXED: Ensure it stays on top and has dark bg */}
+            {/* Forgot Password Modal */}
             {showForgotModal && (
-                <div className="fixed inset-0 z-[999] flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl animate-in fade-in duration-300">
-                    <div className="bg-[#161b22] border border-white/10 w-full max-w-sm rounded-[3rem] p-10 shadow-4xl animate-in zoom-in-95 duration-300 relative overflow-hidden">
+                <div className="fixed inset-0 z-[999] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl animate-in fade-in duration-300">
+                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-sm rounded-[3rem] p-10 shadow-4xl animate-in zoom-in-95 duration-300 relative overflow-hidden">
                         <div className="absolute top-0 right-0 p-4">
-                            <button onClick={() => setShowForgotModal(false)} className="text-gray-600 hover:text-white transition-colors">
+                            <button onClick={() => setShowForgotModal(false)} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
                                 <X size={24} />
                             </button>
                         </div>
                         <div className="w-20 h-20 bg-amber-500/10 rounded-3xl flex items-center justify-center text-amber-500 mx-auto mb-8 shadow-inner">
                             <CircleAlert size={40} />
                         </div>
-                        <h3 className="text-2xl font-black text-white text-center mb-4 tracking-tight">Parolni tiklash</h3>
-                        <p className="text-gray-400 text-center text-sm leading-relaxed mb-10 font-medium">
+                        <h3 className="text-2xl font-black text-[var(--text-primary)] text-center mb-4 tracking-tight">Parolni tiklash</h3>
+                        <p className="text-[var(--text-secondary)] text-center text-sm leading-relaxed mb-10 font-medium">
                             Parolni tiklash yoki o'zgartirish uchun <br />
                             <span className="text-indigo-400 font-black uppercase tracking-widest border-b-2 border-indigo-500/30 pb-1 mt-2 inline-block">Plan (Rejalashtirish)</span> <br />
                             bo'limiga murojaat qiling.
                         </p>
                         <button
                             onClick={() => setShowForgotModal(false)}
-                            className="w-full bg-white text-black font-black py-5 rounded-2xl transition-all hover:bg-gray-200 active:scale-95 shadow-xl shadow-white/5 uppercase tracking-widest text-xs"
+                            className="w-full bg-[var(--bg-body)] text-[var(--text-primary)] border border-[var(--border-color)] font-black py-5 rounded-2xl transition-all hover:bg-[var(--bg-sidebar-footer)] active:scale-95 shadow-xl uppercase tracking-widest text-xs"
                         >
                             Tushunarli
                         </button>

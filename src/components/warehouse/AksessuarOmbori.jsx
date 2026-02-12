@@ -147,7 +147,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
     };
 
     return (
-        <div className="space-y-6 animate-in fade-in duration-500">
+        <div className="space-y-6">
             {/* Header */}
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-[var(--bg-card)] backdrop-blur-3xl p-6 rounded-[3rem] border border-[var(--border-color)] shadow-2xl">
                 <div className="relative w-full md:w-96 group">
@@ -294,8 +294,8 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
 
             {/* INBOUND MODAL */}
             {showInboundModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/50 backdrop-blur-xl animate-in fade-in duration-300">
-                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-lg rounded-[3rem] p-10 space-y-8 shadow-2xl shadow-purple-900/20 animate-in zoom-in-95 duration-300 relative max-h-[90vh] overflow-y-auto custom-scrollbar">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl">
+                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-lg rounded-[3rem] p-10 space-y-8 shadow-2xl shadow-purple-900/20 relative max-h-[90vh] overflow-y-auto custom-scrollbar">
                         <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-8 sticky top-0 bg-[var(--bg-card)] z-10 pt-2">
                             <div className="flex items-center gap-4">
                                 <div className="p-3 bg-purple-600 rounded-2xl text-white shadow-lg shadow-purple-600/30">
@@ -313,7 +313,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                             <div>
                                 <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1 mb-2 block">Nomi</label>
                                 <select
-                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-purple-500 focus:bg-[var(--input-focus-bg)] transition-all font-bold appearance-none cursor-pointer placeholder-[var(--text-secondary)] shadow-inner"
+                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-purple-500 transition-all font-bold appearance-none cursor-pointer placeholder-[var(--text-secondary)] shadow-inner"
                                     value={inboundData.selected_material_name}
                                     onChange={(e) => setInboundData({ ...inboundData, selected_material_name: e.target.value })}
                                 >
@@ -327,7 +327,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                 <div>
                                     <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1 mb-2 block">Rangi</label>
                                     <input
-                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-purple-500 focus:bg-[var(--input-focus-bg)] transition-all font-bold placeholder-[var(--text-secondary)] shadow-inner"
+                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-purple-500 transition-all font-bold placeholder-[var(--text-secondary)] shadow-inner"
                                         value={inboundData.color}
                                         onChange={e => setInboundData({ ...inboundData, color: e.target.value })}
                                         placeholder="Masalan: Qora"
@@ -337,7 +337,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                     <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1 mb-2 block">Miqdor</label>
                                     <input
                                         type="number"
-                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-purple-500 focus:bg-[var(--input-focus-bg)] transition-all font-black text-lg placeholder-[var(--text-secondary)] shadow-inner"
+                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-purple-500 transition-all font-black text-lg placeholder-[var(--text-secondary)] shadow-inner"
                                         value={inboundData.quantity}
                                         onChange={e => setInboundData({ ...inboundData, quantity: e.target.value })}
                                         placeholder="0.00"
@@ -355,8 +355,8 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
             )}
 
             {showOutboundModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/50 backdrop-blur-xl animate-in fade-in duration-300">
-                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-lg rounded-[3rem] p-10 space-y-8 shadow-2xl shadow-rose-900/20 animate-in zoom-in-95 duration-300 relative max-h-[90vh] overflow-y-auto custom-scrollbar">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl">
+                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-lg rounded-[3rem] p-10 space-y-8 shadow-2xl shadow-rose-900/20 relative max-h-[90vh] overflow-y-auto custom-scrollbar">
                         <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-8 sticky top-0 bg-[var(--bg-card)] z-10 pt-2">
                             <div className="flex items-center gap-4">
                                 <div className="p-3 bg-rose-500 rounded-2xl text-white shadow-lg shadow-rose-500/30">
@@ -375,7 +375,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                 <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1 mb-2 block">Chiqim Miqdori</label>
                                 <input
                                     type="number"
-                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-rose-500 focus:bg-[var(--input-focus-bg)] transition-all font-black text-2xl placeholder-[var(--text-secondary)] shadow-inner"
+                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-rose-500 transition-all font-black text-2xl placeholder-[var(--text-secondary)] shadow-inner"
                                     value={outboundData.quantity}
                                     onChange={e => setOutboundData({ ...outboundData, quantity: e.target.value })}
                                     placeholder="0"
@@ -384,7 +384,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                             <div>
                                 <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1 mb-2 block">Izoh / Sabab</label>
                                 <input
-                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-rose-500 focus:bg-[var(--input-focus-bg)] transition-all font-bold placeholder-[var(--text-secondary)] shadow-inner"
+                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-rose-500 transition-all font-bold placeholder-[var(--text-secondary)] shadow-inner"
                                     value={outboundData.reason}
                                     onChange={e => setOutboundData({ ...outboundData, reason: e.target.value })}
                                     placeholder="Masalan: Ishlab chiqarish uchun"
