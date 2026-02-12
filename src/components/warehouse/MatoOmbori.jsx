@@ -123,18 +123,26 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
     };
 
     const fetchRolls = async (inventoryId) => {
+        console.log("Fetching rolls for:", inventoryId);
         const { data, error } = await supabase
             .from('inventory_rolls')
             .select('*')
             .eq('inventory_id', inventoryId)
-            // .eq('status', 'in_stock') // Optionally filter
             .order('created_at', { ascending: true });
 
-        if (!error) setItemRolls(data || []);
+        if (error) {
+            console.error("Error fetching rolls:", error);
+            alert("Poylar ro'yxatini yuklashda xatolik: " + error.message);
+            setItemRolls([]);
+        } else {
+            console.log("Loaded rolls:", data);
+            setItemRolls(data || []);
+        }
     };
 
     const handleOpenRolls = async (item) => {
         setSelectedItem(item);
+        setItemRolls([]); // Clear previous
         setLoading(true);
         await fetchRolls(item.id);
         setShowRollsModal(true);
