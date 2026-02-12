@@ -3,6 +3,7 @@ import {
     Warehouse, Search, Plus, History, CircleArrowDown,
     ArrowUpRight, ScrollText, QrCode, Printer, Trash2, CircleCheck, RotateCcw
 } from 'lucide-react';
+import { Html5QrcodeScanner } from 'html5-qrcode';
 import { supabase } from '../../lib/supabase';
 
 const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
@@ -208,35 +209,42 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
             // We need full roll object. If it's in 'itemRolls' (current view), use it.
             // If not, we might need to fetch it or just use QR data if trusted.
             // Better to find it in itemRolls to ensure it belongs to current Item?
-            // BUT: User might scan a roll from a DIFFERENT item. Ideally, we should allow that? 
-            // Current Outbound Modal is tied to a specific "Inventory Item". 
-            // If we want mixed layout, we need to change architecture.
-            // For now, let's assume we are scanning rolls OF THE SAME ITEM.
+            setLoading(true);
 
-            // Or, we can just trust the ID and Weight and add it, but we need to verify it belongs to this Item ID?
-            // If the QR contains ID, we can check DB. 
-            // Simplification: We look into 'itemRolls'. If not found, maybe show warning or fetch.
+            // 1. Validate if we already have this roll in selected_rolls
+            if (outboundData.selected_rolls.find(r => r.id === qrData.id)) {
+                alert("Bu poy allaqachon ro'yxatga qo'shilgan!");
+                setLoading(false);
+                return;
+            }
 
-            let rollToAdd = itemRolls.find(r => r.id == qrData.id);
+            // 2. We need full roll details. Either we have them in itemRolls (if we opened that item)
+            // or we need to fetch from DB.
+            // Since this is a global scanner potentially, let's try to find in current itemRolls first
+            // If the user hasn't selected an item, fetching is tricky unless we fetch by Roll ID.
 
-            if (!rollToAdd) {
-                // Fetch from DB just in case it wasn't loaded
-                const { data: rollFromDb } = await supabase.from('inventory_rolls').select('*').eq('id', qrData.id).single();
-                if (rollFromDb) {
-                    // Verify match with current Item?
-                    if (rollFromDb.inventory_id != outboundData.inventory_id) {
-                        alert("Diqqat: Bu poy boshqa mato turiga tegishli! Chiqim qilish uchun o'sha mato bo'limiga o'ting.");
-                        return;
-                    }
-                    rollToAdd = rollFromDb;
-                } else {
-                    alert("Poy bazadan topilmadi!");
-                    return;
-                }
+            // Let's FETCH by ID to be safe and accurate
+            const { data: rollData, error } = await supabase
+                .from('inventory_rolls')
+                .select('*, inventory(*)')
+                .eq('id', qrData.id)
+                .single();
+
+            if (error || !rollData) {
+                alert("Poy topilmadi yoki xatolik!");
+                setLoading(false);
+                return;
+            }
+
+            // Check status
+            if (rollData.status !== 'in_stock') {
+                alert(`Poy holati: ${rollData.status}. Faqat omborda bor poyni chiqim qilish mumkin.`);
+                setLoading(false);
+                return;
             }
 
             // Add to selection
-            const newSelection = [...outboundData.selected_rolls, rollToAdd];
+            const newSelection = [...outboundData.selected_rolls, rollData];
             const totalWeight = newSelection.reduce((sum, r) => sum + Number(r.weight), 0);
 
             setOutboundData(prev => ({
@@ -245,16 +253,11 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                 quantity: totalWeight.toFixed(2)
             }));
 
-            // Visual feedback
-            // alert(`Qo'shildi: ${rollToAdd.weight} kg`); // Optional, maybe annoying. Beep sound is better.
-
+            // Play a beep sound if possible? 
+            // Audio context is browser blocked mostly, but we can try basic beep logic or just UI feedback
+            setLoading(false);
         } else {
-            // Scenario 2: Modal is CLOSED. 
-            // We should open the modal for this Item.
-            // But checking which Inventory Item this roll belongs to requires a DB call.
-
             alert("Iltimos, avval tegishli 'Chiqim' oynasini (Arrow Up Icon) oching, so'ng skanerlang.");
-            // Advanced: Auto-open modal logic could be added here fetching inventory_id from roll.
         }
     };
 
@@ -899,50 +902,71 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                             </div>
                             <button onClick={() => setShowOutboundModal(false)} className="p-3 rounded-2xl bg-[var(--bg-body)] hover:bg-rose-500/10 text-[var(--text-secondary)] hover:text-rose-500 transition-all border border-[var(--border-color)]"><Trash2 className="rotate-45" size={20} /></button>
                         </div>
-
                         <div className="overflow-y-auto custom-scrollbar p-8 space-y-8 flex-1">
                             {/* DEDICATED SCANNER INPUT */}
                             <div className="bg-indigo-500/5 border border-indigo-500/20 p-6 rounded-3xl flex flex-col gap-3">
-                                <label className="text-[10px] font-black text-indigo-400 uppercase tracking-widest flex items-center gap-2">
-                                    <QrCode size={16} /> QR Skaner (Bu yerga bosing va skanerlang)
-                                </label>
-                                <input
-                                    autoFocus
-                                    type="text"
-                                    placeholder="Skanerlash uchun shu yerga bosing..."
-                                    className="w-full bg-[var(--bg-card)] border-2 border-indigo-500/30 rounded-xl p-3 text-center text-indigo-400 font-mono text-sm placeholder:text-indigo-500/30 focus:border-indigo-500 focus:bg-indigo-500/10 outline-none transition-all"
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
-                                            e.preventDefault();
-                                            try {
-                                                const val = e.target.value.trim();
-                                                if (!val) return;
+                                <div className="flex justify-between items-center">
+                                    <label className="text-[10px] font-black text-indigo-400 uppercase tracking-widest flex items-center gap-2">
+                                        <QrCode size={16} /> QR Skaner (Kamera yoki Qo'lda)
+                                    </label>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowCameraScanner(!showCameraScanner)}
+                                        className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border flex items-center gap-2 ${showCameraScanner
+                                            ? 'bg-rose-500 text-white border-rose-500 shadow-lg shadow-rose-500/20'
+                                            : 'bg-indigo-500 text-white border-indigo-500 shadow-lg shadow-indigo-500/20 hover:bg-indigo-600'
+                                            }`}
+                                    >
+                                        {showCameraScanner ? <><Trash2 size={14} /> Kamerani Yopish</> : <><QrCode size={14} /> Kamerani Ochish</>}
+                                    </button>
+                                </div>
 
-                                                // Try parse JSON
-                                                let qrData = null;
-                                                // Robust parse logic
-                                                if (val.includes('{') && val.includes('}')) {
-                                                    const start = val.indexOf('{');
-                                                    const end = val.lastIndexOf('}');
-                                                    const jsonStr = val.substring(start, end + 1);
-                                                    qrData = JSON.parse(jsonStr);
-                                                }
+                                {showCameraScanner ? (
+                                    <div className="animate-in fade-in zoom-in duration-300">
+                                        <div id="reader" className="w-full rounded-2xl overflow-hidden border-2 border-indigo-500/30 bg-black"></div>
+                                        <p className="text-[10px] text-center text-indigo-400 mt-2 font-medium">Kamerani QR kodga qarating</p>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <input
+                                            autoFocus
+                                            type="text"
+                                            placeholder="Skanerlash uchun shu yerga bosing..."
+                                            className="w-full bg-[var(--bg-card)] border-2 border-indigo-500/30 rounded-xl p-3 text-center text-indigo-400 font-mono text-sm placeholder:text-indigo-500/30 focus:border-indigo-500 focus:bg-indigo-500/10 outline-none transition-all"
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault();
+                                                    try {
+                                                        const val = e.target.value.trim();
+                                                        if (!val) return;
 
-                                                if (qrData && qrData.id && qrData.w) {
-                                                    handleScannedRoll(qrData);
-                                                    e.target.value = ''; // Clear after scan
-                                                    // Play beep sound logic here if needed
-                                                } else {
-                                                    alert("Noto'g'ri QR kod formati!");
+                                                        // Try parse JSON
+                                                        let qrData = null;
+                                                        // Robust parse logic
+                                                        if (val.includes('{') && val.includes('}')) {
+                                                            const start = val.indexOf('{');
+                                                            const end = val.lastIndexOf('}');
+                                                            const jsonStr = val.substring(start, end + 1);
+                                                            qrData = JSON.parse(jsonStr);
+                                                        }
+
+                                                        if (qrData && qrData.id && qrData.w) {
+                                                            handleScannedRoll(qrData);
+                                                            e.target.value = ''; // Clear after scan
+                                                            // Play beep sound logic here if needed
+                                                        } else {
+                                                            alert("Noto'g'ri QR kod formati!");
+                                                        }
+                                                    } catch (err) {
+                                                        console.error("Scan error", err);
+                                                        // alert("Skanerlash xatoligi");
+                                                    }
                                                 }
-                                            } catch (err) {
-                                                console.error("Scan error", err);
-                                                // alert("Skanerlash xatoligi");
-                                            }
-                                        }
-                                    }}
-                                />
-                                <p className="text-[9px] text-center text-indigo-400/60 font-bold uppercase tracking-widest">Har bir skanerdan so'ng poy avtomatik qo'shiladi</p>
+                                            }}
+                                        />
+                                        <p className="text-[9px] text-center text-indigo-400/60 font-bold uppercase tracking-widest">Har bir skanerdan so'ng poy avtomatik qo'shiladi</p>
+                                    </>
+                                )}
                             </div>
 
 
