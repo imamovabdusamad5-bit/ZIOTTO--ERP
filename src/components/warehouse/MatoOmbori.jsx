@@ -366,15 +366,20 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                 inventoryId = created.id;
             }
 
-            // 2. Log
-            const { error: logError } = await supabase.from('inventory_logs').insert([{
-                inventory_id: inventoryId,
-                type: 'In',
-                quantity: Number(inboundData.quantity),
-                batch_number: cleanBatch,
-                reason: inboundData.reason
-            }]);
-            if (logError) throw logError;
+            // 2. Log (Soft Fail)
+            try {
+                const { error: logError } = await supabase.from('inventory_logs').insert([{
+                    inventory_id: inventoryId,
+                    type: 'In',
+                    quantity: Number(inboundData.quantity),
+                    batch_number: cleanBatch,
+                    reason: inboundData.reason
+                }]);
+                if (logError) throw logError;
+            } catch (logErr) {
+                console.warn("Log insert failed:", logErr);
+                alert("Diqqat: Kirim qilindi, lekin tarixga yozishda xatolik bo'ldi (Ruxsat/RLS).");
+            }
 
             // 3. Rolls
             if (inboundData.rolls.length > 0) {
@@ -446,15 +451,20 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                 }
             }
 
-            // 3. Log
-            const { error: outLogError } = await supabase.from('inventory_logs').insert([{
-                inventory_id: item.id,
-                type: 'Out',
-                quantity: Number(outboundData.quantity),
-                reason: finalReason,
-                batch_number: item.batch_number // Include batch number for history tracking
-            }]);
-            if (outLogError) throw outLogError;
+            // 3. Log (Soft Fail)
+            try {
+                const { error: outLogError } = await supabase.from('inventory_logs').insert([{
+                    inventory_id: item.id,
+                    type: 'Out',
+                    quantity: Number(outboundData.quantity),
+                    reason: finalReason,
+                    batch_number: item.batch_number // Include batch number for history tracking
+                }]);
+                if (outLogError) throw outLogError;
+            } catch (err) {
+                console.warn("Outbound log failed:", err);
+                alert("Diqqat: Chiqim qilindi, lekin tarixga yozishda xatolik bo'ldi (Ruxsat/RLS).");
+            }
 
             alert('Mato muvaffaqiyatli chiqim qilindi!');
             setShowOutboundModal(false);
