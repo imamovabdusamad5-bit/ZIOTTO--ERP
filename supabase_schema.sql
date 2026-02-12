@@ -79,13 +79,17 @@ alter table public.inventory_rolls enable row level security;
 drop policy if exists "Allow public read access" on public.inventory;
 drop policy if exists "Allow authenticated all" on public.inventory;
 create policy "Allow public read access" on public.inventory for select using (true);
-create policy "Allow authenticated all" on public.inventory for all using (auth.role() = 'authenticated');
+create policy "Allow authenticated insert" on public.inventory for insert with check (auth.role() = 'authenticated');
+create policy "Allow authenticated update" on public.inventory for update using (auth.role() = 'authenticated');
+create policy "Allow authenticated delete" on public.inventory for delete using (auth.role() = 'authenticated');
 
 -- Roll Policies
 drop policy if exists "Allow public read access" on public.inventory_rolls;
 drop policy if exists "Allow authenticated all" on public.inventory_rolls;
 create policy "Allow public read access" on public.inventory_rolls for select using (true);
-create policy "Allow authenticated all" on public.inventory_rolls for all using (auth.role() = 'authenticated');
+create policy "Allow authenticated insert" on public.inventory_rolls for insert with check (auth.role() = 'authenticated');
+create policy "Allow authenticated update" on public.inventory_rolls for update using (auth.role() = 'authenticated');
+create policy "Allow authenticated delete" on public.inventory_rolls for delete using (auth.role() = 'authenticated');
 
 -- Inventory Logs Policies
 create table if not exists public.inventory_logs (

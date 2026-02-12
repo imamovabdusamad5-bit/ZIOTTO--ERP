@@ -387,11 +387,14 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                     inventory_id: inventoryId,
                     roll_number: `R-${Date.now().toString().slice(-6)}-${idx + 1}`, // Unique automated ID
                     weight: Number(r.weight),
-                    // status: 'in_stock' // Assuming default or not needed if table strict
+                    // status: 'in_stock'
                 }));
                 // Check if table exists, if not this might fail, but assuming user has created it or it exists
                 const { error: rollError } = await supabase.from('inventory_rolls').insert(rollsToInsert);
-                if (rollError) console.warn("Rolls insert failed (table might be missing):", rollError);
+                if (rollError) {
+                    console.error("Rolls insert failed:", rollError);
+                    alert(`Diqqat! Poylar saqlanmadi (faqat umumiy kilogramm qo'shildi). Xatolik: ${rollError.message}`);
+                }
             }
 
             setShowInboundModal(false);
