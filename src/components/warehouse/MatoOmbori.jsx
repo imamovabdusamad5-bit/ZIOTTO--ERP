@@ -52,6 +52,53 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
 
     const [showHistoryModal, setShowHistoryModal] = useState(false);
     const [itemHistory, setItemHistory] = useState([]);
+    const [showCameraScanner, setShowCameraScanner] = useState(false);
+
+    // Camera Scanner Logic
+    React.useEffect(() => {
+        let scanner = null;
+        if (showCameraScanner && showOutboundModal) {
+            try {
+                // Check if element exists before init
+                const element = document.getElementById("reader");
+                if (element) {
+                    scanner = new Html5QrcodeScanner(
+                        "reader",
+                        { fps: 10, qrbox: { width: 250, height: 250 } },
+                        /* verbose= */ false
+                    );
+
+                    scanner.render((decodedText) => {
+                        // Success
+                        try {
+                            if (decodedText.startsWith('{') && decodedText.endsWith('}')) {
+                                const parsed = JSON.parse(decodedText);
+                                if (parsed.id && parsed.w) {
+                                    handleScannedRoll(parsed);
+                                }
+                            }
+                        } catch (e) {
+                            console.log("Scan parse error", e);
+                        }
+                    }, (error) => {
+                        // Scan error
+                    });
+                }
+            } catch (err) {
+                console.error("Scanner init error:", err);
+            }
+        }
+
+        return () => {
+            if (scanner) {
+                try {
+                    scanner.clear().catch(error => console.error("Failed to clear scanner", error));
+                } catch (e) {
+                    console.error("Scanner cleanup error", e);
+                }
+            }
+        };
+    }, [showCameraScanner, showOutboundModal, outboundData.selected_rolls]);
 
     // --- HELPERS ---
     const generateQRUrl = (data) => {
@@ -979,7 +1026,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                         onChange={e => setOutboundData({ ...outboundData, order_id: e.target.value })}
                                     >
                                         <option value="" className="bg-[var(--bg-card)] text-[var(--text-secondary)]">Tanlanmagan (Umumiy chiqim)</option>
-                                        {orders.map(o => (
+                                        {orders?.map(o => (
                                             <option key={o.id} value={o.id} className="bg-[var(--bg-card)]">Order #{o.order_number} - {o.models?.name}</option>
                                         ))}
                                     </select>
