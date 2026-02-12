@@ -101,7 +101,9 @@ alter table public.inventory_logs enable row level security;
 drop policy if exists "Allow public read access" on public.inventory_logs;
 drop policy if exists "Allow authenticated all" on public.inventory_logs;
 create policy "Allow public read access" on public.inventory_logs for select using (true);
-create policy "Allow authenticated all" on public.inventory_logs for all using (auth.role() = 'authenticated');
+create policy "Allow authenticated insert" on public.inventory_logs for insert with check (auth.role() = 'authenticated');
+create policy "Allow authenticated update" on public.inventory_logs for update using (auth.role() = 'authenticated');
+create policy "Allow authenticated delete" on public.inventory_logs for delete using (auth.role() = 'authenticated');
 
 -- Material Types Policies
 create table if not exists public.material_types (

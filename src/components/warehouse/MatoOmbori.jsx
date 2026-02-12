@@ -278,7 +278,8 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                 .single();
 
             if (error || !rollData) {
-                alert("Poy topilmadi yoki xatolik!");
+                console.error("Fetch error:", error);
+                alert(`Poy topilmadi! ID: ${qrData.id}. Xatolik: ${error?.message || 'Ma\'lumot yo\'q'}`);
                 setLoading(false);
                 return;
             }
@@ -460,7 +461,12 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
             setOutboundData({ inventory_id: '', quantity: '', order_id: '', reason: 'Kesimga', selected_rolls: [] });
             onRefresh();
         } catch (error) {
-            alert('Xatolik: ' + error.message);
+            console.error("Outbound Error:", error);
+            if (error.message?.includes('row-level security')) {
+                alert('Xatolik: RLS (Ruxsat yo\'q). "inventory_logs" jadvaliga yozish taqiqlangan. Iltimos, admin bilan bog\'laning va quyidagi SQLni yurgazing: \n\n' + error.message);
+            } else {
+                alert('Xatolik: ' + error.message);
+            }
         } finally {
             setLoading(false);
         }
