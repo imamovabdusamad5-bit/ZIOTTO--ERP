@@ -94,6 +94,7 @@ create table if not exists public.inventory_logs (
     type text,
     quantity float,
     reason text,
+    batch_number text,
     created_at timestamp with time zone default timezone('utc'::text, now())
 );
 alter table public.inventory_logs enable row level security;

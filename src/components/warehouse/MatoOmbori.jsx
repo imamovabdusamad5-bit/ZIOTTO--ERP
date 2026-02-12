@@ -366,13 +366,14 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
             }
 
             // 2. Log
-            await supabase.from('inventory_logs').insert([{
+            const { error: logError } = await supabase.from('inventory_logs').insert([{
                 inventory_id: inventoryId,
                 type: 'In',
                 quantity: Number(inboundData.quantity),
                 batch_number: cleanBatch,
                 reason: inboundData.reason
             }]);
+            if (logError) throw logError;
 
             // 3. Rolls
             if (inboundData.rolls.length > 0) {
@@ -445,12 +446,14 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
             }
 
             // 3. Log
-            await supabase.from('inventory_logs').insert([{
+            const { error: outLogError } = await supabase.from('inventory_logs').insert([{
                 inventory_id: item.id,
                 type: 'Out',
                 quantity: Number(outboundData.quantity),
-                reason: finalReason
+                reason: finalReason,
+                batch_number: item.batch_number // Include batch number for history tracking
             }]);
+            if (outLogError) throw outLogError;
 
             alert('Mato muvaffaqiyatli chiqim qilindi!');
             setShowOutboundModal(false);
