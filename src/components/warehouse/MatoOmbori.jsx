@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
     Warehouse, Search, Plus, History, CircleArrowDown,
-    ArrowUpRight, ScrollText, QrCode, Printer, Trash2, CircleCheck
+    ArrowUpRight, ScrollText, QrCode, Printer, Trash2, CircleCheck, RotateCcw
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
@@ -49,9 +49,29 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
         selected_rolls: []
     });
 
+    const [showHistoryModal, setShowHistoryModal] = useState(false);
+    const [itemHistory, setItemHistory] = useState([]);
+
     // --- HELPERS ---
     const generateQRUrl = (data) => {
         return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(data)}`;
+    };
+
+    const fetchHistory = async (itemId) => {
+        setLoading(true);
+        // Fetch logs for this item
+        const { data, error } = await supabase
+            .from('inventory_logs')
+            .select('*')
+            .eq('inventory_id', itemId)
+            .order('created_at', { ascending: false });
+
+        if (!error) {
+            setItemHistory(data);
+        } else {
+            console.error("History fetch error:", error);
+        }
+        setLoading(false);
     };
 
     const fetchRolls = async (inventoryId) => {
@@ -453,6 +473,12 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                             <div className="flex justify-center gap-1">
                                                 <button onClick={() => handleOpenRolls(item)} className="p-1.5 hover:bg-indigo-50 text-indigo-500 rounded"><QrCode size={16} /></button>
                                                 <button onClick={() => {
+                                                    setSelectedItem(item);
+                                                    fetchHistory(item.id);
+                                                    setShowHistoryModal(true);
+                                                }} className="p-1.5 hover:bg-sky-50 text-sky-500 rounded" title="Tarix va Statistika"><History size={16} /></button>
+
+                                                <button onClick={() => {
                                                     setInboundData({
                                                         reference_id: item.reference_id,
                                                         color: item.color,
@@ -463,7 +489,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                         rolls: []
                                                     });
                                                     setShowInboundModal(true);
-                                                }} className="p-1.5 hover:bg-amber-50 text-amber-500 rounded"><History size={16} /></button>
+                                                }} className="p-1.5 hover:bg-amber-50 text-amber-500 rounded" title="Qaytim Qilish"><RotateCcw size={16} /></button>
                                                 <button onClick={() => {
                                                     setOutboundData({
                                                         inventory_id: item.id,
@@ -532,6 +558,19 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                 >
                                                     <QrCode size={18} />
                                                 </button>
+
+                                                <button
+                                                    onClick={() => {
+                                                        setSelectedItem(item);
+                                                        fetchHistory(item.id);
+                                                        setShowHistoryModal(true);
+                                                    }}
+                                                    className="p-3 bg-[var(--bg-body)] text-sky-500 hover:bg-sky-500 hover:text-white rounded-xl transition-all border border-[var(--border-color)] hover:border-sky-500 shadow-lg hover:shadow-sky-500/20"
+                                                    title="Tarix va Statistika"
+                                                >
+                                                    <History size={18} />
+                                                </button>
+
                                                 <button
                                                     onClick={() => {
                                                         setInboundData({
@@ -548,7 +587,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                     className="p-3 bg-[var(--bg-body)] text-amber-500 hover:bg-amber-500 hover:text-white rounded-xl transition-all border border-[var(--border-color)] hover:border-amber-500 shadow-lg hover:shadow-amber-500/20"
                                                     title="Qaytim qilish"
                                                 >
-                                                    <History size={18} />
+                                                    <RotateCcw size={18} />
                                                 </button>
                                                 <button
                                                     onClick={() => {
@@ -755,6 +794,95 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                 </div>
             )}
 
+            {/* HISTORY & STATISTICS MODAL */}
+            {showHistoryModal && selectedItem && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl animate-in fade-in">
+                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-[3rem] shadow-2xl relative custom-scrollbar flex flex-col">
+                        <div className="p-8 border-b border-[var(--border-color)] flex justify-between items-center sticky top-0 bg-[var(--bg-card)]/95 backdrop-blur-md z-10 shrink-0">
+                            <div>
+                                <h3 className="text-2xl font-black text-[var(--text-primary)] tracking-tight flex items-center gap-4">
+                                    <div className="p-3 bg-amber-500 rounded-2xl text-white shadow-lg shadow-amber-500/30"><History size={24} /></div>
+                                    <span className="bg-gradient-to-r from-[var(--text-primary)] via-amber-400 to-amber-600 bg-clip-text text-transparent">Mato Tarixi va Statistikasi</span>
+                                </h3>
+                                <p className="text-[11px] text-[var(--text-secondary)] font-black uppercase tracking-widest mt-2 ml-[3.25rem]">{selectedItem.item_name} - {selectedItem.color} ({selectedItem.batch_number})</p>
+                            </div>
+                            <button onClick={() => setShowHistoryModal(false)} className="p-3 rounded-2xl bg-[var(--bg-body)] hover:bg-rose-500/10 text-[var(--text-secondary)] hover:text-rose-500 transition-all border border-[var(--border-color)]"><Trash2 className="rotate-45" size={20} /></button>
+                        </div>
+
+                        <div className="p-8 space-y-8 flex-1">
+                            {/* Summary Cards */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div className="bg-[var(--bg-body)] p-6 rounded-3xl border border-[var(--border-color)]">
+                                    <div className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest font-black mb-2">Jami Kirim</div>
+                                    <div className="text-3xl font-black text-emerald-500">
+                                        {itemHistory.filter(h => h.type === 'In').reduce((sum, h) => sum + Number(h.quantity), 0).toFixed(2)} <span className="text-sm text-[var(--text-secondary)]">kg</span>
+                                    </div>
+                                </div>
+                                <div className="bg-[var(--bg-body)] p-6 rounded-3xl border border-[var(--border-color)]">
+                                    <div className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest font-black mb-2">Jami Chiqim</div>
+                                    <div className="text-3xl font-black text-rose-500">
+                                        {itemHistory.filter(h => h.type === 'Out').reduce((sum, h) => sum + Number(h.quantity), 0).toFixed(2)} <span className="text-sm text-[var(--text-secondary)]">kg</span>
+                                    </div>
+                                </div>
+                                <div className="bg-[var(--bg-body)] p-6 rounded-3xl border border-[var(--border-color)]">
+                                    <div className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest font-black mb-2">Hozirgi Qoldiq</div>
+                                    <div className="text-3xl font-black text-indigo-500">
+                                        {selectedItem.quantity} <span className="text-sm text-[var(--text-secondary)]">kg</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Detailed Log Table */}
+                            <div className="overflow-hidden rounded-3xl border border-[var(--border-color)]">
+                                <table className="w-full text-left text-sm">
+                                    <thead className="bg-[var(--bg-body)] text-[var(--text-secondary)] uppercase font-black text-[10px] tracking-widest">
+                                        <tr>
+                                            <th className="px-6 py-4">Sana</th>
+                                            <th className="px-6 py-4">Harakat</th>
+                                            <th className="px-6 py-4">Miqdor</th>
+                                            <th className="px-6 py-4">Sabab / Model</th>
+                                            <th className="px-6 py-4 text-right">Partiya</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-[var(--border-color)] bg-[var(--bg-card)]">
+                                        {itemHistory.length === 0 ? (
+                                            <tr>
+                                                <td colSpan="5" className="px-6 py-8 text-center text-[var(--text-secondary)] italic">Tarix topilmadi</td>
+                                            </tr>
+                                        ) : (
+                                            itemHistory.map((log) => (
+                                                <tr key={log.id} className="hover:bg-[var(--bg-card-hover)] transition-colors">
+                                                    <td className="px-6 py-4 text-[var(--text-secondary)] font-mono text-xs">
+                                                        {new Date(log.created_at).toLocaleString()}
+                                                    </td>
+                                                    <td className="px-6 py-4">
+                                                        <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${log.type === 'In'
+                                                            ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                                                            : 'bg-rose-500/10 text-rose-500 border-rose-500/20'
+                                                            }`}>
+                                                            {log.type === 'In' ? 'Kirim' : 'Chiqim'}
+                                                        </span>
+                                                    </td>
+                                                    <td className={`px-6 py-4 font-black ${log.type === 'In' ? 'text-emerald-500' : 'text-rose-500'}`}>
+                                                        {log.type === 'In' ? '+' : '-'}{log.quantity} kg
+                                                    </td>
+                                                    <td className="px-6 py-4 text-[var(--text-primary)] font-medium">
+                                                        {log.reason}
+                                                    </td>
+                                                    <td className="px-6 py-4 text-right text-[var(--text-secondary)] font-mono text-xs">
+                                                        {log.batch_number || '-'}
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* OUTBOUND MODAL */}
             {showOutboundModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl">
@@ -773,6 +901,51 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                         </div>
 
                         <div className="overflow-y-auto custom-scrollbar p-8 space-y-8 flex-1">
+                            {/* DEDICATED SCANNER INPUT */}
+                            <div className="bg-indigo-500/5 border border-indigo-500/20 p-6 rounded-3xl flex flex-col gap-3">
+                                <label className="text-[10px] font-black text-indigo-400 uppercase tracking-widest flex items-center gap-2">
+                                    <QrCode size={16} /> QR Skaner (Bu yerga bosing va skanerlang)
+                                </label>
+                                <input
+                                    autoFocus
+                                    type="text"
+                                    placeholder="Skanerlash uchun shu yerga bosing..."
+                                    className="w-full bg-[var(--bg-card)] border-2 border-indigo-500/30 rounded-xl p-3 text-center text-indigo-400 font-mono text-sm placeholder:text-indigo-500/30 focus:border-indigo-500 focus:bg-indigo-500/10 outline-none transition-all"
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            e.preventDefault();
+                                            try {
+                                                const val = e.target.value.trim();
+                                                if (!val) return;
+
+                                                // Try parse JSON
+                                                let qrData = null;
+                                                // Robust parse logic
+                                                if (val.includes('{') && val.includes('}')) {
+                                                    const start = val.indexOf('{');
+                                                    const end = val.lastIndexOf('}');
+                                                    const jsonStr = val.substring(start, end + 1);
+                                                    qrData = JSON.parse(jsonStr);
+                                                }
+
+                                                if (qrData && qrData.id && qrData.w) {
+                                                    handleScannedRoll(qrData);
+                                                    e.target.value = ''; // Clear after scan
+                                                    // Play beep sound logic here if needed
+                                                } else {
+                                                    alert("Noto'g'ri QR kod formati!");
+                                                }
+                                            } catch (err) {
+                                                console.error("Scan error", err);
+                                                // alert("Skanerlash xatoligi");
+                                            }
+                                        }
+                                    }}
+                                />
+                                <p className="text-[9px] text-center text-indigo-400/60 font-bold uppercase tracking-widest">Har bir skanerdan so'ng poy avtomatik qo'shiladi</p>
+                            </div>
+
+
                             <form id="outboundForm" onSubmit={handleChiqim} className="space-y-6">
                                 <div>
                                     <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1 mb-2 block">Qaysi Buyurtma Uchun? (Optional)</label>
@@ -788,36 +961,40 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                     </select>
                                 </div>
 
-                                {/* ROLL SELECTION SHORTCUT */}
+                                {/* ROLL SELECTION LIST (Updated Visuals) */}
                                 {itemRolls.length > 0 && (
-                                    <div className="bg-rose-500/5 border border-rose-500/10 p-6 rounded-3xl">
-                                        <h4 className="flex items-center gap-2 text-rose-400 font-black uppercase text-xs tracking-widest mb-4">
-                                            <CircleCheck size={16} /> Poylarni Tanlash (Qulay)
+                                    <div className="bg-[var(--bg-body)] border border-[var(--border-color)] p-6 rounded-3xl">
+                                        <h4 className="flex items-center justify-between text-[var(--text-secondary)] font-black uppercase text-xs tracking-widest mb-4">
+                                            <span>Mavjud Poylar</span>
+                                            <span className="text-rose-500">{outboundData.selected_rolls.length} ta tanlandi</span>
                                         </h4>
                                         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-48 overflow-y-auto custom-scrollbar pr-2">
-                                            {itemRolls.map(roll => (
-                                                <div
-                                                    key={roll.id}
-                                                    onClick={() => {
-                                                        const isSelected = outboundData.selected_rolls.find(r => r.id === roll.id);
-                                                        let newSelection;
-                                                        if (isSelected) {
-                                                            newSelection = outboundData.selected_rolls.filter(r => r.id !== roll.id);
-                                                        } else {
-                                                            newSelection = [...outboundData.selected_rolls, roll];
-                                                        }
-                                                        const totalWeight = newSelection.reduce((sum, r) => sum + Number(r.weight), 0);
-                                                        setOutboundData({ ...outboundData, selected_rolls: newSelection, quantity: totalWeight.toFixed(2) });
-                                                    }}
-                                                    className={`p-3 rounded-xl border cursor-pointer transition-all flex flex-col items-center justify-center text-center ${outboundData.selected_rolls.find(r => r.id === roll.id)
-                                                        ? 'bg-rose-500 text-white border-rose-500 shadow-lg shadow-rose-500/20'
-                                                        : 'bg-[var(--bg-body)] text-[var(--text-secondary)] border-[var(--border-color)] hover:border-rose-500/30'
-                                                        }`}
-                                                >
-                                                    <span className="font-black text-sm">{roll.weight} kg</span>
-                                                    <span className="text-[9px] uppercase opacity-70">{roll.roll_number}</span>
-                                                </div>
-                                            ))}
+                                            {itemRolls.map(roll => {
+                                                const isSelected = outboundData.selected_rolls.find(r => r.id === roll.id);
+                                                return (
+                                                    <div
+                                                        key={roll.id}
+                                                        onClick={() => {
+                                                            let newSelection;
+                                                            if (isSelected) {
+                                                                newSelection = outboundData.selected_rolls.filter(r => r.id !== roll.id);
+                                                            } else {
+                                                                newSelection = [...outboundData.selected_rolls, roll];
+                                                            }
+                                                            const totalWeight = newSelection.reduce((sum, r) => sum + Number(r.weight), 0);
+                                                            setOutboundData({ ...outboundData, selected_rolls: newSelection, quantity: totalWeight.toFixed(2) });
+                                                        }}
+                                                        className={`p-3 rounded-xl border cursor-pointer transition-all flex flex-col items-center justify-center text-center relative overflow-hidden ${isSelected
+                                                            ? 'bg-rose-500 text-white border-rose-500 shadow-lg shadow-rose-500/20'
+                                                            : 'bg-[var(--bg-card)] text-[var(--text-secondary)] border-[var(--border-color)] hover:border-rose-500/30'
+                                                            }`}
+                                                    >
+                                                        {isSelected && <div className="absolute top-1 right-1"><CircleCheck size={12} fill="white" className="text-rose-500" /></div>}
+                                                        <span className="font-black text-sm">{roll.weight} kg</span>
+                                                        <span className={`text-[9px] uppercase font-bold mt-0.5 ${isSelected ? 'text-white/70' : 'text-[var(--text-secondary)] opacity-50'}`}>{roll.roll_number}</span>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 )}
