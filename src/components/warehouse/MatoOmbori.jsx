@@ -114,8 +114,129 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
         printWindow.document.close();
     };
 
+    // --- QR SCANNER LOGIC ---
+    // Buffer to hold scanner input
+    const [scanBuffer, setScanBuffer] = useState('');
+    const [lastKeyTime, setLastKeyTime] = useState(0);
 
-    // --- HANDLERS ---
+    React.useEffect(() => {
+        const handleKeyDown = async (e) => {
+            // Scanner acts like keyboard. We determine if it's scanner by speed of typing or specific prefix/suffix if configured.
+            // Simple buffer logic:
+            const currentTime = Date.now();
+            const char = e.key;
+
+            // If time between keys is long (e.g. > 50ms), it's likely manual typing, so reset buffer
+            if (currentTime - lastKeyTime > 50) {
+                setScanBuffer(char);
+            } else {
+                setScanBuffer(prev => prev + char);
+            }
+            setLastKeyTime(currentTime);
+
+            // If "Enter" is pressed, try to parse the buffer as JSON
+            if (char === 'Enter') {
+                try {
+                    // Clean buffer from potential 'Shift' or other non-char keys if any
+                    // Usually scanners send exact string + Enter.
+                    // Our QR format: {"id":..., "w":...}
+                    // We need to trim just in case
+                    const rawData = scanBuffer.trim();
+                    // Some scanners might send 'Shift' chars if configured wrong, but let's assume valid JSON string first.
+
+                    // Allow simple ID scan if JSON fails? No, our QR is JSON.
+                    if (rawData.startsWith('{') && rawData.endsWith('}')) {
+                        const parsed = JSON.parse(rawData);
+                        if (parsed.id && parsed.w) {
+                            handleScannedRoll(parsed);
+                        }
+                    } else if (rawData.includes('"id":')) {
+                        // Robustness: Sometimes buffer might have garbage at start
+                        const start = rawData.indexOf('{');
+                        const end = rawData.lastIndexOf('}');
+                        if (start > -1 && end > -1) {
+                            const clean = rawData.substring(start, end + 1);
+                            const parsed = JSON.parse(clean);
+                            handleScannedRoll(parsed);
+                        }
+                    }
+                    setScanBuffer(''); // Reset after process
+                } catch (err) {
+                    // Not a valid JSON or scanner error, ignore manual Enter presses
+                    // console.log("Scan parse error", err); 
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [scanBuffer, lastKeyTime, outboundData, showOutboundModal, itemRolls]);
+
+
+    const handleScannedRoll = async (qrData) => {
+        // qrData = { id: 123, w: 25.5 }
+
+        // Scenario 1: Outbound Modal is OPEN
+        if (showOutboundModal) {
+            // Check if roll is already selected
+            const exists = outboundData.selected_rolls.find(r => r.id == qrData.id);
+            if (exists) {
+                alert(`Bu poy allaqachon ro'yxatda bor! (${qrData.w} kg)`);
+                return;
+            }
+
+            // We need full roll object. If it's in 'itemRolls' (current view), use it.
+            // If not, we might need to fetch it or just use QR data if trusted.
+            // Better to find it in itemRolls to ensure it belongs to current Item?
+            // BUT: User might scan a roll from a DIFFERENT item. Ideally, we should allow that? 
+            // Current Outbound Modal is tied to a specific "Inventory Item". 
+            // If we want mixed layout, we need to change architecture.
+            // For now, let's assume we are scanning rolls OF THE SAME ITEM.
+
+            // Or, we can just trust the ID and Weight and add it, but we need to verify it belongs to this Item ID?
+            // If the QR contains ID, we can check DB. 
+            // Simplification: We look into 'itemRolls'. If not found, maybe show warning or fetch.
+
+            let rollToAdd = itemRolls.find(r => r.id == qrData.id);
+
+            if (!rollToAdd) {
+                // Fetch from DB just in case it wasn't loaded
+                const { data: rollFromDb } = await supabase.from('inventory_rolls').select('*').eq('id', qrData.id).single();
+                if (rollFromDb) {
+                    // Verify match with current Item?
+                    if (rollFromDb.inventory_id != outboundData.inventory_id) {
+                        alert("Diqqat: Bu poy boshqa mato turiga tegishli! Chiqim qilish uchun o'sha mato bo'limiga o'ting.");
+                        return;
+                    }
+                    rollToAdd = rollFromDb;
+                } else {
+                    alert("Poy bazadan topilmadi!");
+                    return;
+                }
+            }
+
+            // Add to selection
+            const newSelection = [...outboundData.selected_rolls, rollToAdd];
+            const totalWeight = newSelection.reduce((sum, r) => sum + Number(r.weight), 0);
+
+            setOutboundData(prev => ({
+                ...prev,
+                selected_rolls: newSelection,
+                quantity: totalWeight.toFixed(2)
+            }));
+
+            // Visual feedback
+            // alert(`Qo'shildi: ${rollToAdd.weight} kg`); // Optional, maybe annoying. Beep sound is better.
+
+        } else {
+            // Scenario 2: Modal is CLOSED. 
+            // We should open the modal for this Item.
+            // But checking which Inventory Item this roll belongs to requires a DB call.
+
+            alert("Iltimos, avval tegishli 'Chiqim' oynasini (Arrow Up Icon) oching, so'ng skanerlang.");
+            // Advanced: Auto-open modal logic could be added here fetching inventory_id from roll.
+        }
+    };
 
     const handleKirim = async (e) => {
         e.preventDefault();
