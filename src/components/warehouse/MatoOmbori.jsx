@@ -317,6 +317,45 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
         }
     };
 
+    const handleDelete = async (item) => {
+        if (!window.confirm(`Siz "${item.item_name}" (${item.quantity} kg) ni o'chirmoqchisiz.\n\nBu amalni ortga qaytarib bo'lmaydi va barcha tarixi o'chib ketadi.\nTasdiqlaysizmi?`)) {
+            return;
+        }
+
+        try {
+            setLoading(true);
+
+            // 1. Delete Logs first (safe delete)
+            const { error: logError } = await supabase
+                .from('inventory_logs')
+                .delete()
+                .eq('inventory_id', item.id);
+
+            if (logError) throw logError;
+
+            // 2. Delete Rolls (Cascade usually handles this, but explicit is fine too)
+            // Schema has cascade on rolls, so deleting inventory handles it.
+
+            // 3. Delete Inventory
+            const { error: delError } = await supabase
+                .from('inventory')
+                .delete()
+                .eq('id', item.id);
+
+            if (delError) throw delError;
+
+            alert("Ma'lumot muvaffaqiyatli o'chirildi!");
+            // Refresh
+            onRefresh();
+
+        } catch (error) {
+            console.error("Delete error:", error);
+            alert("O'chirishda xatolik: " + error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleKirim = async (e) => {
         e.preventDefault();
         try {
@@ -579,7 +618,9 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                         selected_rolls: []
                                                     });
                                                     fetchRolls(item.id).then(() => setShowOutboundModal(true));
-                                                }} className="p-1.5 hover:bg-rose-50 text-rose-500 rounded"><ArrowUpRight size={16} /></button>
+                                                }} className="p-1.5 hover:bg-rose-50 text-rose-500 rounded" title="Chiqim/Kesim"><ArrowUpRight size={16} /></button>
+
+                                                <button onClick={() => handleDelete(item)} className="p-1.5 hover:bg-red-50 text-red-600 rounded" title="O'chirib yuborish"><Trash2 size={16} /></button>
                                             </div>
                                         </td>
                                     </tr>
@@ -686,6 +727,8 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                 >
                                                     <ArrowUpRight size={18} />
                                                 </button>
+
+                                                <button onClick={() => handleDelete(item)} className="p-3 bg-[var(--bg-body)] text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-all border border-[var(--border-color)] hover:border-red-500 shadow-lg hover:shadow-red-500/20" title="O'chirib yuborish"><Trash2 size={18} /></button>
                                             </div>
                                         </td>
                                     </tr>
