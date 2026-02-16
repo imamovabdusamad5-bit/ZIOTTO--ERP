@@ -27,7 +27,8 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
             (item.color_code || '').toLowerCase().includes(query) ||
             (item.material_types?.thread_type || '').toLowerCase().includes(query) ||
             (item.material_types?.grammage || '').toString().includes(query) ||
-            (item.batch_number || '').toLowerCase().includes(query)
+            (item.batch_number || '').toLowerCase().includes(query) ||
+            (item.source || '').toLowerCase().includes(query)
         );
     });
 
@@ -44,7 +45,8 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
         grammage: '',
         width: '',
         note: '',
-        rolls: []
+        rolls: [],
+        source: "E'zonur" // Default source
     });
 
     // Auto-fill specs when reference is selected
@@ -88,6 +90,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
         rolls: [],
         deletedRolls: [], // To track rolls removed during edit
         note: '', // Try to fetch from 'In' log
+        source: '',
         // Specs for display/reference connection
         type_specs: '',
         grammage: '',
@@ -139,6 +142,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                 color_code: item.color_code || '',
                 batch_number: item.batch_number || '',
                 quantity: item.quantity || 0,
+                source: item.source || '',
 
                 rolls: sortedRolls, // Keep full objects: {id, roll_number, weight, status}
                 deletedRolls: [],
@@ -188,6 +192,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                     batch_number: editData.batch_number,
                     quantity: newTotalWeight,
                     reference_id: editData.reference_id || null,
+                    source: editData.source,
                     last_updated: new Date()
                 })
                 .eq('id', editData.id);
@@ -716,6 +721,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                         color_code: cleanColorCode,
                         batch_number: cleanBatch,
                         reference_id: inboundData.reference_id || null, // Optional if just name used
+                        source: inboundData.source,
                         last_updated: new Date()
                     }])
                     .select()
@@ -789,7 +795,8 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                 grammage: '',
                 width: '',
                 note: '',
-                rolls: []
+                rolls: [],
+                source: "E'zonur"
             });
 
             await onRefresh();
@@ -862,65 +869,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
         }
     };
 
-    const handleEdit = (item) => {
-        setSelectedItem(item);
-        setEditData({
-            item_name: item.item_name || '',
-            color: item.color || '',
-            color_code: item.color_code || '',
-            batch_number: item.batch_number || '',
-            quantity: item.quantity || 0
-        });
-        setShowEditModal(true);
-    };
 
-    const handleSaveEdit = async (e) => {
-        e.preventDefault();
-        try {
-            setLoading(true);
-
-            // Calculate difference for logging if quantity changed
-            const oldQty = Number(selectedItem.quantity || 0);
-            const newQty = Number(editData.quantity || 0);
-            const diff = newQty - oldQty;
-
-            // Update Inventory
-            const { error: updateError } = await supabase
-                .from('inventory')
-                .update({
-                    item_name: editData.item_name,
-                    color: editData.color,
-                    color_code: editData.color_code,
-                    batch_number: editData.batch_number,
-                    quantity: newQty,
-                    last_updated: new Date()
-                })
-                .eq('id', selectedItem.id);
-
-            if (updateError) throw updateError;
-
-            // Log if quantity changed significantly
-            if (Math.abs(diff) > 0.001) {
-                await supabase.from('inventory_logs').insert([{
-                    inventory_id: selectedItem.id,
-                    type: diff > 0 ? 'In' : 'Out', // Or specific type 'Correction' if you prefer, but In/Out keeps balance mostly sane
-                    quantity: Math.abs(diff),
-                    reason: `Tahrir (Correction): ${oldQty} -> ${newQty}`,
-                    batch_number: editData.batch_number
-                }]);
-            }
-
-            alert("Muvaffaqiyatli saqlandi!");
-            setShowEditModal(false);
-            onRefresh();
-
-        } catch (error) {
-            console.error("Edit Error:", error);
-            alert("Saqlashda xatolik: " + error.message);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleDelete = async (item) => {
         if (!window.confirm("Haqiqatan ham o'chirmoqchimisiz?")) return;
@@ -1008,6 +957,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                             </th>
                             <th className="px-6 py-5">Sana / ID</th>
                             <th className="px-6 py-5">Mato Turi</th>
+                            <th className="px-6 py-5">Kimdan</th>
                             <th className="px-6 py-5">Rang</th>
                             <th className="px-6 py-5">Turi</th>
                             <th className="px-6 py-5">Partiya</th>
@@ -1046,6 +996,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                             <div className="text-[10px] text-[var(--text-secondary)] font-mono uppercase">MAT-{item.id}</div>
                                         </td>
                                         <td className="px-6 py-5 font-black text-[var(--text-primary)] text-sm">{item.item_name}</td>
+                                        <td className="px-6 py-5 font-bold text-[var(--text-secondary)] text-xs uppercase">{item.source || '-'}</td>
                                         <td className="px-6 py-5">
                                             <div className="flex items-center gap-3">
                                                 <div
@@ -1211,6 +1162,19 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                 value={inboundData.date}
                                                 onChange={e => setInboundData({ ...inboundData, date: e.target.value })}
                                             />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Kimdan (Manba)</label>
+                                            <select
+                                                className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
+                                                value={inboundData.source}
+                                                onChange={e => setInboundData({ ...inboundData, source: e.target.value })}
+                                            >
+                                                <option value="E'zonur">E'zonur</option>
+                                                <option value="Kesim">Kesim</option>
+                                                <option value="Buzilgan">Buzilgan (Qayta)</option>
+                                                <option value="Boshqa">Boshqa</option>
+                                            </select>
                                         </div>
                                         <div>
                                             <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Partiya Raqami</label>
@@ -1522,6 +1486,19 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                     value={editData.item_name}
                                     onChange={e => setEditData({ ...editData, item_name: e.target.value })}
                                 />
+                            </div>
+                            <div>
+                                <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1 block">Kimdan (Manba)</label>
+                                <select
+                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 font-bold text-[var(--text-primary)] focus:border-indigo-500 outline-none"
+                                    value={editData.source || "E'zonur"}
+                                    onChange={e => setEditData({ ...editData, source: e.target.value })}
+                                >
+                                    <option value="E'zonur">E'zonur</option>
+                                    <option value="Kesim">Kesim</option>
+                                    <option value="Buzilgan">Buzilgan (Qayta)</option>
+                                    <option value="Boshqa">Boshqa</option>
+                                </select>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
