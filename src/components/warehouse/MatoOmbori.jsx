@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
 import {
     Warehouse, Search, Plus, History, CircleArrowDown,
-    ArrowUpRight, ScrollText, QrCode, Printer, Trash2, CircleCheck, RotateCcw, ChevronDown, ChevronUp, Edit, X
+    ArrowUpRight, ArrowDownLeft, ScrollText, QrCode, Printer, Trash2, CircleCheck, RotateCcw, ChevronDown, ChevronUp, Edit, X
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
@@ -970,18 +969,71 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
             {/* History Modal (Minimalist Reuse) */}
             {showHistoryModal && selectedItem && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl">
-                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-4xl max-h-[80vh] overflow-y-auto rounded-[2rem] p-8 shadow-2xl relative">
-                        <button onClick={() => setShowHistoryModal(false)} className="absolute top-6 right-6 p-2 bg-[var(--bg-body)] rounded-full text-[var(--text-secondary)] hover:text-white"><Trash2 size={20} className="rotate-45" /></button>
-                        <h3 className="text-xl font-black text-[var(--text-primary)] mb-6 flex items-center gap-2"><History size={20} /> Tarix</h3>
-                        <div className="space-y-2">
-                            {itemHistory.length === 0 ? <div className="text-center py-10 text-[var(--text-secondary)]">Tarix bo'm-bo'sh</div> : itemHistory.map(h => (
-                                <div key={h.id} className="flex justify-between items-center bg-[var(--bg-body)] p-4 rounded-xl border border-[var(--border-color)]">
-                                    <div>
-                                        <div className="text-xs font-bold text-[var(--text-secondary)]">{new Date(h.created_at).toLocaleString()}</div>
-                                        <div className="text-sm font-bold text-[var(--text-primary)]">{h.reason}</div>
+                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col rounded-[2rem] shadow-2xl relative animate-in zoom-in-95 duration-300">
+                        {/* Header */}
+                        <div className="p-6 border-b border-[var(--border-color)] flex justify-between items-center bg-[var(--bg-card)] shrink-0">
+                            <h3 className="text-xl font-black text-[var(--text-primary)] flex items-center gap-2">
+                                <History size={24} className="text-indigo-500" />
+                                Tarix: <span className="text-[var(--text-secondary)] font-medium text-lg ml-2">{selectedItem.item_name}</span>
+                            </h3>
+                            <button
+                                onClick={() => setShowHistoryModal(false)}
+                                className="w-10 h-10 rounded-full bg-[var(--bg-body)] text-[var(--text-secondary)] hover:bg-rose-500 hover:text-white flex items-center justify-center transition-all"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        {/* Summary Stats */}
+                        <div className="p-6 grid grid-cols-3 gap-4 bg-[var(--bg-body)]/50 shrink-0">
+                            {(() => {
+                                const totalIn = itemHistory.filter(h => h.type === 'In').reduce((a, b) => a + Number(b.quantity), 0);
+                                const totalOut = itemHistory.filter(h => h.type === 'Out').reduce((a, b) => a + Number(b.quantity), 0);
+                                const currentBalance = totalIn - totalOut;
+
+                                return (
+                                    <>
+                                        <div className="bg-[var(--bg-card)] p-4 rounded-2xl border border-[var(--border-color)] shadow-sm">
+                                            <div className="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-1">Jami Kirim</div>
+                                            <div className="text-2xl font-black text-[var(--text-primary)]">+{totalIn.toLocaleString()} <span className="text-xs text-[var(--text-secondary)]">kg</span></div>
+                                        </div>
+                                        <div className="bg-[var(--bg-card)] p-4 rounded-2xl border border-[var(--border-color)] shadow-sm">
+                                            <div className="text-[10px] font-black uppercase tracking-widest text-rose-500 mb-1">Jami Chiqim</div>
+                                            <div className="text-2xl font-black text-[var(--text-primary)]">-{totalOut.toLocaleString()} <span className="text-xs text-[var(--text-secondary)]">kg</span></div>
+                                        </div>
+                                        <div className="bg-[var(--bg-card)] p-4 rounded-2xl border border-[var(--border-color)] shadow-sm relative overflow-hidden">
+                                            <div className="absolute top-0 right-0 w-16 h-16 bg-indigo-500/10 rounded-bl-full -mr-4 -mt-4"></div>
+                                            <div className="text-[10px] font-black uppercase tracking-widest text-indigo-500 mb-1">Joriy Qoldiq</div>
+                                            <div className="text-2xl font-black text-[var(--text-primary)]">{currentBalance.toLocaleString()} <span className="text-xs text-[var(--text-secondary)]">kg</span></div>
+                                        </div>
+                                    </>
+                                );
+                            })()}
+                        </div>
+
+                        {/* History List */}
+                        <div className="flex-1 overflow-y-auto p-6 space-y-3 custom-scrollbar">
+                            {itemHistory.length === 0 ? (
+                                <div className="text-center py-10 flex flex-col items-center justify-center text-[var(--text-secondary)] opacity-60">
+                                    <History size={48} className="mb-4 stroke-1" />
+                                    <p className="font-bold">Hozircha tarix mavjud emas</p>
+                                </div>
+                            ) : itemHistory.map(h => (
+                                <div key={h.id} className="group flex justify-between items-center bg-[var(--bg-body)] hover:bg-[var(--bg-card-hover)] p-4 rounded-2xl border border-[var(--border-color)] transition-all">
+                                    <div className="flex items-center gap-4">
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${h.type === 'In' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}`}>
+                                            {h.type === 'In' ? <ArrowDownLeft size={20} /> : <ArrowUpRight size={20} />}
+                                        </div>
+                                        <div>
+                                            <div className="text-xs font-black text-[var(--text-secondary)] uppercase tracking-wide mb-0.5">
+                                                {new Date(h.created_at).toLocaleString('ru-RU')}
+                                            </div>
+                                            <div className="text-sm font-bold text-[var(--text-primary)]">{h.reason || (h.type === 'In' ? 'Kirim' : 'Chiqim')}</div>
+                                            {h.batch_number && <div className="text-[10px] text-[var(--text-secondary)] font-mono mt-1 bg-[var(--bg-card)] inline-block px-2 py-0.5 rounded border border-[var(--border-color)]">Partiya: {h.batch_number}</div>}
+                                        </div>
                                     </div>
                                     <div className={`text-lg font-black ${h.type === 'In' ? 'text-emerald-500' : 'text-rose-500'}`}>
-                                        {h.type === 'In' ? '+' : '-'}{h.quantity} kg
+                                        {h.type === 'In' ? '+' : '-'}{h.quantity} <span className="text-xs text-[var(--text-secondary)] font-bold">kg</span>
                                     </div>
                                 </div>
                             ))}
