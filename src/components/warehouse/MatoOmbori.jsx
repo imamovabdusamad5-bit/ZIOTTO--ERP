@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; // Updated MatoOmbori v2
 import {
     Warehouse, Search, Plus, History, CircleArrowDown,
     ArrowUpRight, ScrollText, QrCode, Printer, Trash2, CircleCheck, RotateCcw, ChevronDown, ChevronUp, Edit
@@ -552,8 +552,8 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                                         <td className="px-6 py-3 text-center">
                                                                             <div className="flex items-center justify-center gap-3">
                                                                                 <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${roll.status === 'used'
-                                                                                        ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
-                                                                                        : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                                                                                    ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
+                                                                                    : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
                                                                                     }`}>
                                                                                     {roll.status === 'used' ? 'Ishlatilgan' : 'Omborda'}
                                                                                 </span>
