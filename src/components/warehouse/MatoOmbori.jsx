@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'; // Updated MatoOmbori v2
+import React, { useState, useEffect } from 'react';
 import {
     Warehouse, Search, Plus, History, CircleArrowDown,
-    ArrowUpRight, ScrollText, QrCode, Printer, Trash2, CircleCheck, RotateCcw, ChevronDown, ChevronUp, Edit
+    ArrowUpRight, ScrollText, QrCode, Printer, Trash2, CircleCheck, RotateCcw, ChevronDown, ChevronUp, Edit, X
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
@@ -13,6 +13,9 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
     const [selectedItem, setSelectedItem] = useState(null);
     const [itemRolls, setItemRolls] = useState([]);
     const [expandedRowId, setExpandedRowId] = useState(null);
+
+    // Selection State
+    const [selectedIds, setSelectedIds] = useState([]);
 
     // Filter
     const filteredInventory = inventory.filter(item => {
@@ -70,6 +73,47 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
 
     const [showHistoryModal, setShowHistoryModal] = useState(false);
     const [itemHistory, setItemHistory] = useState([]);
+
+    // --- LOGIC: Select & Bulk Delete ---
+    const handleSelectAll = (e) => {
+        if (e.target.checked) {
+            setSelectedIds(filteredInventory.map(i => i.id));
+        } else {
+            setSelectedIds([]);
+        }
+    };
+
+    const handleSelectRow = (id) => {
+        if (selectedIds.includes(id)) {
+            setSelectedIds(selectedIds.filter(i => i !== id));
+        } else {
+            setSelectedIds([...selectedIds, id]);
+        }
+    };
+
+    const handleBulkDelete = async () => {
+        if (!window.confirm(`${selectedIds.length} ta elementni o'chirmoqchimisiz?`)) return;
+
+        setLoading(true);
+        try {
+            // Delete related logs and rolls first (foreign key constraints)
+            await supabase.from('inventory_logs').delete().in('inventory_id', selectedIds);
+            await supabase.from('inventory_rolls').delete().in('inventory_id', selectedIds);
+
+            const { error } = await supabase.from('inventory').delete().in('id', selectedIds);
+
+            if (error) throw error;
+
+            setSelectedIds([]);
+            onRefresh();
+        } catch (error) {
+            console.error(error);
+            alert("Xatolik: " + error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
     // --- LOGIC: Fetch Rolls and Toggle Expansion ---
     const fetchRolls = async (inventoryId) => {
@@ -409,35 +453,70 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
 
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-[var(--bg-card)] backdrop-blur-3xl p-6 rounded-[2.5rem] border border-[var(--border-color)] shadow-2xl">
-                <div className="relative w-full md:w-96 group">
-                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" size={20} />
-                    <input
-                        type="text"
-                        placeholder="Qidirish... (ID, Partiya, Rang)"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-14 pr-6 py-4 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl outline-none text-[var(--text-primary)] font-bold transition-all shadow-inner focus:border-indigo-500/50"
-                    />
+            {/* Header - Dynamic based on selection */}
+            {selectedIds.length > 0 ? (
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-rose-500/10 backdrop-blur-3xl p-6 rounded-[2.5rem] border border-rose-500/20 shadow-2xl animate-in slide-in-from-top-2">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-rose-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-rose-500/30">
+                            <Trash2 size={24} />
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-black text-rose-500">{selectedIds.length} ta Tanlandi</h3>
+                            <p className="text-xs font-bold text-rose-400/70 uppercase tracking-widest">O'chirish uchun tayyor</p>
+                        </div>
+                    </div>
+                    <div className="flex gap-3 w-full md:w-auto">
+                        <button
+                            onClick={() => setSelectedIds([])}
+                            className="flex-1 md:flex-none px-6 py-4 rounded-2xl border border-rose-500/20 text-rose-500 font-bold hover:bg-rose-500/10 transition-all flex items-center justify-center gap-2"
+                        >
+                            <X size={18} /> Bekor qilish
+                        </button>
+                        <button
+                            onClick={handleBulkDelete}
+                            className="flex-1 md:flex-none bg-rose-500 text-white px-8 py-4 rounded-2xl hover:bg-rose-600 transition-all shadow-xl shadow-rose-500/20 font-black uppercase text-xs tracking-widest flex items-center justify-center gap-2"
+                        >
+                            <Trash2 size={18} /> O'chirish
+                        </button>
+                    </div>
                 </div>
-                <div className="flex gap-3">
-                    <button className="px-6 py-4 rounded-2xl border border-[var(--border-color)] text-[var(--text-secondary)] font-bold hover:bg-[var(--bg-card-hover)] transition-all">Filtrlar</button>
-                    <button
-                        onClick={() => setShowInboundModal(true)}
-                        className="bg-indigo-600 text-white px-8 py-4 rounded-2xl hover:bg-indigo-500 transition-all shadow-xl shadow-indigo-600/20 font-black uppercase text-xs tracking-widest border border-indigo-400/20 flex items-center gap-2"
-                    >
-                        <Plus size={18} /> Mato Kirimi
-                    </button>
+            ) : (
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-[var(--bg-card)] backdrop-blur-3xl p-6 rounded-[2.5rem] border border-[var(--border-color)] shadow-2xl">
+                    <div className="relative w-full md:w-96 group">
+                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" size={20} />
+                        <input
+                            type="text"
+                            placeholder="Qidirish... (ID, Partiya, Rang)"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full pl-14 pr-6 py-4 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl outline-none text-[var(--text-primary)] font-bold transition-all shadow-inner focus:border-indigo-500/50"
+                        />
+                    </div>
+                    <div className="flex gap-3">
+                        <button className="px-6 py-4 rounded-2xl border border-[var(--border-color)] text-[var(--text-secondary)] font-bold hover:bg-[var(--bg-card-hover)] transition-all">Filtrlar</button>
+                        <button
+                            onClick={() => setShowInboundModal(true)}
+                            className="bg-indigo-600 text-white px-8 py-4 rounded-2xl hover:bg-indigo-500 transition-all shadow-xl shadow-indigo-600/20 font-black uppercase text-xs tracking-widest border border-indigo-400/20 flex items-center gap-2"
+                        >
+                            <Plus size={18} /> Mato Kirimi
+                        </button>
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* Main Table */}
             <div className={`overflow-hidden bg-[var(--bg-card)] backdrop-blur-3xl rounded-3xl border border-[var(--border-color)] shadow-2xl min-h-[500px]`}>
                 <table className="w-full text-left border-collapse">
                     <thead className="bg-[var(--bg-sidebar-footer)] text-[var(--text-secondary)] text-[11px] font-black uppercase tracking-wider border-b border-[var(--border-color)]">
                         <tr>
-                            <th className="px-6 py-5 text-center w-12"><input type="checkbox" className="rounded bg-[var(--input-bg)] border-[var(--border-color)]" /></th>
+                            <th className="px-6 py-5 text-center w-12">
+                                <input
+                                    type="checkbox"
+                                    className="w-5 h-5 rounded-lg bg-[var(--input-bg)] border-[var(--border-color)] checked:bg-indigo-600 focus:ring-indigo-500 cursor-pointer transition-all"
+                                    checked={selectedIds.length === filteredInventory.length && filteredInventory.length > 0}
+                                    onChange={handleSelectAll}
+                                />
+                            </th>
                             <th className="px-6 py-5">Sana / ID</th>
                             <th className="px-6 py-5">Mato Turi</th>
                             <th className="px-6 py-5">Rang</th>
@@ -451,17 +530,30 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                     <tbody className="divide-y divide-[var(--border-color)]">
                         {filteredInventory.map(item => {
                             const isExpanded = expandedRowId === item.id;
+                            const isSelected = selectedIds.includes(item.id);
                             const ref = references?.find(r => r.id === item.reference_id) || {};
                             // Safe defaults
                             const typeStr = item.material_types?.thread_type || ref.thread_type || 'Suprem 30/1';
                             const specs = ref.grammage ? `${ref.grammage}gr | ${ref.width || '-'}sm` : (item.material_types?.grammage ? `${item.material_types.grammage}gr` : '-');
 
+                            // Fix Date Display - fallback to last_updated if created_at is missing
+                            const dateDisplay = item.created_at
+                                ? new Date(item.created_at).toLocaleDateString('ru-RU')
+                                : (item.last_updated ? new Date(item.last_updated).toLocaleDateString('ru-RU') : '-');
+
                             return (
                                 <React.Fragment key={item.id}>
-                                    <tr className={`transition-colors group ${isExpanded ? 'bg-[var(--bg-card-hover)]' : 'hover:bg-[var(--bg-card-hover)]'}`}>
-                                        <td className="px-6 py-5 text-center"><input type="checkbox" className="rounded bg-[var(--input-bg)] border-[var(--border-color)]" /></td>
+                                    <tr className={`transition-all group ${isSelected ? 'bg-indigo-500/5' : (isExpanded ? 'bg-[var(--bg-card-hover)]' : 'hover:bg-[var(--bg-card-hover)]')}`}>
+                                        <td className="px-6 py-5 text-center">
+                                            <input
+                                                type="checkbox"
+                                                className="w-5 h-5 rounded-lg bg-[var(--input-bg)] border-[var(--border-color)] checked:bg-indigo-600 focus:ring-indigo-500 cursor-pointer transition-all"
+                                                checked={isSelected}
+                                                onChange={() => handleSelectRow(item.id)}
+                                            />
+                                        </td>
                                         <td className="px-6 py-5">
-                                            <div className="font-bold text-[var(--text-primary)] text-sm mb-1">{item.created_at ? new Date(item.created_at).toLocaleDateString('ru-RU') : '-'}</div>
+                                            <div className="font-bold text-[var(--text-primary)] text-sm mb-1">{dateDisplay}</div>
                                             <div className="text-[10px] text-[var(--text-secondary)] font-mono uppercase">MAT-{item.id}</div>
                                         </td>
                                         <td className="px-6 py-5 font-black text-[var(--text-primary)] text-sm">{item.item_name}</td>
@@ -552,8 +644,8 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                                         <td className="px-6 py-3 text-center">
                                                                             <div className="flex items-center justify-center gap-3">
                                                                                 <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${roll.status === 'used'
-                                                                                    ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
-                                                                                    : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                                                                                        ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
+                                                                                        : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
                                                                                     }`}>
                                                                                     {roll.status === 'used' ? 'Ishlatilgan' : 'Omborda'}
                                                                                 </span>
