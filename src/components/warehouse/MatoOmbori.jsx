@@ -277,7 +277,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
             const cleanColorCode = inboundData.color_code.trim();
 
             // 1. Check or Create Inventory Item
-            const { data: existing } = await supabase
+            const { data: existing, error: fetchError } = await supabase
                 .from('inventory')
                 .select('*')
                 .eq('item_name', cleanName)
@@ -285,6 +285,8 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                 .eq('category', 'Mato')
                 .eq('batch_number', cleanBatch)
                 .maybeSingle();
+
+            if (fetchError) throw fetchError;
 
             let inventoryId;
 
@@ -298,7 +300,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                 if (updErr) throw updErr;
                 inventoryId = existing.id;
             } else {
-                const { data: created, error } = await supabase
+                const { data: created, error: createError } = await supabase
                     .from('inventory')
                     .insert([{
                         item_name: cleanName,
@@ -313,7 +315,9 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                     }])
                     .select()
                     .single();
-                if (error) throw error;
+
+                if (createError) throw createError;
+                if (!created) throw new Error("Failed to create inventory item");
                 inventoryId = created.id;
             }
 
@@ -321,7 +325,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
             const specsStr = `Type: ${inboundData.type_specs || '-'}, ${inboundData.grammage || '-'}gr, ${inboundData.width || '-'}sm`;
             const finalNote = `${inboundData.note || 'Yangi kirim'} | ${specsStr}`;
 
-            await supabase.from('inventory_logs').insert([{
+            const { error: logError } = await supabase.from('inventory_logs').insert([{
                 inventory_id: inventoryId,
                 type: 'In',
                 quantity: Number(inboundData.quantity),
@@ -329,13 +333,17 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                 reason: finalNote,
             }]);
 
+            if (logError) throw logError;
+
             // 3. Create Rolls with Sequence Logic
             if (inboundData.rolls.length > 0) {
                 // Get current count for this inventory to start sequence
-                const { count } = await supabase
+                const { count, error: countError } = await supabase
                     .from('inventory_rolls')
                     .select('*', { count: 'exact', head: true })
                     .eq('inventory_id', inventoryId);
+
+                if (countError) throw countError;
 
                 const startIdx = (count || 0) + 1;
 
@@ -644,8 +652,8 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                                         <td className="px-6 py-3 text-center">
                                                                             <div className="flex items-center justify-center gap-3">
                                                                                 <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${roll.status === 'used'
-                                                                                        ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
-                                                                                        : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                                                                                    ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
+                                                                                    : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
                                                                                     }`}>
                                                                                     {roll.status === 'used' ? 'Ishlatilgan' : 'Omborda'}
                                                                                 </span>
