@@ -73,6 +73,16 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
     const [showHistoryModal, setShowHistoryModal] = useState(false);
     const [itemHistory, setItemHistory] = useState([]);
 
+    // Edit State
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [editData, setEditData] = useState({
+        item_name: '',
+        color: '',
+        color_code: '',
+        batch_number: '',
+        quantity: ''
+    });
+
     // --- LOGIC: Select & Bulk Delete ---
     const handleSelectAll = (e) => {
         if (e.target.checked) {
@@ -459,6 +469,66 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
         }
     };
 
+    const handleEdit = (item) => {
+        setSelectedItem(item);
+        setEditData({
+            item_name: item.item_name || '',
+            color: item.color || '',
+            color_code: item.color_code || '',
+            batch_number: item.batch_number || '',
+            quantity: item.quantity || 0
+        });
+        setShowEditModal(true);
+    };
+
+    const handleSaveEdit = async (e) => {
+        e.preventDefault();
+        try {
+            setLoading(true);
+
+            // Calculate difference for logging if quantity changed
+            const oldQty = Number(selectedItem.quantity || 0);
+            const newQty = Number(editData.quantity || 0);
+            const diff = newQty - oldQty;
+
+            // Update Inventory
+            const { error: updateError } = await supabase
+                .from('inventory')
+                .update({
+                    item_name: editData.item_name,
+                    color: editData.color,
+                    color_code: editData.color_code,
+                    batch_number: editData.batch_number,
+                    quantity: newQty,
+                    last_updated: new Date()
+                })
+                .eq('id', selectedItem.id);
+
+            if (updateError) throw updateError;
+
+            // Log if quantity changed significantly
+            if (Math.abs(diff) > 0.001) {
+                await supabase.from('inventory_logs').insert([{
+                    inventory_id: selectedItem.id,
+                    type: diff > 0 ? 'In' : 'Out', // Or specific type 'Correction' if you prefer, but In/Out keeps balance mostly sane
+                    quantity: Math.abs(diff),
+                    reason: `Tahrir (Correction): ${oldQty} -> ${newQty}`,
+                    batch_number: editData.batch_number
+                }]);
+            }
+
+            alert("Muvaffaqiyatli saqlandi!");
+            setShowEditModal(false);
+            onRefresh();
+
+        } catch (error) {
+            console.error("Edit Error:", error);
+            alert("Saqlashda xatolik: " + error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleDelete = async (item) => {
         if (!window.confirm("Haqiqatan ham o'chirmoqchimisiz?")) return;
         try {
@@ -625,7 +695,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                     fetchHistory(item.id);
                                                     setShowHistoryModal(true);
                                                 }} className="p-2 text-[var(--text-secondary)] hover:text-sky-400 transition-colors"><History size={16} /></button>
-                                                <button className="p-2 text-[var(--text-secondary)] hover:text-amber-400 transition-colors"><Edit size={16} /></button>
+                                                <button onClick={() => handleEdit(item)} className="p-2 text-[var(--text-secondary)] hover:text-amber-400 transition-colors"><Edit size={16} /></button>
                                                 <button onClick={() => handleDelete(item)} className="p-2 text-[var(--text-secondary)] hover:text-rose-400 transition-colors"><Trash2 size={16} /></button>
                                                 <button
                                                     onClick={() => toggleRow(item)}
@@ -1038,6 +1108,82 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                 </div>
                             ))}
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Edit Modal */}
+            {showEditModal && selectedItem && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl animate-in fade-in">
+                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-lg rounded-[2.5rem] p-8 shadow-2xl relative">
+                        <button onClick={() => setShowEditModal(false)} className="absolute top-6 right-6 p-2 bg-[var(--bg-body)] rounded-full text-[var(--text-secondary)] hover:text-white"><X size={20} /></button>
+                        <h3 className="text-2xl font-black text-[var(--text-primary)] mb-1">Tahrirlash</h3>
+                        <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-6">Mato ma'lumotlarini o'zgartirish</p>
+
+                        <form onSubmit={handleSaveEdit} className="space-y-4">
+                            <div>
+                                <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1 block">Mato Nomi</label>
+                                <input
+                                    type="text"
+                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 font-bold text-[var(--text-primary)] focus:border-indigo-500 outline-none"
+                                    value={editData.item_name}
+                                    onChange={e => setEditData({ ...editData, item_name: e.target.value })}
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1 block">Rang</label>
+                                    <input
+                                        type="text"
+                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 font-bold text-[var(--text-primary)] focus:border-indigo-500 outline-none"
+                                        value={editData.color}
+                                        onChange={e => setEditData({ ...editData, color: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1 block">Rang Kodi</label>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="color"
+                                            className="w-12 h-11 rounded-xl bg-transparent border border-[var(--border-color)] cursor-pointer p-1"
+                                            value={editData.color_code || '#000000'}
+                                            onChange={e => setEditData({ ...editData, color_code: e.target.value })}
+                                        />
+                                        <input
+                                            type="text"
+                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 font-bold text-[var(--text-primary)] focus:border-indigo-500 outline-none"
+                                            value={editData.color_code}
+                                            onChange={e => setEditData({ ...editData, color_code: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1 block">Partiya Raqami</label>
+                                <input
+                                    type="text"
+                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 font-bold text-[var(--text-primary)] focus:border-indigo-500 outline-none"
+                                    value={editData.batch_number}
+                                    onChange={e => setEditData({ ...editData, batch_number: e.target.value })}
+                                />
+                                <p className="text-[10px] text-amber-500 mt-1 font-bold">Ogohlantirish: Partiya raqamini o'zgartirish rulonlarning seriya raqamiga ta'sir qilmaydi.</p>
+                            </div>
+                            <div>
+                                <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1 block">Jami Og'irlik (Kg)</label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 font-black text-xl text-indigo-400 focus:border-indigo-500 outline-none"
+                                    value={editData.quantity}
+                                    onChange={e => setEditData({ ...editData, quantity: e.target.value })}
+                                />
+                                <p className="text-[10px] text-[var(--text-secondary)] mt-1 font-bold">Qo'lda kiritilgan o'zgarishlar "Correction (Tahrir)" sifatida saqlanadi.</p>
+                            </div>
+
+                            <button type="submit" className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-black uppercase tracking-widest shadow-xl shadow-indigo-600/20 mt-4">
+                                Saqlash
+                            </button>
+                        </form>
                     </div>
                 </div>
             )}
