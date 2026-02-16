@@ -96,7 +96,10 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
 
         setLoading(true);
         try {
-            // Delete related logs and rolls first (foreign key constraints)
+            // Delete related material_requests FIRST (foreign key constraint)
+            await supabase.from('material_requests').delete().in('inventory_id', selectedIds);
+
+            // Delete related logs and rolls
             await supabase.from('inventory_logs').delete().in('inventory_id', selectedIds);
             await supabase.from('inventory_rolls').delete().in('inventory_id', selectedIds);
 
@@ -261,6 +264,8 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
     // --- ACTIONS ---
     const handleKirim = async (e) => {
         e.preventDefault();
+        let newInventoryId = null;
+
         try {
             setLoading(true);
             const ref = references.find(r => r.id == inboundData.reference_id);
@@ -288,8 +293,6 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
 
             if (fetchError) throw fetchError;
 
-            let inventoryId;
-
             if (existing) {
                 const newQty = Number(existing.quantity || 0) + Number(inboundData.quantity);
                 const { error: updErr } = await supabase.from('inventory').update({
@@ -298,7 +301,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                     color_code: cleanColorCode || existing.color_code
                 }).eq('id', existing.id);
                 if (updErr) throw updErr;
-                inventoryId = existing.id;
+                newInventoryId = existing.id;
             } else {
                 const { data: created, error: createError } = await supabase
                     .from('inventory')
@@ -318,7 +321,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
 
                 if (createError) throw createError;
                 if (!created) throw new Error("Failed to create inventory item");
-                inventoryId = created.id;
+                newInventoryId = created.id;
             }
 
             // 2. Log History
@@ -326,36 +329,49 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
             const finalNote = `${inboundData.note || 'Yangi kirim'} | ${specsStr}`;
 
             const { error: logError } = await supabase.from('inventory_logs').insert([{
-                inventory_id: inventoryId,
+                inventory_id: newInventoryId,
                 type: 'In',
                 quantity: Number(inboundData.quantity),
-                batch_number: cleanBatch,
                 reason: finalNote,
+                batch_number: cleanBatch
             }]);
 
             if (logError) throw logError;
 
             // 3. Create Rolls with Sequence Logic
             if (inboundData.rolls.length > 0) {
-                // Get current count for this inventory to start sequence
-                const { count, error: countError } = await supabase
-                    .from('inventory_rolls')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('inventory_id', inventoryId);
+                try {
+                    // Get current count for this inventory to start sequence
+                    const { count, error: countError } = await supabase
+                        .from('inventory_rolls')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('inventory_id', newInventoryId);
 
-                if (countError) throw countError;
+                    if (countError) throw countError;
 
-                const startIdx = (count || 0) + 1;
+                    const startIdx = (count || 0) + 1;
 
-                const rollsToInsert = inboundData.rolls.map((r, idx) => ({
-                    inventory_id: inventoryId,
-                    roll_number: `${cleanBatch}-${startIdx + idx}`, // 10420-1, 10420-2...
-                    weight: Number(r.weight),
-                    status: 'in_stock'
-                }));
+                    const rollsToInsert = inboundData.rolls.map((r, idx) => ({
+                        inventory_id: newInventoryId,
+                        roll_number: `${cleanBatch}-${startIdx + idx}`, // 10420-1, 10420-2...
+                        weight: Number(r.weight),
+                        status: 'in_stock'
+                    }));
 
-                const { error: rollError } = await supabase.from('inventory_rolls').insert(rollsToInsert);
-                if (rollError) throw rollError;
+                    const { error: rollError } = await supabase.from('inventory_rolls').insert(rollsToInsert);
+                    if (rollError) throw rollError;
+
+                } catch (rollEx) {
+                    // Compensating Transaction: Rollback inventory creation if rolls fail
+                    console.error("Roll insertion failed, rolling back inventory...", rollEx);
+
+                    // Only rollback if we created a NEW item (to avoid deleting existing data on update)
+                    if (!existing && newInventoryId) {
+                        await supabase.from('inventory_logs').delete().eq('inventory_id', newInventoryId);
+                        await supabase.from('inventory').delete().eq('id', newInventoryId);
+                    }
+                    throw new Error("Rulonlarni saqlashda xatolik: " + rollEx.message + " (Amal bekor qilindi)");
+                }
             }
 
             setShowInboundModal(false);
@@ -448,6 +464,9 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
         if (!window.confirm("Haqiqatan ham o'chirmoqchimisiz?")) return;
         try {
             setLoading(true);
+            // Delete material requests FIRST
+            await supabase.from('material_requests').delete().eq('inventory_id', item.id);
+
             await supabase.from('inventory_logs').delete().eq('inventory_id', item.id);
             await supabase.from('inventory_rolls').delete().eq('inventory_id', item.id);
             await supabase.from('inventory').delete().eq('id', item.id);
@@ -587,8 +606,10 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                             </span>
                                         </td>
                                         <td className="px-6 py-5 text-center">
-                                            <div className="font-black text-[var(--text-primary)]">
-                                                <span className="text-indigo-400">---</span> <br /> <span className="text-[10px] text-[var(--text-secondary)] font-medium">Kg</span>
+                                            <div className="flex justify-center flex-col items-center">
+                                                <button onClick={() => toggleRow(item)} className="text-indigo-400 hover:text-indigo-300 font-bold text-xs flex items-center gap-1">
+                                                    <ScrollText size={14} /> RO'YXAT
+                                                </button>
                                             </div>
                                         </td>
                                         <td className="px-6 py-5 text-right">
