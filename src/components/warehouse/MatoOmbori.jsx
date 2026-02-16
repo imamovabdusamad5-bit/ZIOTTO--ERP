@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import {
     Warehouse, Search, Plus, History, CircleArrowDown,
     ArrowUpRight, ArrowDownLeft, ScrollText, QrCode, Printer, Trash2, CircleCheck, RotateCcw, ChevronDown, ChevronUp, Edit, X
