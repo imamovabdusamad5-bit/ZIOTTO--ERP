@@ -77,14 +77,406 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
     // Edit State
     const [showEditModal, setShowEditModal] = useState(false);
     const [editData, setEditData] = useState({
+        id: null,
+        date: '',
         item_name: '',
+        reference_id: '',
         color: '',
         color_code: '',
         batch_number: '',
-        quantity: ''
+        quantity: 0,
+        rolls: [],
+        deletedRolls: [], // To track rolls removed during edit
+        note: '', // Try to fetch from 'In' log
+        // Specs for display/reference connection
+        type_specs: '',
+        grammage: '',
+        width: ''
     });
 
-    // --- LOGIC: Select & Bulk Delete ---
+    // ... (existing code)
+
+    const handleEdit = async (item) => {
+        setLoading(true);
+        try {
+            // 1. Fetch Rolls
+            const { data: rolls, error: rollsError } = await supabase
+                .from('inventory_rolls')
+                .select('*')
+                .eq('inventory_id', item.id)
+                .order('id', { ascending: true });
+
+            if (rollsError) throw rollsError;
+
+            // Sort rolls
+            const sortedRolls = (rolls || []).sort((a, b) => {
+                const aNum = parseInt(a.roll_number.split('-').pop());
+                const bNum = parseInt(b.roll_number.split('-').pop());
+                return (aNum && bNum) ? aNum - bNum : a.roll_number.localeCompare(b.roll_number);
+            });
+
+            // 2. Fetch 'In' log for Note (Reason)
+            const { data: logs, error: logError } = await supabase
+                .from('inventory_logs')
+                .select('reason, created_at')
+                .eq('inventory_id', item.id)
+                .eq('type', 'In')
+                .order('created_at', { ascending: true })
+                .limit(1);
+
+            const initialLog = logs && logs.length > 0 ? logs[0] : null;
+
+            // Extract specs from reference or log if possible, but mainly rely on references
+            const ref = references?.find(r => r.id === item.reference_id);
+
+            // Prepare Edit Data
+            setEditData({
+                id: item.id,
+                date: item.created_at ? item.created_at.split('T')[0] : new Date().toISOString().split('T')[0],
+                item_name: item.item_name || '',
+                reference_id: item.reference_id || '',
+                color: item.color || '',
+                color_code: item.color_code || '',
+                batch_number: item.batch_number || '',
+                quantity: item.quantity || 0,
+
+                rolls: sortedRolls, // Keep full objects: {id, roll_number, weight, status}
+                deletedRolls: [],
+
+                note: initialLog ? initialLog.reason : '',
+
+                type_specs: ref?.thread_type || '', // We don't save these to inventory, just for UI context
+                grammage: ref?.grammage || '',
+                width: ref?.width || ''
+            });
+
+            setSelectedItem(item);
+            setShowEditModal(true);
+
+        } catch (error) {
+            console.error(error);
+            alert("Ma'lumotlarni yuklashda xatolik");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSaveEdit = async (e) => {
+        e.preventDefault();
+        try {
+            setLoading(true);
+
+            // 1. Calculate new total from rolls logic (Edit modal should enforce consistency)
+            // But user might edit quantity manually? In inbound quantity is sum of rolls.
+            // Let's recalculate quantity from rolls to be safe and consistent.
+            const newTotalWeight = editData.rolls.reduce((sum, r) => sum + Number(r.weight), 0);
+
+            // 2. Validation
+            if (editData.rolls.length === 0) {
+                alert("Xatolik: Rulonlar mavjud emas!");
+                setLoading(false);
+                return;
+            }
+
+            // 3. Update Inventory Header
+            const { error: updateError } = await supabase
+                .from('inventory')
+                .update({
+                    item_name: editData.item_name,
+                    color: editData.color,
+                    color_code: editData.color_code,
+                    batch_number: editData.batch_number,
+                    quantity: newTotalWeight,
+                    reference_id: editData.reference_id || null,
+                    last_updated: new Date()
+                })
+                .eq('id', editData.id);
+
+            if (updateError) throw updateError;
+
+            // 4. Handle Rolls Updates
+
+            // A. Delete removed rolls directly
+            if (editData.deletedRolls.length > 0) {
+                await supabase.from('inventory_rolls').delete().in('id', editData.deletedRolls);
+            }
+
+            // B. Upsert (Update or Insert) current rolls
+            // We need to handle 'New' rolls (no ID) and 'Existing' rolls (have ID)
+            const rollsToUpsert = [];
+
+            // Get max sequence for naming new rolls if needed
+            // But wait, existing rolls have names. New rolls need names.
+            // A simple strategy for new rolls: Find highest index in current names
+
+            let maxIndex = 0;
+            // Scan current rolls to find max index in "batch-Index"
+            // Also need to consider deleted rolls? No, just find free index or append? 
+            // Safest: Append from max found.
+
+            editData.rolls.forEach(r => {
+                if (r.roll_number) {
+                    const parts = r.roll_number.split('-');
+                    const num = parseInt(parts[parts.length - 1]);
+                    if (!isNaN(num) && num > maxIndex) maxIndex = num;
+                }
+            });
+
+            // Prepare operations
+            for (let i = 0; i < editData.rolls.length; i++) {
+                const roll = editData.rolls[i];
+                if (roll.id) {
+                    // Update existing
+                    await supabase.from('inventory_rolls').update({
+                        weight: roll.weight,
+                        roll_number: roll.roll_number, // User currently can't edit name, but if we allow re-sequencing... let's keep it simple
+                        // Ensure batch number in roll_number matches new batch number?
+                        // If batch_number changed, we should technically rename ALL rolls.
+                        // Let's doing it:
+                        roll_number: `${editData.batch_number}-${roll.roll_number.split('-').pop()}`
+                    }).eq('id', roll.id);
+                } else {
+                    // Insert New
+                    maxIndex++;
+                    const newRollNumber = `${editData.batch_number}-${maxIndex}`;
+                    await supabase.from('inventory_rolls').insert([{
+                        inventory_id: editData.id,
+                        roll_number: newRollNumber,
+                        weight: roll.weight,
+                        status: 'in_stock'
+                    }]);
+                }
+            }
+
+            // 5. Log "Correction" if total weight changed
+            const oldQty = Number(selectedItem.quantity || 0);
+            const diff = newTotalWeight - oldQty;
+
+            if (Math.abs(diff) > 0.001) {
+                await supabase.from('inventory_logs').insert([{
+                    inventory_id: editData.id,
+                    type: diff > 0 ? 'In' : 'Out',
+                    quantity: Math.abs(diff),
+                    reason: `Tahrir (Correction): To'liq o'zgartirish. ${oldQty} -> ${newTotalWeight}`,
+                    batch_number: editData.batch_number
+                }]);
+            }
+
+            alert("O'zgarishlar saqlandi!");
+            setShowEditModal(false);
+            onRefresh();
+
+        } catch (error) {
+            console.error("Edit Save Error:", error);
+            alert("Saqlashda xatolik: " + error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // ... (handleDelete)
+
+    return (
+        <div className="space-y-6 animate-in fade-in duration-500">
+            {/* ... (Header, Table, Other Modals) ... */}
+
+            {/* ... (Rest of JSX until Edit Modal) ... */}
+
+            {/* Edit Modal (Redesigned) */}
+            {showEditModal && selectedItem && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm animate-in fade-in">
+                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-5xl max-h-[95vh] overflow-y-auto rounded-[2rem] shadow-2xl relative custom-scrollbar">
+                        <div className="p-6 border-b border-[var(--border-color)] flex justify-between items-center sticky top-0 bg-[var(--bg-card)] z-10">
+                            <h3 className="text-xl font-bold text-[var(--text-primary)]">Tahrirlash</h3>
+                            <button onClick={() => setShowEditModal(false)} className="text-[var(--text-secondary)] hover:text-white"><X size={20} /></button>
+                        </div>
+
+                        <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-10">
+                            {/* Left: Form */}
+                            <div className="space-y-6">
+                                <div>
+                                    <h4 className="text-sm font-bold text-[var(--text-primary)] mb-4 uppercase tracking-widest">Partiya Ma'lumotlari</h4>
+
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Sana (Yaratilgan)</label>
+                                            <input
+                                                type="date"
+                                                disabled // Keep creation date immutable or allow edit? Usually immutable.
+                                                className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-secondary)] outline-none font-bold opacity-50 cursor-not-allowed"
+                                                value={editData.date}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Partiya Raqami</label>
+                                            <input
+                                                type="text"
+                                                className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
+                                                value={editData.batch_number}
+                                                onChange={e => setEditData({ ...editData, batch_number: e.target.value })}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Mato Turi</label>
+                                            <div className="relative">
+                                                <input
+                                                    list="edit-mato-suggestions"
+                                                    placeholder="Tanlang yoki yozing..."
+                                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
+                                                    value={editData.item_name}
+                                                    onChange={e => {
+                                                        const val = e.target.value;
+                                                        const found = (references || []).find(r => r.name === val);
+                                                        setEditData({
+                                                            ...editData,
+                                                            item_name: val,
+                                                            reference_id: found ? found.id : editData.reference_id,
+                                                            // Auto-update specs for view if ref found
+                                                            type_specs: found?.thread_type || editData.type_specs,
+                                                            grammage: found?.grammage || editData.grammage,
+                                                            width: found?.width || editData.width
+                                                        });
+                                                    }}
+                                                />
+                                                <datalist id="edit-mato-suggestions">
+                                                    {[...new Set((references || []).filter(r => r.type === 'Mato').map(r => r.name))].map(n => <option key={n} value={n} />)}
+                                                </datalist>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Turi / Gramaj / Eni (Ma'lumot uchun)</label>
+                                            <div className="flex gap-2">
+                                                <input disabled value={editData.type_specs || '-'} className="flex-1 bg-[var(--bg-body)] border border-[var(--border-color)] rounded-xl p-3 text-xs font-bold text-[var(--text-secondary)]" />
+                                                <input disabled value={`${editData.grammage || '-'} gr`} className="w-20 bg-[var(--bg-body)] border border-[var(--border-color)] rounded-xl p-3 text-xs font-bold text-[var(--text-secondary)]" />
+                                                <input disabled value={`${editData.width || '-'} sm`} className="w-20 bg-[var(--bg-body)] border border-[var(--border-color)] rounded-xl p-3 text-xs font-bold text-[var(--text-secondary)]" />
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Rang va Kod</label>
+                                            <div className="flex gap-2">
+                                                <input
+                                                    type="text"
+                                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
+                                                    value={editData.color}
+                                                    onChange={e => setEditData({ ...editData, color: e.target.value })}
+                                                />
+                                                <input
+                                                    type="color"
+                                                    className="w-12 h-11 rounded-xl bg-transparent border border-[var(--border-color)] cursor-pointer p-1"
+                                                    value={editData.color_code || '#000000'}
+                                                    onChange={e => setEditData({ ...editData, color_code: e.target.value })}
+                                                />
+                                            </div>
+                                            <input
+                                                type="text"
+                                                className="w-full mt-2 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-mono font-bold"
+                                                value={editData.color_code}
+                                                onChange={e => setEditData({ ...editData, color_code: e.target.value })}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Asl Izoh (O'zgartirib bo'lmaydi)</label>
+                                            <textarea
+                                                disabled
+                                                className="w-full bg-[var(--bg-body)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-secondary)] outline-none h-24 resize-none font-bold opacity-70"
+                                                value={editData.note}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Right: Rolls */}
+                            <div className="flex flex-col h-full">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h4 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest">Rulonlar Tahriri</h4>
+                                    <div className="flex gap-4 text-xs font-mono text-[var(--text-secondary)]">
+                                        <span>Jami Rulon: <b className="text-[var(--text-primary)] text-sm">{editData.rolls.length}</b></span>
+                                        <span>Jami Kg: <b className="text-[var(--text-primary)] text-sm">{editData.rolls.reduce((a, b) => a + Number(b.weight), 0).toFixed(2)}</b></span>
+                                    </div>
+                                </div>
+
+                                <div className="flex-1 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-3xl p-6 relative flex flex-col items-center justify-center min-h-[400px]">
+                                    <div className="w-full h-full absolute inset-0 overflow-y-auto p-4 grid grid-cols-2 lg:grid-cols-3 gap-3 content-start custom-scrollbar">
+                                        {editData.rolls.map((r, i) => (
+                                            <div key={r.uniqueId || r.id || i} className={`relative bg-[var(--bg-card)] border ${r.status === 'used' ? 'border-amber-500/30 bg-amber-500/5' : 'border-[var(--border-color)]'} p-4 rounded-xl flex flex-col items-center shadow-lg group`}>
+                                                <span className="text-[10px] text-[var(--text-secondary)] mb-1 font-bold">
+                                                    {r.roll_number || 'Yangi'}
+                                                </span>
+                                                <input
+                                                    type="number"
+                                                    disabled={r.status === 'used'}
+                                                    className="w-full text-center bg-transparent font-black text-xl outline-none text-[var(--text-primary)] disabled:opacity-50"
+                                                    value={r.weight}
+                                                    onChange={e => {
+                                                        const val = e.target.value;
+                                                        const updatedRolls = [...editData.rolls];
+                                                        updatedRolls[i] = { ...r, weight: val };
+                                                        setEditData({ ...editData, rolls: updatedRolls });
+                                                    }}
+                                                />
+                                                <span className="text-[10px] text-[var(--text-secondary)]">kg</span>
+
+                                                {/* Delete Button (Only if not used, or if allow override) */}
+                                                {r.status !== 'used' && (
+                                                    <button
+                                                        onClick={() => {
+                                                            if (!window.confirm("Bu rulonni o'chirib tashlaysizmi?")) return;
+                                                            const updatedRolls = editData.rolls.filter((_, idx) => idx !== i);
+                                                            const deleted = r.id ? [...editData.deletedRolls, r.id] : editData.deletedRolls;
+                                                            setEditData({ ...editData, rolls: updatedRolls, deletedRolls: deleted });
+                                                        }}
+                                                        className="absolute -top-1 -right-1 w-6 h-6 bg-rose-500 rounded-full text-white text-[10px] flex items-center justify-center hover:scale-110 transition-transform font-bold opacity-0 group-hover:opacity-100"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                )}
+
+                                                {r.status === 'used' && <span className='absolute bottom-1 right-2 text-[8px] font-black text-amber-500 uppercase'>Ishlatilgan</span>}
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {editData.rolls.length === 0 && (
+                                        <div className="text-center text-[var(--text-secondary)] opacity-50 absolute inset-0 flex flex-col items-center justify-center">
+                                            <Warehouse size={48} className="mb-2" />
+                                            <p className="text-sm font-bold">Rulonlar yo'q</p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="mt-4 flex gap-2">
+                                    <button
+                                        onClick={() => {
+                                            // Add new roll placeholder
+                                            const newRoll = {
+                                                weight: '',
+                                                status: 'in_stock',
+                                                uniqueId: Date.now() // temporary ID for key
+                                            };
+                                            setEditData({ ...editData, rolls: [...editData.rolls, newRoll] });
+                                        }}
+                                        className="flex-1 py-4 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[var(--bg-card-hover)] transition-all shadow-sm"
+                                    >
+                                        + Rulon qo'shish
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-6 border-t border-[var(--border-color)] flex justify-end gap-3 bg-[var(--bg-card)] sticky bottom-0 z-10">
+                            <button onClick={() => setShowEditModal(false)} className="px-6 py-3 rounded-xl border border-[var(--border-color)] text-[var(--text-secondary)] font-bold text-sm hover:bg-[var(--bg-card-hover)]">Bekor qilish</button>
+                            <button onClick={handleSaveEdit} className="px-8 py-3 rounded-xl bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-500 shadow-lg shadow-indigo-600/20 active:scale-95 transition-all flex items-center gap-2">
+                                Saqlash
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+
     const handleSelectAll = (e) => {
         if (e.target.checked) {
             setSelectedIds(filteredInventory.map(i => i.id));
