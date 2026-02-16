@@ -193,6 +193,12 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                     quantity: newTotalWeight,
                     reference_id: editData.reference_id || null,
                     source: editData.source,
+
+                    // Added these fields to be saved
+                    type_specs: editData.type_specs,
+                    grammage: editData.grammage,
+                    width: editData.width,
+
                     last_updated: new Date()
                 })
                 .eq('id', editData.id);
@@ -1328,11 +1334,35 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                             </div>
                                         </div>
                                         <div>
-                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Turi / Gramaj / Eni (Ma'lumot uchun)</label>
+                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Turi / Gramaj / Eni</label>
                                             <div className="flex gap-2">
-                                                <input disabled value={editData.type_specs || '-'} className="flex-1 bg-[var(--bg-body)] border border-[var(--border-color)] rounded-xl p-3 text-xs font-bold text-[var(--text-secondary)]" />
-                                                <input disabled value={`${editData.grammage || '-'} gr`} className="w-20 bg-[var(--bg-body)] border border-[var(--border-color)] rounded-xl p-3 text-xs font-bold text-[var(--text-secondary)]" />
-                                                <input disabled value={`${editData.width || '-'} sm`} className="w-20 bg-[var(--bg-body)] border border-[var(--border-color)] rounded-xl p-3 text-xs font-bold text-[var(--text-secondary)]" />
+                                                <input
+                                                    type="text"
+                                                    placeholder="Turi (30/1)"
+                                                    className="flex-1 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm font-bold text-[var(--text-primary)] outline-none focus:border-indigo-500"
+                                                    value={editData.type_specs || ''}
+                                                    onChange={e => setEditData({ ...editData, type_specs: e.target.value })}
+                                                />
+                                                <div className="relative w-24">
+                                                    <input
+                                                        type="number"
+                                                        placeholder="Gr"
+                                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm font-bold text-[var(--text-primary)] outline-none focus:border-indigo-500"
+                                                        value={editData.grammage || ''}
+                                                        onChange={e => setEditData({ ...editData, grammage: e.target.value })}
+                                                    />
+                                                    <span className="absolute right-2 top-3 text-[10px] text-[var(--text-secondary)] font-bold">gr</span>
+                                                </div>
+                                                <div className="relative w-24">
+                                                    <input
+                                                        type="number"
+                                                        placeholder="Sm"
+                                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm font-bold text-[var(--text-primary)] outline-none focus:border-indigo-500"
+                                                        value={editData.width || ''}
+                                                        onChange={e => setEditData({ ...editData, width: e.target.value })}
+                                                    />
+                                                    <span className="absolute right-2 top-3 text-[10px] text-[var(--text-secondary)] font-bold">sm</span>
+                                                </div>
                                             </div>
                                         </div>
 
