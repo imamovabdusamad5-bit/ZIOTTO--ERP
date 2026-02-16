@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import {
     Warehouse, Search, Plus, History, CircleArrowDown,
     ArrowUpRight, ArrowDownLeft, ScrollText, QrCode, Printer, Trash2, CircleCheck, RotateCcw, ChevronDown, ChevronUp, Edit, X
@@ -278,209 +278,6 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
             setLoading(false);
         }
     };
-
-    // ... (handleDelete)
-
-    return (
-        <div className="space-y-6 animate-in fade-in duration-500">
-            {/* ... (Header, Table, Other Modals) ... */}
-
-            {/* ... (Rest of JSX until Edit Modal) ... */}
-
-            {/* Edit Modal (Redesigned) */}
-            {showEditModal && selectedItem && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm animate-in fade-in">
-                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-5xl max-h-[95vh] overflow-y-auto rounded-[2rem] shadow-2xl relative custom-scrollbar">
-                        <div className="p-6 border-b border-[var(--border-color)] flex justify-between items-center sticky top-0 bg-[var(--bg-card)] z-10">
-                            <h3 className="text-xl font-bold text-[var(--text-primary)]">Tahrirlash</h3>
-                            <button onClick={() => setShowEditModal(false)} className="text-[var(--text-secondary)] hover:text-white"><X size={20} /></button>
-                        </div>
-
-                        <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-10">
-                            {/* Left: Form */}
-                            <div className="space-y-6">
-                                <div>
-                                    <h4 className="text-sm font-bold text-[var(--text-primary)] mb-4 uppercase tracking-widest">Partiya Ma'lumotlari</h4>
-
-                                    <div className="space-y-4">
-                                        <div>
-                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Sana (Yaratilgan)</label>
-                                            <input
-                                                type="date"
-                                                disabled // Keep creation date immutable or allow edit? Usually immutable.
-                                                className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-secondary)] outline-none font-bold opacity-50 cursor-not-allowed"
-                                                value={editData.date}
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Partiya Raqami</label>
-                                            <input
-                                                type="text"
-                                                className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
-                                                value={editData.batch_number}
-                                                onChange={e => setEditData({ ...editData, batch_number: e.target.value })}
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Mato Turi</label>
-                                            <div className="relative">
-                                                <input
-                                                    list="edit-mato-suggestions"
-                                                    placeholder="Tanlang yoki yozing..."
-                                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
-                                                    value={editData.item_name}
-                                                    onChange={e => {
-                                                        const val = e.target.value;
-                                                        const found = (references || []).find(r => r.name === val);
-                                                        setEditData({
-                                                            ...editData,
-                                                            item_name: val,
-                                                            reference_id: found ? found.id : editData.reference_id,
-                                                            // Auto-update specs for view if ref found
-                                                            type_specs: found?.thread_type || editData.type_specs,
-                                                            grammage: found?.grammage || editData.grammage,
-                                                            width: found?.width || editData.width
-                                                        });
-                                                    }}
-                                                />
-                                                <datalist id="edit-mato-suggestions">
-                                                    {[...new Set((references || []).filter(r => r.type === 'Mato').map(r => r.name))].map(n => <option key={n} value={n} />)}
-                                                </datalist>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Turi / Gramaj / Eni (Ma'lumot uchun)</label>
-                                            <div className="flex gap-2">
-                                                <input disabled value={editData.type_specs || '-'} className="flex-1 bg-[var(--bg-body)] border border-[var(--border-color)] rounded-xl p-3 text-xs font-bold text-[var(--text-secondary)]" />
-                                                <input disabled value={`${editData.grammage || '-'} gr`} className="w-20 bg-[var(--bg-body)] border border-[var(--border-color)] rounded-xl p-3 text-xs font-bold text-[var(--text-secondary)]" />
-                                                <input disabled value={`${editData.width || '-'} sm`} className="w-20 bg-[var(--bg-body)] border border-[var(--border-color)] rounded-xl p-3 text-xs font-bold text-[var(--text-secondary)]" />
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Rang va Kod</label>
-                                            <div className="flex gap-2">
-                                                <input
-                                                    type="text"
-                                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
-                                                    value={editData.color}
-                                                    onChange={e => setEditData({ ...editData, color: e.target.value })}
-                                                />
-                                                <input
-                                                    type="color"
-                                                    className="w-12 h-11 rounded-xl bg-transparent border border-[var(--border-color)] cursor-pointer p-1"
-                                                    value={editData.color_code || '#000000'}
-                                                    onChange={e => setEditData({ ...editData, color_code: e.target.value })}
-                                                />
-                                            </div>
-                                            <input
-                                                type="text"
-                                                className="w-full mt-2 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-mono font-bold"
-                                                value={editData.color_code}
-                                                onChange={e => setEditData({ ...editData, color_code: e.target.value })}
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Asl Izoh (O'zgartirib bo'lmaydi)</label>
-                                            <textarea
-                                                disabled
-                                                className="w-full bg-[var(--bg-body)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-secondary)] outline-none h-24 resize-none font-bold opacity-70"
-                                                value={editData.note}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Right: Rolls */}
-                            <div className="flex flex-col h-full">
-                                <div className="flex justify-between items-center mb-4">
-                                    <h4 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest">Rulonlar Tahriri</h4>
-                                    <div className="flex gap-4 text-xs font-mono text-[var(--text-secondary)]">
-                                        <span>Jami Rulon: <b className="text-[var(--text-primary)] text-sm">{editData.rolls.length}</b></span>
-                                        <span>Jami Kg: <b className="text-[var(--text-primary)] text-sm">{editData.rolls.reduce((a, b) => a + Number(b.weight), 0).toFixed(2)}</b></span>
-                                    </div>
-                                </div>
-
-                                <div className="flex-1 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-3xl p-6 relative flex flex-col items-center justify-center min-h-[400px]">
-                                    <div className="w-full h-full absolute inset-0 overflow-y-auto p-4 grid grid-cols-2 lg:grid-cols-3 gap-3 content-start custom-scrollbar">
-                                        {editData.rolls.map((r, i) => (
-                                            <div key={r.uniqueId || r.id || i} className={`relative bg-[var(--bg-card)] border ${r.status === 'used' ? 'border-amber-500/30 bg-amber-500/5' : 'border-[var(--border-color)]'} p-4 rounded-xl flex flex-col items-center shadow-lg group`}>
-                                                <span className="text-[10px] text-[var(--text-secondary)] mb-1 font-bold">
-                                                    {r.roll_number || 'Yangi'}
-                                                </span>
-                                                <input
-                                                    type="number"
-                                                    disabled={r.status === 'used'}
-                                                    className="w-full text-center bg-transparent font-black text-xl outline-none text-[var(--text-primary)] disabled:opacity-50"
-                                                    value={r.weight}
-                                                    onChange={e => {
-                                                        const val = e.target.value;
-                                                        const updatedRolls = [...editData.rolls];
-                                                        updatedRolls[i] = { ...r, weight: val };
-                                                        setEditData({ ...editData, rolls: updatedRolls });
-                                                    }}
-                                                />
-                                                <span className="text-[10px] text-[var(--text-secondary)]">kg</span>
-
-                                                {/* Delete Button (Only if not used, or if allow override) */}
-                                                {r.status !== 'used' && (
-                                                    <button
-                                                        onClick={() => {
-                                                            if (!window.confirm("Bu rulonni o'chirib tashlaysizmi?")) return;
-                                                            const updatedRolls = editData.rolls.filter((_, idx) => idx !== i);
-                                                            const deleted = r.id ? [...editData.deletedRolls, r.id] : editData.deletedRolls;
-                                                            setEditData({ ...editData, rolls: updatedRolls, deletedRolls: deleted });
-                                                        }}
-                                                        className="absolute -top-1 -right-1 w-6 h-6 bg-rose-500 rounded-full text-white text-[10px] flex items-center justify-center hover:scale-110 transition-transform font-bold opacity-0 group-hover:opacity-100"
-                                                    >
-                                                        ×
-                                                    </button>
-                                                )}
-
-                                                {r.status === 'used' && <span className='absolute bottom-1 right-2 text-[8px] font-black text-amber-500 uppercase'>Ishlatilgan</span>}
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    {editData.rolls.length === 0 && (
-                                        <div className="text-center text-[var(--text-secondary)] opacity-50 absolute inset-0 flex flex-col items-center justify-center">
-                                            <Warehouse size={48} className="mb-2" />
-                                            <p className="text-sm font-bold">Rulonlar yo'q</p>
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="mt-4 flex gap-2">
-                                    <button
-                                        onClick={() => {
-                                            // Add new roll placeholder
-                                            const newRoll = {
-                                                weight: '',
-                                                status: 'in_stock',
-                                                uniqueId: Date.now() // temporary ID for key
-                                            };
-                                            setEditData({ ...editData, rolls: [...editData.rolls, newRoll] });
-                                        }}
-                                        className="flex-1 py-4 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[var(--bg-card-hover)] transition-all shadow-sm"
-                                    >
-                                        + Rulon qo'shish
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="p-6 border-t border-[var(--border-color)] flex justify-end gap-3 bg-[var(--bg-card)] sticky bottom-0 z-10">
-                            <button onClick={() => setShowEditModal(false)} className="px-6 py-3 rounded-xl border border-[var(--border-color)] text-[var(--text-secondary)] font-bold text-sm hover:bg-[var(--bg-card-hover)]">Bekor qilish</button>
-                            <button onClick={handleSaveEdit} className="px-8 py-3 rounded-xl bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-500 shadow-lg shadow-indigo-600/20 active:scale-95 transition-all flex items-center gap-2">
-                                Saqlash
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </div>
-    );
 
     const handleSelectAll = (e) => {
         if (e.target.checked) {
@@ -1319,7 +1116,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                             const sum = newRolls.reduce((a, b) => a + Number(b.weight), 0);
                                                             setInboundData({ ...inboundData, rolls: newRolls, quantity: sum.toFixed(2) });
                                                         }}
-                                                        className="absolute -top-1 -right-1 w-6 h-6 bg-rose-500 rounded-full text-white text-[10px] flex items-center justify-center hover:scale-110 transition-transform font-bold opacity-0 group-hover:opacity-100">×</button>
+                                                        className="absolute -top-1 -right-1 w-6 h-6 bg-rose-500 rounded-full text-white text-[10px] flex items-center justify-center hover:scale-110 transition-transform font-bold opacity-0 group-hover:opacity-100">Г—</button>
                                                 </div>
                                             ))}
                                         </div>
@@ -1471,89 +1268,207 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
 
             {/* Edit Modal */}
             {showEditModal && selectedItem && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl animate-in fade-in">
-                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-lg rounded-[2.5rem] p-8 shadow-2xl relative">
-                        <button onClick={() => setShowEditModal(false)} className="absolute top-6 right-6 p-2 bg-[var(--bg-body)] rounded-full text-[var(--text-secondary)] hover:text-white"><X size={20} /></button>
-                        <h3 className="text-2xl font-black text-[var(--text-primary)] mb-1">Tahrirlash</h3>
-                        <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-6">Mato ma'lumotlarini o'zgartirish</p>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm animate-in fade-in">
+                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-5xl max-h-[95vh] overflow-y-auto rounded-[2rem] shadow-2xl relative custom-scrollbar">
+                        <div className="p-6 border-b border-[var(--border-color)] flex justify-between items-center sticky top-0 bg-[var(--bg-card)] z-10">
+                            <h3 className="text-xl font-bold text-[var(--text-primary)]">Tahrirlash</h3>
+                            <button onClick={() => setShowEditModal(false)} className="text-[var(--text-secondary)] hover:text-white"><X size={20} /></button>
+                        </div>
 
-                        <form onSubmit={handleSaveEdit} className="space-y-4">
-                            <div>
-                                <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1 block">Mato Nomi</label>
-                                <input
-                                    type="text"
-                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 font-bold text-[var(--text-primary)] focus:border-indigo-500 outline-none"
-                                    value={editData.item_name}
-                                    onChange={e => setEditData({ ...editData, item_name: e.target.value })}
-                                />
-                            </div>
-                            <div>
-                                <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1 block">Kimdan (Manba)</label>
-                                <select
-                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 font-bold text-[var(--text-primary)] focus:border-indigo-500 outline-none"
-                                    value={editData.source || "E'zonur"}
-                                    onChange={e => setEditData({ ...editData, source: e.target.value })}
-                                >
-                                    <option value="E'zonur">E'zonur</option>
-                                    <option value="Kesim">Kesim</option>
-                                    <option value="Buzilgan">Buzilgan (Qayta)</option>
-                                    <option value="Boshqa">Boshqa</option>
-                                </select>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
+                        <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-10">
+                            {/* Left: Form */}
+                            <div className="space-y-6">
                                 <div>
-                                    <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1 block">Rang</label>
-                                    <input
-                                        type="text"
-                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 font-bold text-[var(--text-primary)] focus:border-indigo-500 outline-none"
-                                        value={editData.color}
-                                        onChange={e => setEditData({ ...editData, color: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1 block">Rang Kodi</label>
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="color"
-                                            className="w-12 h-11 rounded-xl bg-transparent border border-[var(--border-color)] cursor-pointer p-1"
-                                            value={editData.color_code || '#000000'}
-                                            onChange={e => setEditData({ ...editData, color_code: e.target.value })}
-                                        />
-                                        <input
-                                            type="text"
-                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 font-bold text-[var(--text-primary)] focus:border-indigo-500 outline-none"
-                                            value={editData.color_code}
-                                            onChange={e => setEditData({ ...editData, color_code: e.target.value })}
-                                        />
+                                    <h4 className="text-sm font-bold text-[var(--text-primary)] mb-4 uppercase tracking-widest">Partiya Ma'lumotlari</h4>
+
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Sana (Yaratilgan)</label>
+                                            <input
+                                                type="date"
+                                                disabled // Keep creation date immutable or allow edit? Usually immutable.
+                                                className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-secondary)] outline-none font-bold opacity-50 cursor-not-allowed"
+                                                value={editData.date}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Partiya Raqami</label>
+                                            <input
+                                                type="text"
+                                                className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
+                                                value={editData.batch_number}
+                                                onChange={e => setEditData({ ...editData, batch_number: e.target.value })}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Mato Turi</label>
+                                            <div className="relative">
+                                                <input
+                                                    list="edit-mato-suggestions"
+                                                    placeholder="Tanlang yoki yozing..."
+                                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
+                                                    value={editData.item_name}
+                                                    onChange={e => {
+                                                        const val = e.target.value;
+                                                        const found = (references || []).find(r => r.name === val);
+                                                        setEditData({
+                                                            ...editData,
+                                                            item_name: val,
+                                                            reference_id: found ? found.id : editData.reference_id,
+                                                            // Auto-update specs for view if ref found
+                                                            type_specs: found?.thread_type || editData.type_specs,
+                                                            grammage: found?.grammage || editData.grammage,
+                                                            width: found?.width || editData.width
+                                                        });
+                                                    }}
+                                                />
+                                                <datalist id="edit-mato-suggestions">
+                                                    {[...new Set((references || []).filter(r => r.type === 'Mato').map(r => r.name))].map(n => <option key={n} value={n} />)}
+                                                </datalist>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Turi / Gramaj / Eni (Ma'lumot uchun)</label>
+                                            <div className="flex gap-2">
+                                                <input disabled value={editData.type_specs || '-'} className="flex-1 bg-[var(--bg-body)] border border-[var(--border-color)] rounded-xl p-3 text-xs font-bold text-[var(--text-secondary)]" />
+                                                <input disabled value={`${editData.grammage || '-'} gr`} className="w-20 bg-[var(--bg-body)] border border-[var(--border-color)] rounded-xl p-3 text-xs font-bold text-[var(--text-secondary)]" />
+                                                <input disabled value={`${editData.width || '-'} sm`} className="w-20 bg-[var(--bg-body)] border border-[var(--border-color)] rounded-xl p-3 text-xs font-bold text-[var(--text-secondary)]" />
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Kimdan (Manba)</label>
+                                            <select
+                                                className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 font-bold text-[var(--text-primary)] focus:border-indigo-500 outline-none"
+                                                value={editData.source || "E'zonur"}
+                                                onChange={e => setEditData({ ...editData, source: e.target.value })}
+                                            >
+                                                <option value="E'zonur">E'zonur</option>
+                                                <option value="Kesim">Kesim</option>
+                                                <option value="Buzilgan">Buzilgan (Qayta)</option>
+                                                <option value="Boshqa">Boshqa</option>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Rang va Kod</label>
+                                            <div className="flex gap-2">
+                                                <input
+                                                    type="text"
+                                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
+                                                    value={editData.color}
+                                                    onChange={e => setEditData({ ...editData, color: e.target.value })}
+                                                />
+                                                <input
+                                                    type="color"
+                                                    className="w-12 h-11 rounded-xl bg-transparent border border-[var(--border-color)] cursor-pointer p-1"
+                                                    value={editData.color_code || '#000000'}
+                                                    onChange={e => setEditData({ ...editData, color_code: e.target.value })}
+                                                />
+                                            </div>
+                                            <input
+                                                type="text"
+                                                className="w-full mt-2 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-mono font-bold"
+                                                value={editData.color_code}
+                                                onChange={e => setEditData({ ...editData, color_code: e.target.value })}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Asl Izoh (O'zgartirib bo'lmaydi)</label>
+                                            <textarea
+                                                disabled
+                                                className="w-full bg-[var(--bg-body)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-secondary)] outline-none h-24 resize-none font-bold opacity-70"
+                                                value={editData.note}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div>
-                                <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1 block">Partiya Raqami</label>
-                                <input
-                                    type="text"
-                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 font-bold text-[var(--text-primary)] focus:border-indigo-500 outline-none"
-                                    value={editData.batch_number}
-                                    onChange={e => setEditData({ ...editData, batch_number: e.target.value })}
-                                />
-                                <p className="text-[10px] text-amber-500 mt-1 font-bold">Ogohlantirish: Partiya raqamini o'zgartirish rulonlarning seriya raqamiga ta'sir qilmaydi.</p>
-                            </div>
-                            <div>
-                                <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1 block">Jami Og'irlik (Kg)</label>
-                                <input
-                                    type="number"
-                                    step="0.01"
-                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 font-black text-xl text-indigo-400 focus:border-indigo-500 outline-none"
-                                    value={editData.quantity}
-                                    onChange={e => setEditData({ ...editData, quantity: e.target.value })}
-                                />
-                                <p className="text-[10px] text-[var(--text-secondary)] mt-1 font-bold">Qo'lda kiritilgan o'zgarishlar "Correction (Tahrir)" sifatida saqlanadi.</p>
-                            </div>
 
-                            <button type="submit" className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-black uppercase tracking-widest shadow-xl shadow-indigo-600/20 mt-4">
+                            {/* Right: Rolls */}
+                            <div className="flex flex-col h-full">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h4 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest">Rulonlar Tahriri</h4>
+                                    <div className="flex gap-4 text-xs font-mono text-[var(--text-secondary)]">
+                                        <span>Jami Rulon: <b className="text-[var(--text-primary)] text-sm">{editData.rolls.length}</b></span>
+                                        <span>Jami Kg: <b className="text-[var(--text-primary)] text-sm">{editData.rolls.reduce((a, b) => a + Number(b.weight), 0).toFixed(2)}</b></span>
+                                    </div>
+                                </div>
+
+                                <div className="flex-1 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-3xl p-6 relative flex flex-col items-center justify-center min-h-[400px]">
+                                    <div className="w-full h-full absolute inset-0 overflow-y-auto p-4 grid grid-cols-2 lg:grid-cols-3 gap-3 content-start custom-scrollbar">
+                                        {editData.rolls.map((r, i) => (
+                                            <div key={r.uniqueId || r.id || i} className={`relative bg-[var(--bg-card)] border ${r.status === 'used' ? 'border-amber-500/30 bg-amber-500/5' : 'border-[var(--border-color)]'} p-4 rounded-xl flex flex-col items-center shadow-lg group`}>
+                                                <span className="text-[10px] text-[var(--text-secondary)] mb-1 font-bold">
+                                                    {r.roll_number || 'Yangi'}
+                                                </span>
+                                                <input
+                                                    type="number"
+                                                    disabled={r.status === 'used'}
+                                                    className="w-full text-center bg-transparent font-black text-xl outline-none text-[var(--text-primary)] disabled:opacity-50"
+                                                    value={r.weight}
+                                                    onChange={e => {
+                                                        const val = e.target.value;
+                                                        const updatedRolls = [...editData.rolls];
+                                                        updatedRolls[i] = { ...r, weight: val };
+                                                        setEditData({ ...editData, rolls: updatedRolls });
+                                                    }}
+                                                />
+                                                <span className="text-[10px] text-[var(--text-secondary)]">kg</span>
+
+                                                {/* Delete Button (Only if not used, or if allow override) */}
+                                                {r.status !== 'used' && (
+                                                    <button
+                                                        onClick={() => {
+                                                            if (!window.confirm("Bu rulonni o'chirib tashlaysizmi?")) return;
+                                                            const updatedRolls = editData.rolls.filter((_, idx) => idx !== i);
+                                                            const deleted = r.id ? [...editData.deletedRolls, r.id] : editData.deletedRolls;
+                                                            setEditData({ ...editData, rolls: updatedRolls, deletedRolls: deleted });
+                                                        }}
+                                                        className="absolute -top-1 -right-1 w-6 h-6 bg-rose-500 rounded-full text-white text-[10px] flex items-center justify-center hover:scale-110 transition-transform font-bold opacity-0 group-hover:opacity-100"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                )}
+
+                                                {r.status === 'used' && <span className='absolute bottom-1 right-2 text-[8px] font-black text-amber-500 uppercase'>Ishlatilgan</span>}
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {editData.rolls.length === 0 && (
+                                        <div className="text-center text-[var(--text-secondary)] opacity-50 absolute inset-0 flex flex-col items-center justify-center">
+                                            <Warehouse size={48} className="mb-2" />
+                                            <p className="text-sm font-bold">Rulonlar yo'q</p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="mt-4 flex gap-2">
+                                    <button
+                                        onClick={() => {
+                                            // Add new roll placeholder
+                                            const newRoll = {
+                                                weight: '',
+                                                status: 'in_stock',
+                                                uniqueId: Date.now() // temporary ID for key
+                                            };
+                                            setEditData({ ...editData, rolls: [...editData.rolls, newRoll] });
+                                        }}
+                                        className="flex-1 py-4 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[var(--bg-card-hover)] transition-all shadow-sm"
+                                    >
+                                        + Rulon qo'shish
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-6 border-t border-[var(--border-color)] flex justify-end gap-3 bg-[var(--bg-card)] sticky bottom-0 z-10">
+                            <button onClick={() => setShowEditModal(false)} className="px-6 py-3 rounded-xl border border-[var(--border-color)] text-[var(--text-secondary)] font-bold text-sm hover:bg-[var(--bg-card-hover)]">Bekor qilish</button>
+                            <button onClick={handleSaveEdit} className="px-8 py-3 rounded-xl bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-500 shadow-lg shadow-indigo-600/20 active:scale-95 transition-all flex items-center gap-2">
                                 Saqlash
                             </button>
-                        </form>
+                        </div>
                     </div>
                 </div>
             )}
