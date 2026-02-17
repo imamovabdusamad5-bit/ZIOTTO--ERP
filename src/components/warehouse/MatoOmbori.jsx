@@ -1149,16 +1149,23 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                         </div>
                                         <div>
                                             <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Kimdan (Manba)</label>
-                                            <select
+                                            <input
+                                                list="source-suggestions"
                                                 className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
                                                 value={inboundData.source}
                                                 onChange={e => setInboundData({ ...inboundData, source: e.target.value })}
-                                            >
-                                                <option value="E'zonur">E'zonur</option>
-                                                <option value="Kesim">Kesim</option>
-                                                <option value="Buzilgan">Buzilgan (Qayta)</option>
-                                                <option value="Boshqa">Boshqa</option>
-                                            </select>
+                                                placeholder="Tanlang yoki yozing..."
+                                            />
+                                            <datalist id="source-suggestions">
+                                                <option value="E'zonur" />
+                                                <option value="Kesim" />
+                                                <option value="Buzilgan (Qayta)" />
+                                                <option value="Boshqa" />
+                                                {[...new Set(localInventory?.map(i => i.source).filter(Boolean) || [])]
+                                                    .filter(s => !["E'zonur", "Kesim", "Buzilgan (Qayta)", "Buzilgan", "Boshqa"].includes(s))
+                                                    .map(s => <option key={s} value={s} />)
+                                                }
+                                            </datalist>
                                         </div>
                                         <div>
                                             <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Partiya Raqami</label>
