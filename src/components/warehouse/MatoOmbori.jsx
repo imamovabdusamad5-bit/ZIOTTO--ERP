@@ -192,7 +192,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                     batch_number: editData.batch_number,
                     quantity: newTotalWeight,
                     reference_id: editData.reference_id || null,
-                    source: editData.source, // Saving to source column directly
+                    // source: editData.source, // TEMPORARILY DISABLED: Column might be missing in DB. Keep disabled until confirmed.
 
                     // FALLBACK: Since 'grammage', 'width', 'type_specs' columns might not exist in DB yet,
 
