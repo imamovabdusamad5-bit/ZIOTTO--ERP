@@ -17,8 +17,70 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
     // Selection State
     const [selectedIds, setSelectedIds] = useState([]);
 
-    // Filter
-    const filteredInventory = inventory.filter(item => {
+    // NEW: Local Inventory state to handle missing 'source' via logs
+    const [localInventory, setLocalInventory] = useState([]);
+
+    // EFFECT: Sync props to local state AND fetch logs for missing sources
+    useEffect(() => {
+        const enrichInventory = async () => {
+            if (!inventory) {
+                setLocalInventory([]);
+                return;
+            }
+
+            // 1. Initial set from props
+            let enriched = [...inventory];
+
+            // 2. Identify items missing source
+            const idsToCheck = enriched.filter(i => !i.source).map(i => i.id);
+
+            if (idsToCheck.length > 0) {
+                try {
+                    // Fetch logs for these items
+                    const { data: logs } = await supabase
+                        .from('inventory_logs')
+                        .select('inventory_id, reason')
+                        .in('inventory_id', idsToCheck)
+                        .order('created_at', { ascending: false });
+
+                    if (logs && logs.length > 0) {
+                        enriched = enriched.map(item => {
+                            if (item.source) return item; // already has source
+
+                            let foundSource = null;
+
+                            // A. Check for 'Correction' log: "Updated [SOURCE]"
+                            const updateLog = logs.find(l => l.inventory_id === item.id && l.reason && l.reason.includes('Updated ['));
+                            if (updateLog) {
+                                const match = updateLog.reason.match(/Updated \[(.*?)\]/);
+                                if (match && match[1]) foundSource = match[1];
+                            }
+
+                            // B. Check for Initial log: "SOURCE | ..."
+                            if (!foundSource) {
+                                const initialLog = logs.find(l => l.inventory_id === item.id && l.reason && l.reason.includes('|'));
+                                if (initialLog) {
+                                    const parts = initialLog.reason.split('|');
+                                    if (parts.length > 0) foundSource = parts[0].trim();
+                                }
+                            }
+
+                            return foundSource ? { ...item, source: foundSource } : item;
+                        });
+                    }
+                } catch (e) {
+                    console.error("Error enriching inventory sources:", e);
+                }
+            }
+
+            setLocalInventory(enriched);
+        };
+
+        enrichInventory();
+    }, [inventory]);
+
+    // Filter - Use localInventory instead of inventory prop
+    const filteredInventory = localInventory.filter(item => {
         const query = searchTerm.toLowerCase();
         return (
             !searchTerm ||
