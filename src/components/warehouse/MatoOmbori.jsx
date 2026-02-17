@@ -13,6 +13,41 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
     const [selectedItem, setSelectedItem] = useState(null);
     const [itemRolls, setItemRolls] = useState([]);
     const [expandedRowId, setExpandedRowId] = useState(null);
+    const [subTab, setSubTab] = useState('kirim'); // 'kirim' | 'chiqim'
+    const [outboundLogs, setOutboundLogs] = useState([]);
+    const [outboundExtra, setOutboundExtra] = useState({
+        model: '',
+        part: '',
+        age: '',
+        cutter: 'Mastura' // Default as requested
+    });
+
+    useEffect(() => {
+        if (subTab === 'chiqim') {
+            const fetchOutbound = async () => {
+                setLoading(true);
+                const { data, error } = await supabase
+                    .from('inventory_logs')
+                    .select(`
+                        *,
+                        inventory (
+                            item_name,
+                            color,
+                            batch_number,
+                            material_types,
+                            type_specs
+                        )
+                    `)
+                    .eq('type', 'Out')
+                    .order('created_at', { ascending: false });
+
+                if (error) console.error(error);
+                else setOutboundLogs(data || []);
+                setLoading(false);
+            };
+            fetchOutbound();
+        }
+    }, [subTab]);
 
     // Selection State
     const [selectedIds, setSelectedIds] = useState([]);
@@ -727,7 +762,17 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
             await supabase.from('inventory').update({ quantity: newQty, last_updated: new Date() }).eq('id', item.id);
 
             // 4. Log
-            let finalReason = outboundData.reason;
+            let finalReason = outboundData.reason || '';
+            const extraInfo = [];
+            if (outboundExtra.model) extraInfo.push(`[Model: ${outboundExtra.model}]`);
+            if (outboundExtra.part) extraInfo.push(`[Qism: ${outboundExtra.part}]`);
+            if (outboundExtra.age) extraInfo.push(`[Yosh: ${outboundExtra.age}]`);
+            if (outboundExtra.cutter) extraInfo.push(`[Bichuvchi: ${outboundExtra.cutter}]`);
+
+            if (extraInfo.length > 0) {
+                finalReason = `${extraInfo.join(' ')} ${finalReason}`;
+            }
+
             if (outboundData.order_id) {
                 const ord = orders.find(o => o.id == outboundData.order_id);
                 if (ord) finalReason += ` (Buyurtma: #${ord.order_number})`;
@@ -743,7 +788,8 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
 
             alert('Chiqim bajarildi!');
             setShowOutboundModal(false);
-            setOutboundData({ inventory_id: '', inventory_name: '', quantity: '', order_id: '', reason: 'Kesimga', selected_rolls: [] });
+            setOutboundData({ inventory_id: '', inventory_name: '', quantity: '', order_id: '', reason: '', selected_rolls: [] });
+            setOutboundExtra({ model: '', part: '', age: '', cutter: 'Mastura' });
             onRefresh();
 
             // Refresh expanded row data if needed
@@ -778,8 +824,38 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
         }
     };
 
+    const filteredOutboundLogs = outboundLogs.filter(log => {
+        if (!searchTerm) return true;
+        const lowSearch = searchTerm.toLowerCase();
+        const item = log.inventory || {};
+        const reason = log.reason || '';
+
+        return (
+            (item.item_name && item.item_name.toLowerCase().includes(lowSearch)) ||
+            (item.color && item.color.toLowerCase().includes(lowSearch)) ||
+            (log.batch_number && log.batch_number.toLowerCase().includes(lowSearch)) ||
+            reason.toLowerCase().includes(lowSearch)
+        );
+    });
+
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
+            {/* Tabs */}
+            <div className="flex gap-2 p-1 my-6 bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] w-max">
+                <button
+                    onClick={() => setSubTab('kirim')}
+                    className={`px-8 py-3 rounded-xl font-black uppercase text-xs tracking-widest transition-all ${subTab === 'kirim' ? 'bg-indigo-600 text-white shadow-lg' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-card-hover)]'}`}
+                >
+                    Kirim Bo'limi
+                </button>
+                <button
+                    onClick={() => setSubTab('chiqim')}
+                    className={`px-8 py-3 rounded-xl font-black uppercase text-xs tracking-widest transition-all ${subTab === 'chiqim' ? 'bg-indigo-600 text-white shadow-lg' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-card-hover)]'}`}
+                >
+                    Chiqim Bo'limi
+                </button>
+            </div>
+
             {/* Header - Dynamic based on selection */}
             {selectedIds.length > 0 ? (
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-rose-500/10 backdrop-blur-3xl p-6 rounded-[2.5rem] border border-rose-500/20 shadow-2xl animate-in slide-in-from-top-2">
@@ -813,7 +889,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                         <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" size={20} />
                         <input
                             type="text"
-                            placeholder="Qidirish... (ID, Partiya, Rang)"
+                            placeholder={subTab === 'kirim' ? "Qidirish... (ID, Partiya, Rang)" : "Qidirish... (Chiqim loglari)"}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="w-full pl-14 pr-6 py-4 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl outline-none text-[var(--text-primary)] font-bold transition-all shadow-inner focus:border-indigo-500/50"
@@ -821,212 +897,272 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                     </div>
                     <div className="flex gap-3">
                         <button className="px-6 py-4 rounded-2xl border border-[var(--border-color)] text-[var(--text-secondary)] font-bold hover:bg-[var(--bg-card-hover)] transition-all">Filtrlar</button>
-                        <button
-                            onClick={() => setShowInboundModal(true)}
-                            className="bg-indigo-600 text-white px-8 py-4 rounded-2xl hover:bg-indigo-500 transition-all shadow-xl shadow-indigo-600/20 font-black uppercase text-xs tracking-widest border border-indigo-400/20 flex items-center gap-2"
-                        >
-                            <Plus size={18} /> Mato Kirimi
-                        </button>
+                        {subTab === 'kirim' && (
+                            <button
+                                onClick={() => setShowInboundModal(true)}
+                                className="bg-indigo-600 text-white px-8 py-4 rounded-2xl hover:bg-indigo-500 transition-all shadow-xl shadow-indigo-600/20 font-black uppercase text-xs tracking-widest border border-indigo-400/20 flex items-center gap-2"
+                            >
+                                <Plus size={18} /> Mato Kirimi
+                            </button>
+                        )}
                     </div>
                 </div>
             )}
 
             {/* Main Table */}
-            <div className={`overflow-hidden bg-[var(--bg-card)] backdrop-blur-3xl rounded-3xl border border-[var(--border-color)] shadow-2xl min-h-[500px]`}>
-                <table className="w-full text-left border-collapse">
-                    <thead className="bg-[var(--bg-sidebar-footer)] text-[var(--text-secondary)] text-[11px] font-black uppercase tracking-wider border-b border-[var(--border-color)]">
-                        <tr>
-                            <th className="px-6 py-5 text-center w-12">
-                                <input
-                                    type="checkbox"
-                                    className="w-5 h-5 rounded-lg bg-[var(--input-bg)] border-[var(--border-color)] checked:bg-indigo-600 focus:ring-indigo-500 cursor-pointer transition-all"
-                                    checked={selectedIds.length === filteredInventory.length && filteredInventory.length > 0}
-                                    onChange={handleSelectAll}
-                                />
-                            </th>
-                            <th className="px-6 py-5">Sana / ID</th>
-                            <th className="px-6 py-5">Mato Turi</th>
-                            <th className="px-6 py-5">Rang</th>
-                            <th className="px-6 py-5">Turi</th>
-                            <th className="px-6 py-5">Partiya</th>
-                            <th className="px-6 py-5 text-center">Rulonlar</th>
-                            <th className="px-6 py-5 text-right">Jami Og'irlik</th>
-                            <th className="px-6 py-5">Kimdan</th>
-                            <th className="px-6 py-5 text-center">Amallar</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[var(--border-color)]">
-                        {filteredInventory.map(item => {
-                            const isExpanded = expandedRowId === item.id;
-                            const isSelected = selectedIds.includes(item.id);
-                            const ref = references?.find(r => r.id === item.reference_id) || {};
-                            // Safe defaults
-                            const typeStr = item.material_types?.thread_type || ref.thread_type || 'Suprem 30/1';
-                            const specs = ref.grammage ? `${ref.grammage}gr | ${ref.width || '-'}sm` : (item.material_types?.grammage ? `${item.material_types.grammage}gr` : '-');
+            {subTab === 'chiqim' ? (
+                <div className="overflow-hidden bg-[var(--bg-card)] backdrop-blur-3xl rounded-3xl border border-[var(--border-color)] shadow-2xl min-h-[500px] animate-in fade-in">
+                    <table className="w-full text-left border-collapse">
+                        <thead className="bg-[var(--bg-sidebar-footer)] text-[var(--text-secondary)] text-[11px] font-black uppercase tracking-wider border-b border-[var(--border-color)]">
+                            <tr>
+                                <th className="px-6 py-5">Sana</th>
+                                <th className="px-6 py-5">Mato Turi</th>
+                                <th className="px-6 py-5">Rang</th>
+                                <th className="px-6 py-5">Turi</th>
+                                <th className="px-6 py-5">Partiya</th>
+                                <th className="px-6 py-5 text-right">Jami Chiqim</th>
+                                <th className="px-6 py-5">Model</th>
+                                <th className="px-6 py-5">Qism</th>
+                                <th className="px-6 py-5">Yosh</th>
+                                <th className="px-6 py-5">Bichuvchi</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-[var(--border-color)]">
+                            {filteredOutboundLogs.map(log => {
+                                const item = log.inventory || {};
+                                const reason = log.reason || '';
+                                const extract = (k) => {
+                                    const m = reason.match(new RegExp(`\\[${k}: (.*?)\\]`));
+                                    return m ? m[1] : '-';
+                                };
+                                const model = extract('Model');
+                                const part = extract('Qism');
+                                const age = extract('Yosh');
+                                const cutter = extract('Bichuvchi');
 
-                            // Fix Date Display - fallback to last_updated if created_at is missing
-                            const dateDisplay = item.created_at
-                                ? new Date(item.created_at).toLocaleDateString('ru-RU')
-                                : (item.last_updated ? new Date(item.last_updated).toLocaleDateString('ru-RU') : '-');
+                                const ref = references?.find(r => r.id === item.reference_id) || {};
+                                const typeStr = item.material_types?.thread_type || ref.thread_type || item.type_specs || '-';
 
-                            return (
-                                <React.Fragment key={item.id}>
-                                    <tr className={`transition-all group ${isSelected ? 'bg-indigo-500/5' : (isExpanded ? 'bg-[var(--bg-card-hover)]' : 'hover:bg-[var(--bg-card-hover)]')}`}>
-                                        <td className="px-6 py-5 text-center">
-                                            <input
-                                                type="checkbox"
-                                                className="w-5 h-5 rounded-lg bg-[var(--input-bg)] border-[var(--border-color)] checked:bg-indigo-600 focus:ring-indigo-500 cursor-pointer transition-all"
-                                                checked={isSelected}
-                                                onChange={() => handleSelectRow(item.id)}
-                                            />
+                                return (
+                                    <tr key={log.id} className="hover:bg-[var(--bg-card-hover)] transition-colors">
+                                        <td className="px-6 py-5 text-sm font-bold text-[var(--text-primary)]">
+                                            {new Date(log.created_at).toLocaleDateString('ru-RU')}
                                         </td>
-                                        <td className="px-6 py-5">
-                                            <div className="font-bold text-[var(--text-primary)] text-sm mb-1">{dateDisplay}</div>
-                                            <div className="text-[10px] text-[var(--text-secondary)] font-mono uppercase">MAT-{item.id}</div>
-                                        </td>
-                                        <td className="px-6 py-5 font-black text-[var(--text-primary)] text-sm">{item.item_name}</td>
-
-                                        <td className="px-6 py-5">
-                                            <div className="flex items-center gap-3">
-                                                <div
-                                                    className="w-8 h-8 rounded-full border border-[var(--border-color)] shadow-sm"
-                                                    style={{ backgroundColor: item.color_code || '#ccc' }}
-                                                ></div>
-                                                <div>
-                                                    <div className="font-bold text-[var(--text-primary)] text-xs">{item.color}</div>
-                                                    <div className="text-[10px] text-[var(--text-secondary)] opacity-70">{item.color_code || '-'}</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-5">
-                                            <div className="font-bold text-[var(--text-primary)] text-xs">{typeStr}</div>
-                                            <div className="text-[10px] text-[var(--text-secondary)] opacity-70 mt-0.5">{specs}</div>
-                                        </td>
-                                        <td className="px-6 py-5">
-                                            <span className="bg-[var(--bg-body)] text-[var(--text-primary)] font-mono text-xs font-bold px-3 py-1.5 rounded-lg border border-[var(--border-color)]">
-                                                {item.batch_number || 'N/A'}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-5 text-center">
-                                            <div className="flex justify-center flex-col items-center">
-                                                <button onClick={() => toggleRow(item)} className="text-indigo-400 hover:text-indigo-300 font-bold text-xs flex items-center gap-1">
-                                                    <ScrollText size={14} /> RO'YXAT
-                                                </button>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-5 text-right">
-                                            <div className="font-black text-indigo-400 text-lg">{item.quantity}</div>
-                                        </td>
-                                        <td className="px-6 py-5 font-bold text-[var(--text-secondary)] text-xs uppercase">{item.source || '-'}</td>
-                                        <td className="px-6 py-5">
-                                            <div className="flex items-center justify-center gap-2">
-                                                <button onClick={() => {
-                                                    setSelectedItem(item);
-                                                    toggleRow(item);
-                                                }} className="p-2 text-[var(--text-secondary)] hover:text-indigo-400 transition-colors"><QrCode size={16} /></button>
-                                                <button onClick={() => {
-                                                    setSelectedItem(item);
-                                                    fetchHistory(item.id);
-                                                    setShowHistoryModal(true);
-                                                }} className="p-2 text-[var(--text-secondary)] hover:text-sky-400 transition-colors"><History size={16} /></button>
-                                                <button onClick={() => handleEdit(item)} className="p-2 text-[var(--text-secondary)] hover:text-amber-400 transition-colors"><Edit size={16} /></button>
-                                                <button onClick={() => handleDelete(item)} className="p-2 text-[var(--text-secondary)] hover:text-rose-400 transition-colors"><Trash2 size={16} /></button>
-                                                <button
-                                                    onClick={() => toggleRow(item)}
-                                                    className={`p-2 rounded-xl border border-[var(--border-color)] transition-all ${isExpanded ? 'bg-indigo-600 text-white border-indigo-600' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-body)]'}`}
-                                                >
-                                                    {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                                                </button>
-                                            </div>
-                                        </td>
+                                        <td className="px-6 py-5 font-black text-sm">{item.item_name || '-'}</td>
+                                        <td className="px-6 py-5 text-xs font-bold">{item.color || '-'}</td>
+                                        <td className="px-6 py-5 text-xs text-[var(--text-secondary)]">{typeStr}</td>
+                                        <td className="px-6 py-5 text-xs font-mono">{log.batch_number || item.batch_number || '-'}</td>
+                                        <td className="px-6 py-5 text-right font-black text-rose-500 text-lg">{log.quantity} kg</td>
+                                        <td className="px-6 py-5 text-xs font-bold text-indigo-400">{model}</td>
+                                        <td className="px-6 py-5 text-xs">{part}</td>
+                                        <td className="px-6 py-5 text-xs text-[var(--text-secondary)]">{age}</td>
+                                        <td className="px-6 py-5 text-xs font-bold">{cutter}</td>
                                     </tr>
+                                );
+                            })}
+                            {filteredOutboundLogs.length === 0 && (
+                                <tr><td colSpan="10" className="p-10 text-center text-[var(--text-secondary)]">Chiqimlar mavjud emas</td></tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            ) : (
+                <div className={`overflow-hidden bg-[var(--bg-card)] backdrop-blur-3xl rounded-3xl border border-[var(--border-color)] shadow-2xl min-h-[500px]`}>
+                    <table className="w-full text-left border-collapse">
+                        <thead className="bg-[var(--bg-sidebar-footer)] text-[var(--text-secondary)] text-[11px] font-black uppercase tracking-wider border-b border-[var(--border-color)]">
+                            <tr>
+                                <th className="px-6 py-5 text-center w-12">
+                                    <input
+                                        type="checkbox"
+                                        className="w-5 h-5 rounded-lg bg-[var(--input-bg)] border-[var(--border-color)] checked:bg-indigo-600 focus:ring-indigo-500 cursor-pointer transition-all"
+                                        checked={selectedIds.length === filteredInventory.length && filteredInventory.length > 0}
+                                        onChange={handleSelectAll}
+                                    />
+                                </th>
+                                <th className="px-6 py-5">Sana / ID</th>
+                                <th className="px-6 py-5">Mato Turi</th>
+                                <th className="px-6 py-5">Rang</th>
+                                <th className="px-6 py-5">Turi</th>
+                                <th className="px-6 py-5">Partiya</th>
+                                <th className="px-6 py-5 text-center">Rulonlar</th>
+                                <th className="px-6 py-5 text-right">Jami Og'irlik</th>
+                                <th className="px-6 py-5">Kimdan</th>
+                                <th className="px-6 py-5 text-center">Amallar</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-[var(--border-color)]">
+                            {filteredInventory.map(item => {
+                                const isExpanded = expandedRowId === item.id;
+                                const isSelected = selectedIds.includes(item.id);
+                                const ref = references?.find(r => r.id === item.reference_id) || {};
+                                // Safe defaults
+                                const typeStr = item.material_types?.thread_type || ref.thread_type || 'Suprem 30/1';
+                                const specs = ref.grammage ? `${ref.grammage}gr | ${ref.width || '-'}sm` : (item.material_types?.grammage ? `${item.material_types.grammage}gr` : '-');
 
-                                    {/* EXPANDED ROW */}
-                                    {isExpanded && (
-                                        <tr className="bg-[var(--bg-body)]/50 transition-all">
-                                            <td colSpan="9" className="p-6 border-b border-[var(--border-color)]">
-                                                <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] overflow-hidden">
-                                                    <div className="px-6 py-4 border-b border-[var(--border-color)] flex justify-between items-center bg-[var(--bg-body)]">
-                                                        <div className="flex items-center gap-3">
-                                                            <ScrollText size={18} className="text-indigo-400" />
-                                                            <h4 className="font-bold text-sm text-[var(--text-primary)]">Rulonlar Ro'yxati</h4>
-                                                        </div>
-                                                        <span className="text-xs text-[var(--text-secondary)] font-bold">Jami: {itemRolls.length} ta rulon</span>
-                                                    </div>
+                                // Fix Date Display - fallback to last_updated if created_at is missing
+                                const dateDisplay = item.created_at
+                                    ? new Date(item.created_at).toLocaleDateString('ru-RU')
+                                    : (item.last_updated ? new Date(item.last_updated).toLocaleDateString('ru-RU') : '-');
 
-                                                    <table className="w-full text-left text-sm">
-                                                        <thead className="text-[10px] uppercase text-[var(--text-secondary)] font-bold border-b border-[var(--border-color)] bg-[var(--bg-card)]">
-                                                            <tr>
-                                                                <th className="px-6 py-3">ID Raqam</th>
-                                                                <th className="px-6 py-3 text-right">Og'irlik (Kg)</th>
-                                                                <th className="px-6 py-3 text-center">Holati</th>
-                                                                <th className="px-6 py-3 text-right">QR Kod</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody className="divide-y divide-[var(--border-color)]">
-                                                            {loading ? (
-                                                                <tr><td colSpan="4" className="p-8 text-center text-[var(--text-secondary)]">Yuklanmoqda...</td></tr>
-                                                            ) : itemRolls.length === 0 ? (
-                                                                <tr><td colSpan="4" className="p-8 text-center text-[var(--text-secondary)]">Poylar mavjud emas</td></tr>
-                                                            ) : (
-                                                                itemRolls.map(roll => (
-                                                                    <tr key={roll.id} className="hover:bg-[var(--bg-card-hover)]">
-                                                                        <td className="px-6 py-3 font-mono font-bold text-[var(--text-primary)]">{roll.roll_number}</td>
-                                                                        <td className="px-6 py-3 text-right font-medium">{roll.weight}</td>
-                                                                        <td className="px-6 py-3 text-center">
-                                                                            <div className="flex items-center justify-center gap-3">
-                                                                                <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${roll.status === 'used'
-                                                                                    ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
-                                                                                    : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
-                                                                                    }`}>
-                                                                                    {roll.status === 'used' ? 'Ishlatilgan' : 'Omborda'}
-                                                                                </span>
-                                                                                {roll.status !== 'used' && (
-                                                                                    <button
-                                                                                        onClick={() => {
-                                                                                            setOutboundData({
-                                                                                                inventory_id: item.id,
-                                                                                                quantity: roll.weight, // Preset weight
-                                                                                                inventory_name: item.item_name,
-                                                                                                selected_rolls: [roll],
-                                                                                                reason: 'Kesimga'
-                                                                                            });
-                                                                                            setShowOutboundModal(true);
-                                                                                        }}
-                                                                                        className="flex items-center gap-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 px-2 py-1 rounded border border-amber-500/20 text-[10px] font-bold uppercase transition-colors"
-                                                                                    >
-                                                                                        <ArrowUpRight size={10} /> Chiqim
-                                                                                    </button>
-                                                                                )}
-                                                                            </div>
-                                                                        </td>
-                                                                        <td className="px-6 py-3 text-right">
-                                                                            <button onClick={() => handlePrintQR(roll, item)} className="text-[var(--text-secondary)] hover:text-indigo-400 transition-colors"><QrCode size={16} /></button>
-                                                                        </td>
-                                                                    </tr>
-                                                                ))
-                                                            )}
-                                                        </tbody>
-                                                    </table>
+                                return (
+                                    <React.Fragment key={item.id}>
+                                        <tr className={`transition-all group ${isSelected ? 'bg-indigo-500/5' : (isExpanded ? 'bg-[var(--bg-card-hover)]' : 'hover:bg-[var(--bg-card-hover)]')}`}>
+                                            <td className="px-6 py-5 text-center">
+                                                <input
+                                                    type="checkbox"
+                                                    className="w-5 h-5 rounded-lg bg-[var(--input-bg)] border-[var(--border-color)] checked:bg-indigo-600 focus:ring-indigo-500 cursor-pointer transition-all"
+                                                    checked={isSelected}
+                                                    onChange={() => handleSelectRow(item.id)}
+                                                />
+                                            </td>
+                                            <td className="px-6 py-5">
+                                                <div className="font-bold text-[var(--text-primary)] text-sm mb-1">{dateDisplay}</div>
+                                                <div className="text-[10px] text-[var(--text-secondary)] font-mono uppercase">MAT-{item.id}</div>
+                                            </td>
+                                            <td className="px-6 py-5 font-black text-[var(--text-primary)] text-sm">{item.item_name}</td>
 
-                                                    <div className="p-4 border-t border-[var(--border-color)] bg-[var(--bg-body)] flex justify-end">
-                                                        <button
-                                                            onClick={() => handlePrintAllRolls(item, itemRolls)}
-                                                            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg shadow-indigo-600/20 transition-all"
-                                                        >
-                                                            <Printer size={16} /> Barcha Rulonlarni Chop Etish
-                                                        </button>
+                                            <td className="px-6 py-5">
+                                                <div className="flex items-center gap-3">
+                                                    <div
+                                                        className="w-8 h-8 rounded-full border border-[var(--border-color)] shadow-sm"
+                                                        style={{ backgroundColor: item.color_code || '#ccc' }}
+                                                    ></div>
+                                                    <div>
+                                                        <div className="font-bold text-[var(--text-primary)] text-xs">{item.color}</div>
+                                                        <div className="text-[10px] text-[var(--text-secondary)] opacity-70">{item.color_code || '-'}</div>
                                                     </div>
                                                 </div>
                                             </td>
+                                            <td className="px-6 py-5">
+                                                <div className="font-bold text-[var(--text-primary)] text-xs">{typeStr}</div>
+                                                <div className="text-[10px] text-[var(--text-secondary)] opacity-70 mt-0.5">{specs}</div>
+                                            </td>
+                                            <td className="px-6 py-5">
+                                                <span className="bg-[var(--bg-body)] text-[var(--text-primary)] font-mono text-xs font-bold px-3 py-1.5 rounded-lg border border-[var(--border-color)]">
+                                                    {item.batch_number || 'N/A'}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-5 text-center">
+                                                <div className="flex justify-center flex-col items-center">
+                                                    <button onClick={() => toggleRow(item)} className="text-indigo-400 hover:text-indigo-300 font-bold text-xs flex items-center gap-1">
+                                                        <ScrollText size={14} /> RO'YXAT
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-5 text-right">
+                                                <div className="font-black text-indigo-400 text-lg">{item.quantity}</div>
+                                            </td>
+                                            <td className="px-6 py-5 font-bold text-[var(--text-secondary)] text-xs uppercase">{item.source || '-'}</td>
+                                            <td className="px-6 py-5">
+                                                <div className="flex items-center justify-center gap-2">
+                                                    <button onClick={() => {
+                                                        setSelectedItem(item);
+                                                        toggleRow(item);
+                                                    }} className="p-2 text-[var(--text-secondary)] hover:text-indigo-400 transition-colors"><QrCode size={16} /></button>
+                                                    <button onClick={() => {
+                                                        setSelectedItem(item);
+                                                        fetchHistory(item.id);
+                                                        setShowHistoryModal(true);
+                                                    }} className="p-2 text-[var(--text-secondary)] hover:text-sky-400 transition-colors"><History size={16} /></button>
+                                                    <button onClick={() => handleEdit(item)} className="p-2 text-[var(--text-secondary)] hover:text-amber-400 transition-colors"><Edit size={16} /></button>
+                                                    <button onClick={() => handleDelete(item)} className="p-2 text-[var(--text-secondary)] hover:text-rose-400 transition-colors"><Trash2 size={16} /></button>
+                                                    <button
+                                                        onClick={() => toggleRow(item)}
+                                                        className={`p-2 rounded-xl border border-[var(--border-color)] transition-all ${isExpanded ? 'bg-indigo-600 text-white border-indigo-600' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-body)]'}`}
+                                                    >
+                                                        {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                                    </button>
+                                                </div>
+                                            </td>
                                         </tr>
-                                    )}
-                                </React.Fragment>
-                            );
-                        })}
-                    </tbody>
-                </table>
-            </div>
+
+                                        {/* EXPANDED ROW */}
+                                        {isExpanded && (
+                                            <tr className="bg-[var(--bg-body)]/50 transition-all">
+                                                <td colSpan="9" className="p-6 border-b border-[var(--border-color)]">
+                                                    <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] overflow-hidden">
+                                                        <div className="px-6 py-4 border-b border-[var(--border-color)] flex justify-between items-center bg-[var(--bg-body)]">
+                                                            <div className="flex items-center gap-3">
+                                                                <ScrollText size={18} className="text-indigo-400" />
+                                                                <h4 className="font-bold text-sm text-[var(--text-primary)]">Rulonlar Ro'yxati</h4>
+                                                            </div>
+                                                            <span className="text-xs text-[var(--text-secondary)] font-bold">Jami: {itemRolls.length} ta rulon</span>
+                                                        </div>
+
+                                                        <table className="w-full text-left text-sm">
+                                                            <thead className="text-[10px] uppercase text-[var(--text-secondary)] font-bold border-b border-[var(--border-color)] bg-[var(--bg-card)]">
+                                                                <tr>
+                                                                    <th className="px-6 py-3">ID Raqam</th>
+                                                                    <th className="px-6 py-3 text-right">Og'irlik (Kg)</th>
+                                                                    <th className="px-6 py-3 text-center">Holati</th>
+                                                                    <th className="px-6 py-3 text-right">QR Kod</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody className="divide-y divide-[var(--border-color)]">
+                                                                {loading ? (
+                                                                    <tr><td colSpan="4" className="p-8 text-center text-[var(--text-secondary)]">Yuklanmoqda...</td></tr>
+                                                                ) : itemRolls.length === 0 ? (
+                                                                    <tr><td colSpan="4" className="p-8 text-center text-[var(--text-secondary)]">Poylar mavjud emas</td></tr>
+                                                                ) : (
+                                                                    itemRolls.map(roll => (
+                                                                        <tr key={roll.id} className="hover:bg-[var(--bg-card-hover)]">
+                                                                            <td className="px-6 py-3 font-mono font-bold text-[var(--text-primary)]">{roll.roll_number}</td>
+                                                                            <td className="px-6 py-3 text-right font-medium">{roll.weight}</td>
+                                                                            <td className="px-6 py-3 text-center">
+                                                                                <div className="flex items-center justify-center gap-3">
+                                                                                    <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${roll.status === 'used'
+                                                                                        ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
+                                                                                        : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                                                                                        }`}>
+                                                                                        {roll.status === 'used' ? 'Ishlatilgan' : 'Omborda'}
+                                                                                    </span>
+                                                                                    {roll.status !== 'used' && (
+                                                                                        <button
+                                                                                            onClick={() => {
+                                                                                                setOutboundData({
+                                                                                                    inventory_id: item.id,
+                                                                                                    quantity: roll.weight, // Preset weight
+                                                                                                    inventory_name: item.item_name,
+                                                                                                    selected_rolls: [roll],
+                                                                                                    reason: 'Kesimga'
+                                                                                                });
+                                                                                                setShowOutboundModal(true);
+                                                                                            }}
+                                                                                            className="flex items-center gap-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 px-2 py-1 rounded border border-amber-500/20 text-[10px] font-bold uppercase transition-colors"
+                                                                                        >
+                                                                                            <ArrowUpRight size={10} /> Chiqim
+                                                                                        </button>
+                                                                                    )}
+                                                                                </div>
+                                                                            </td>
+                                                                            <td className="px-6 py-3 text-right">
+                                                                                <button onClick={() => handlePrintQR(roll, item)} className="text-[var(--text-secondary)] hover:text-indigo-400 transition-colors"><QrCode size={16} /></button>
+                                                                            </td>
+                                                                        </tr>
+                                                                    ))
+                                                                )}
+                                                            </tbody>
+                                                        </table>
+
+                                                        <div className="p-4 border-t border-[var(--border-color)] bg-[var(--bg-body)] flex justify-end">
+                                                            <button
+                                                                onClick={() => handlePrintAllRolls(item, itemRolls)}
+                                                                className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg shadow-indigo-600/20 transition-all"
+                                                            >
+                                                                <Printer size={16} /> Barcha Rulonlarni Chop Etish
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </React.Fragment>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+            )}
 
             {/* Placeholder for fetchInventory function modification */}
             {/* This section assumes fetchInventory is defined elsewhere and this is an insertion into it */}
@@ -1369,10 +1505,67 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                 </div>
                             </div>
 
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-xs font-bold text-[var(--text-secondary)] mb-1 block">Model (Plan)</label>
+                                    <input
+                                        list="model-suggestions"
+                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-rose-500 font-bold"
+                                        value={outboundExtra.model}
+                                        onChange={e => setOutboundExtra({ ...outboundExtra, model: e.target.value })}
+                                        placeholder="Modelni tanlang..."
+                                        required
+                                    />
+                                    <datalist id="model-suggestions">
+                                        {(orders || []).map(o => <option key={o.id} value={o.model_name || o.order_number} />)}
+                                    </datalist>
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-[var(--text-secondary)] mb-1 block">Qism</label>
+                                    <select
+                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-rose-500 font-bold"
+                                        value={outboundExtra.part}
+                                        onChange={e => setOutboundExtra({ ...outboundExtra, part: e.target.value })}
+                                    >
+                                        <option value="">Tanlang</option>
+                                        <option value="Futbolka">Futbolka</option>
+                                        <option value="Shalvar">Shalvar</option>
+                                        <option value="Mayka">Mayka</option>
+                                        <option value="Kofta">Kofta</option>
+                                        <option value="Boshqa">Boshqa</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-[var(--text-secondary)] mb-1 block">Yosh / O'lcham</label>
+                                    <select
+                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-rose-500 font-bold"
+                                        value={outboundExtra.age}
+                                        onChange={e => setOutboundExtra({ ...outboundExtra, age: e.target.value })}
+                                    >
+                                        <option value="">Tanlang</option>
+                                        <option value="2/5 yosh">2/5 yosh</option>
+                                        <option value="6/9 yosh">6/9 yosh</option>
+                                        <option value="10/14 yosh">10/14 yosh</option>
+                                        <option value="S/M">S/M</option>
+                                        <option value="L/XL">L/XL</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-[var(--text-secondary)] mb-1 block">Bichuvchi</label>
+                                    <input
+                                        type="text"
+                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-rose-500 font-bold"
+                                        value={outboundExtra.cutter}
+                                        onChange={e => setOutboundExtra({ ...outboundExtra, cutter: e.target.value })}
+                                        placeholder="Ism"
+                                    />
+                                </div>
+                            </div>
+
                             <div>
-                                <label className="block text-xs font-bold uppercase mb-2 text-[var(--text-secondary)]">Sabab / Qayerga</label>
+                                <label className="block text-xs font-bold uppercase mb-2 text-[var(--text-secondary)]">Qo'shimcha Izoh</label>
                                 <textarea
-                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-4 font-bold text-[var(--text-primary)] outline-none focus:border-rose-500 min-h-[100px]"
+                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-4 font-bold text-[var(--text-primary)] outline-none focus:border-rose-500 min-h-[80px]"
                                     value={outboundData.reason}
                                     onChange={e => setOutboundData({ ...outboundData, reason: e.target.value })}
                                     placeholder="Masalan: Kesim bo'limiga"
