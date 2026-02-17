@@ -138,11 +138,26 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                 date: item.created_at ? item.created_at.split('T')[0] : new Date().toISOString().split('T')[0],
                 item_name: item.item_name || '',
                 reference_id: item.reference_id || '',
+                // Try to find source in logs if not in item
+                source: item.source || (() => {
+                    // Check logs for "Updated [SOURCE]" pattern (latest correction log)
+                    const correctionLog = logs && logs.find(l => l.reason && l.reason.includes('Updated ['));
+                    if (correctionLog) {
+                        const match = correctionLog.reason.match(/Updated \[(.*?)\]/);
+                        if (match && match[1]) return match[1];
+                    }
+                    // Check initial log for "SOURCE |" pattern
+                    const initial = logs && logs.find(l => l.reason && l.reason.includes('|'));
+                    if (initial) {
+                        const parts = initial.reason.split('|');
+                        if (parts.length > 0) return parts[0].trim();
+                    }
+                    return '';
+                })(),
                 color: item.color || '',
                 color_code: item.color_code || '',
                 batch_number: item.batch_number || '',
                 quantity: item.quantity || 0,
-                source: item.source || '',
 
                 rolls: sortedRolls, // Keep full objects: {id, roll_number, weight, status}
                 deletedRolls: [],
@@ -949,6 +964,100 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                     </tbody>
                 </table>
             </div>
+
+            {/* Placeholder for fetchInventory function modification */}
+            {/* This section assumes fetchInventory is defined elsewhere and this is an insertion into it */}
+            {/* The actual fetchInventory function would look something like this: */}
+            {/*
+            const fetchInventory = async () => {
+                try {
+                    let query = supabase
+                        .from('inventory')
+                        .select(`
+                            *,
+                            material_types (
+                                name,
+                                thread_type,
+                                grammage,
+                                width
+                            )
+                        `);
+
+                    // ... filters ...
+
+                    const { data, error } = await query.order('created_at', { ascending: false });
+
+                    if (error) throw error;
+
+                    // WORKAROUND: Fetch latest logs to find 'Source' if column is null
+                    // This is needed because we are temporarily saving source in logs due to missing DB column.
+                    const inventoryIds = data.map(i => i.id);
+                    if (inventoryIds.length > 0) {
+                        const { data: logs } = await supabase
+                            .from('inventory_logs')
+                            .select('inventory_id, reason')
+                            .in('inventory_id', inventoryIds)
+                            .order('created_at', { ascending: false });
+
+                        // Merge source from logs into inventory items
+                        if (logs) {
+                            data.forEach(item => {
+                                if (!item.source) {
+                                    // Find log for this item that contains "Updated ["
+                                    const log = logs.find(l => l.inventory_id === item.id && l.reason && l.reason.includes('Updated ['));
+                                    if (log) {
+                                        // Extract source from "Updated [SOURCE] | ..."
+                                        const match = log.reason.match(/Updated \[(.*?)\]/);
+                                        if (match && match[1]) {
+                                            item.source = match[1];
+                                        }
+                                    }
+                                    // Also check initial log format if needed "E'ZONUR | ..."
+                                    if (!item.source) {
+                                        const initialLog = logs.find(l => l.inventory_id === item.id && l.reason && l.reason.includes('|'));
+                                        if (initialLog) {
+                                             const parts = initialLog.reason.split('|');
+            
+            // WORKAROUND: Extract Source from Logs if missing in column
+            const inventoryIds = data.map(i => i.id);
+            if (inventoryIds.length > 0) {
+                 const { data: logs } = await supabase
+                    .from('inventory_logs')
+                    .select('inventory_id, reason')
+                    .in('inventory_id', inventoryIds)
+                    .order('created_at', { ascending: false }); // Latest first
+
+                 if (logs) {
+                    data.forEach(item => {
+                        if (!item.source) {
+                            // 1. Look for 'Correction' log with "Updated [SOURCE]"
+                            const updateLog = logs.find(l => l.inventory_id === item.id && l.reason && l.reason.includes('Updated ['));
+                            if (updateLog) {
+                                const match = updateLog.reason.match(/Updated \[(.*?)\]/);
+                                if (match && match[1]) item.source = match[1];
+                            }
+                            // 2. Look for Initial Log with "SOURCE |"
+                            if (!item.source) {
+                                const initialLog = logs.find(l => l.inventory_id === item.id && l.reason && l.reason.includes('|'));
+                                if (initialLog) {
+                                     const parts = initialLog.reason.split('|');
+                                     if (parts.length > 0) item.source = parts[0].trim();
+                                }
+                            }
+                        }
+                    });
+                 }
+            }
+
+            setInventory(data || []);
+            setFilteredInventory(data || []);
+                } catch (error) {
+                    console.error("Error fetching inventory:", error);
+                } finally {
+                    // setLoading(false);
+                }
+            };
+            */}
 
             {/* INBOUND MODAL (Redesigned) */}
             {showInboundModal && (
