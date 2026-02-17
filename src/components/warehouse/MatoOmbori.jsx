@@ -186,25 +186,19 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
             const { error: updateError } = await supabase
                 .from('inventory')
                 .update({
-                    item_name: editData.item_name,
+                    // WORKAROUND: Append Source to Item Name since 'source' column is missing
+                    // We check if source is already in name to avoid duplication
+                    item_name: editData.source && !editData.item_name.includes(`(${editData.source})`)
+                        ? `${editData.item_name.split('(')[0].trim()} (${editData.source})`
+                        : editData.item_name,
+
                     color: editData.color,
                     color_code: editData.color_code,
                     batch_number: editData.batch_number,
                     quantity: newTotalWeight,
                     reference_id: editData.reference_id || null,
-                    // source: editData.source, // TEMPORARILY DISABLED: Column might be missing in DB.
 
-                    // FALLBACK: Since 'grammage', 'width', 'type_specs' columns might not exist in DB yet,
-                    // we will NOT save them to columns to prevent crash.
-                    // Instead, we ensure the 'note' is updated with this info if needed, or we just rely on the UI state for now.
-                    // But wait, if we don't save them, they are lost.
-                    // Let's try to update the NOTE field with this info as a string, preserving original note.
-                    // Format: "SOURCE | Type: TYPE, GRAMmg, WIDTHsm | ORIGINAL_NOTE"
-                    // note: `${editData.source} | Type: ${editData.type_specs}, ${editData.grammage}gr, ${editData.width}sm | ${editData.note}`
-                    // But 'note' field in inventory table? 'inventory' table usually has no 'note' column in this schema based on handleKirim.
-                    // handleKirim inserts note into 'inventory_logs'.
-                    // So... we can't easily save these permanently if columns don't exist without adding a new log?
-                    // Adding a new log 'Correction' with the new note is a good idea.
+                    // source: editData.source, // Keep disabled until DB migration
 
                     last_updated: new Date()
                 })
