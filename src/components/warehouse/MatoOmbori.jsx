@@ -645,7 +645,8 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                         color_code: cleanColorCode,
                         batch_number: cleanBatch,
                         reference_id: inboundData.reference_id || null, // Optional if just name used
-                        source: inboundData.source,
+                        reference_id: inboundData.reference_id || null, // Optional if just name used
+                        // source: inboundData.source, // REMOVED: Column does not exist
                         last_updated: new Date()
                     }])
                     .select()
@@ -658,7 +659,9 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
 
             // 2. Log History
             const specsStr = `Type: ${inboundData.type_specs || '-'}, ${inboundData.grammage || '-'}gr, ${inboundData.width || '-'}sm`;
-            const finalNote = `${inboundData.note || 'Yangi kirim'} | ${specsStr}`;
+            // Include Source in the log reason since column is missing
+            const sourceStr = inboundData.source ? `${inboundData.source} | ` : '';
+            const finalNote = `${sourceStr}${inboundData.note || 'Yangi kirim'} | ${specsStr}`;
 
             const { error: logError } = await supabase.from('inventory_logs').insert([{
                 inventory_id: newInventoryId,
@@ -1483,7 +1486,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                     )}
                                 </div>
 
-                                <div className="mt-4 flex gap-2">
+                                <div className="mt-4 flex gap-2 pb-20">
                                     <button
                                         onClick={() => setInboundData({ ...inboundData, rolls: [...inboundData.rolls, { weight: '' }] })}
                                         className="flex-1 py-4 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[var(--bg-card-hover)] transition-all shadow-sm"
