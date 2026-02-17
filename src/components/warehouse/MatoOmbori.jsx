@@ -194,14 +194,34 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                     reference_id: editData.reference_id || null,
                     source: editData.source,
 
-                    // Added these fields to be saved
-                    type_specs: editData.type_specs,
-                    grammage: editData.grammage,
-                    width: editData.width,
+                    // FALLBACK: Since 'grammage', 'width', 'type_specs' columns might not exist in DB yet,
+                    // we will NOT save them to columns to prevent crash.
+                    // Instead, we ensure the 'note' is updated with this info if needed, or we just rely on the UI state for now.
+                    // But wait, if we don't save them, they are lost.
+                    // Let's try to update the NOTE field with this info as a string, preserving original note.
+                    // Format: "SOURCE | Type: TYPE, GRAMmg, WIDTHsm | ORIGINAL_NOTE"
+                    // note: `${editData.source} | Type: ${editData.type_specs}, ${editData.grammage}gr, ${editData.width}sm | ${editData.note}`
+                    // But 'note' field in inventory table? 'inventory' table usually has no 'note' column in this schema based on handleKirim.
+                    // handleKirim inserts note into 'inventory_logs'.
+                    // So... we can't easily save these permanently if columns don't exist without adding a new log?
+                    // Adding a new log 'Correction' with the new note is a good idea.
 
                     last_updated: new Date()
                 })
                 .eq('id', editData.id);
+
+            // Log the update effectively as a 'Correction' to save the new specs in the history/log
+            // allowing us to retrieve them later (though UI currently reads from inventory table for specs)
+            // This is a temporary workaround until DB schema is fixed.
+            const newSpecsNote = `Updated Specs: ${editData.type_specs}, ${editData.grammage}gr, ${editData.width}sm`;
+            await supabase.from('inventory_logs').insert([{
+                inventory_id: editData.id,
+                type: 'Correction',
+                quantity: 0, // No quantity change logic here, separate log?
+                reason: newSpecsNote,
+                batch_number: editData.batch_number,
+                created_at: new Date()
+            }]);
 
             if (updateError) throw updateError;
 

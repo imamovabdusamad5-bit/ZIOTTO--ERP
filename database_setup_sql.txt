@@ -1,0 +1,13 @@
+-- Ushbu kodni Supabase SQL Editor bo'limiga nusxalab, "RUN" tugmasini bosing.
+-- Bu kod inventory jadvaliga yetishmayotgan ustunlarni qo'shadi.
+
+ALTER TABLE public.inventory ADD COLUMN IF NOT EXISTS source text;
+ALTER TABLE public.inventory ADD COLUMN IF NOT EXISTS type_specs text;
+ALTER TABLE public.inventory ADD COLUMN IF NOT EXISTS grammage numeric;
+ALTER TABLE public.inventory ADD COLUMN IF NOT EXISTS width numeric;
+
+-- O'zgarishlarni tasdiqlash uchun:
+COMMENT ON COLUMN public.inventory.source IS 'Mato kelgan manba (Kimdan)';
+COMMENT ON COLUMN public.inventory.type_specs IS 'Mato turi (30/1 va h.k)';
+COMMENT ON COLUMN public.inventory.grammage IS 'Mato gramaji';
+COMMENT ON COLUMN public.inventory.width IS 'Mato eni';
