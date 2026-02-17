@@ -192,7 +192,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                     batch_number: editData.batch_number,
                     quantity: newTotalWeight,
                     reference_id: editData.reference_id || null,
-                    source: editData.source,
+                    // source: editData.source, // TEMPORARILY DISABLED: Column might be missing in DB.
 
                     // FALLBACK: Since 'grammage', 'width', 'type_specs' columns might not exist in DB yet,
                     // we will NOT save them to columns to prevent crash.
@@ -210,14 +210,13 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                 })
                 .eq('id', editData.id);
 
-            // Log the update effectively as a 'Correction' to save the new specs in the history/log
-            // allowing us to retrieve them later (though UI currently reads from inventory table for specs)
+            // Log the update effectively as a 'Correction'
             // This is a temporary workaround until DB schema is fixed.
-            const newSpecsNote = `Updated Specs: ${editData.type_specs}, ${editData.grammage}gr, ${editData.width}sm`;
+            const newSpecsNote = `Updated [${editData.source || 'N/A'}] | Specs: ${editData.type_specs}, ${editData.grammage}gr, ${editData.width}sm`;
             await supabase.from('inventory_logs').insert([{
                 inventory_id: editData.id,
                 type: 'Correction',
-                quantity: 0, // No quantity change logic here, separate log?
+                quantity: 0,
                 reason: newSpecsNote,
                 batch_number: editData.batch_number,
                 created_at: new Date()
@@ -1387,17 +1386,26 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                         </div>
 
                                         <div>
-                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Kimdan (Manba)</label>
-                                            <select
-                                                className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 font-bold text-[var(--text-primary)] focus:border-indigo-500 outline-none"
-                                                value={editData.source || "E'zonur"}
-                                                onChange={e => setEditData({ ...editData, source: e.target.value })}
-                                            >
-                                                <option value="E'zonur">E'zonur</option>
-                                                <option value="Kesim">Kesim</option>
-                                                <option value="Buzilgan">Buzilgan (Qayta)</option>
-                                                <option value="Boshqa">Boshqa</option>
-                                            </select>
+                                            <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1 block">Kimdan (Manba)</label>
+                                            <div className="relative">
+                                                <input
+                                                    list="source-suggestions"
+                                                    type="text"
+                                                    placeholder="Manbani kiriting..."
+                                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 font-bold text-[var(--text-primary)] focus:border-indigo-500 outline-none"
+                                                    value={editData.source || ''}
+                                                    onChange={e => setEditData({ ...editData, source: e.target.value })}
+                                                />
+                                                <datalist id="source-suggestions">
+                                                    <option value="E'zonur" />
+                                                    <option value="Kesim" />
+                                                    <option value="Buzilgan (Qayta)" />
+                                                    <option value="Boshqa" />
+                                                </datalist>
+                                                <div className="absolute right-3 top-3 pointer-events-none">
+                                                    <ChevronDown size={16} className="text-[var(--text-secondary)]" />
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <div>
@@ -1521,8 +1529,9 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                         </div>
                     </div>
                 </div>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 };
 
