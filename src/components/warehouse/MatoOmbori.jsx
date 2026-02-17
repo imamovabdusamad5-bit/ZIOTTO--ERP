@@ -790,6 +790,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                             <th className="px-6 py-5">Partiya</th>
                             <th className="px-6 py-5 text-center">Rulonlar</th>
                             <th className="px-6 py-5 text-right">Jami Og'irlik</th>
+                            <th className="px-6 py-5">Kimdan</th>
                             <th className="px-6 py-5 text-center">Amallar</th>
                         </tr>
                     </thead>
@@ -823,7 +824,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                             <div className="text-[10px] text-[var(--text-secondary)] font-mono uppercase">MAT-{item.id}</div>
                                         </td>
                                         <td className="px-6 py-5 font-black text-[var(--text-primary)] text-sm">{item.item_name}</td>
-                                        <td className="px-6 py-5 font-bold text-[var(--text-secondary)] text-xs uppercase">{item.source || '-'}</td>
+
                                         <td className="px-6 py-5">
                                             <div className="flex items-center gap-3">
                                                 <div
@@ -855,6 +856,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                         <td className="px-6 py-5 text-right">
                                             <div className="font-black text-indigo-400 text-lg">{item.quantity}</div>
                                         </td>
+                                        <td className="px-6 py-5 font-bold text-[var(--text-secondary)] text-xs uppercase">{item.source || '-'}</td>
                                         <td className="px-6 py-5">
                                             <div className="flex items-center justify-center gap-2">
                                                 <button onClick={() => {
