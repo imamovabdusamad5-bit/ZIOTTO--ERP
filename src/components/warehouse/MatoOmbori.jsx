@@ -784,7 +784,6 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                             </th>
                             <th className="px-6 py-5">Sana / ID</th>
                             <th className="px-6 py-5">Mato Turi</th>
-                            <th className="px-6 py-5">Kimdan</th>
                             <th className="px-6 py-5">Rang</th>
                             <th className="px-6 py-5">Turi</th>
                             <th className="px-6 py-5">Partiya</th>
