@@ -843,13 +843,13 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
             {/* Tabs */}
             <div className="flex gap-2 p-1 my-6 bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] w-max">
                 <button
-                    onClick={() => setSubTab('kirim')}
+                    onClick={() => { setSubTab('kirim'); setSearchTerm(''); }}
                     className={`px-8 py-3 rounded-xl font-black uppercase text-xs tracking-widest transition-all ${subTab === 'kirim' ? 'bg-indigo-600 text-white shadow-lg' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-card-hover)]'}`}
                 >
                     Kirim Bo'limi
                 </button>
                 <button
-                    onClick={() => setSubTab('chiqim')}
+                    onClick={() => { setSubTab('chiqim'); setSearchTerm(''); }}
                     className={`px-8 py-3 rounded-xl font-black uppercase text-xs tracking-widest transition-all ${subTab === 'chiqim' ? 'bg-indigo-600 text-white shadow-lg' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-card-hover)]'}`}
                 >
                     Chiqim Bo'limi
@@ -896,6 +896,27 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                         />
                     </div>
                     <div className="flex gap-3">
+                        {subTab === 'chiqim' && (
+                            <button
+                                onClick={() => {
+                                    setLoading(true);
+                                    // Manually re-trigger fetch
+                                    const fetchOutbound = async () => {
+                                        const { data } = await supabase
+                                            .from('inventory_logs')
+                                            .select(`*, inventory (item_name, color, batch_number, material_types, type_specs)`)
+                                            .eq('type', 'Out')
+                                            .order('created_at', { ascending: false });
+                                        setOutboundLogs(data || []);
+                                        setLoading(false);
+                                    };
+                                    fetchOutbound();
+                                }}
+                                className="px-4 py-4 rounded-xl border border-[var(--border-color)] text-indigo-500 font-bold hover:bg-indigo-500/10 transition-all flex items-center gap-2"
+                            >
+                                <RotateCcw size={18} />
+                            </button>
+                        )}
                         <button className="px-6 py-4 rounded-2xl border border-[var(--border-color)] text-[var(--text-secondary)] font-bold hover:bg-[var(--bg-card-hover)] transition-all">Filtrlar</button>
                         {subTab === 'kirim' && (
                             <button
