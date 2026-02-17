@@ -186,19 +186,15 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
             const { error: updateError } = await supabase
                 .from('inventory')
                 .update({
-                    // WORKAROUND: Append Source to Item Name since 'source' column is missing
-                    // We check if source is already in name to avoid duplication
-                    item_name: editData.source && !editData.item_name.includes(`(${editData.source})`)
-                        ? `${editData.item_name.split('(')[0].trim()} (${editData.source})`
-                        : editData.item_name,
-
+                    item_name: editData.item_name,
                     color: editData.color,
                     color_code: editData.color_code,
                     batch_number: editData.batch_number,
                     quantity: newTotalWeight,
                     reference_id: editData.reference_id || null,
+                    source: editData.source, // Saving to source column directly
 
-                    // source: editData.source, // Keep disabled until DB migration
+                    // FALLBACK: Since 'grammage', 'width', 'type_specs' columns might not exist in DB yet,
 
                     last_updated: new Date()
                 })
