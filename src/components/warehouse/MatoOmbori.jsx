@@ -1,8 +1,8 @@
 ﻿import React, { useState, useEffect } from 'react';
 import {
-    Warehouse, Search, Plus, History, CircleArrowDown,
-    ArrowUpRight, ArrowDownLeft, ScrollText, QrCode, Printer, Trash2, CircleCheck, RotateCcw, ChevronDown, ChevronUp, Edit, X
+    ArrowUpRight, ArrowDownLeft, ScrollText, QrCode, Printer, Trash2, CircleCheck, RotateCcw, ChevronDown, ChevronUp, Edit, X, Scan
 } from 'lucide-react';
+import { Html5QrcodeScanner } from 'html5-qrcode';
 import { supabase } from '../../lib/supabase';
 
 const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
@@ -40,8 +40,117 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
         }
     }, [subTab]);
 
-    // Selection State
-    const [selectedIds, setSelectedIds] = useState([]);
+    // Selection State for Rolls (Multi-select)
+    const [selectedRollIds, setSelectedRollIds] = useState([]);
+
+    // Scanner State
+    const [showScanner, setShowScanner] = useState(false);
+    const [scannedRolls, setScannedRolls] = useState([]);
+
+    useEffect(() => {
+        let scanner = null;
+        if (showScanner) {
+            // Small timeout to ensure DOM element exists
+            setTimeout(() => {
+                scanner = new Html5QrcodeScanner(
+                    "reader",
+                    { fps: 10, qrbox: { width: 250, height: 250 } },
+                    /* verbose= */ false
+                );
+
+                scanner.render(async (decodedText) => {
+                    // Check if already scanned (local robust check)
+                    // Note: accessing scannedRolls inside closure might be stale, use functional update or ref.
+                    // But here we rely on async fetch anyway.
+
+                    // Since closure issue, checking 'scannedRolls' directly might see empty array always if useEffect doesn't update.
+                    // We must be careful. Ideally use a ref for scannedRolls or separate handler.
+                    handleScanSuccess(decodedText);
+                }, (error) => {
+                    // ignore
+                });
+            }, 100);
+        }
+
+        return () => {
+            if (scanner) {
+                scanner.clear().catch(e => console.error(e));
+            }
+        };
+    }, [showScanner]); // Only restart if showScanner toggles. ScannedRolls dependency would restart scanner constantly.
+
+    // Separate handler to avoid closure staleness if possible, but actually useEffect closure "traps" the initial state.
+    // Solution: Use a Ref or just fetch DB and then check duplication in existing state via functional update.
+    const handleScanSuccess = async (decodedText) => {
+        try {
+            // First Validations
+            // 1. Check DB for this ID
+            const { data: rollData, error } = await supabase
+                .from('inventory_rolls')
+                .select(`*, inventory!inner(*)`) // Join inventory
+                .or(`id.eq.${decodedText},roll_id.eq.${decodedText}`)
+                .single();
+
+            if (error || !rollData) {
+                console.warn('Scan Error:', error);
+                alert('Rulon topilmadi: ' + decodedText);
+                return;
+            }
+
+            if (rollData.status === 'used') {
+                alert(`Diqqat! Bu rulon ishlatilgan: ${rollData.roll_number}`);
+                return;
+            }
+
+            setScannedRolls(prev => {
+                if (prev.some(r => r.id === rollData.id)) {
+                    // Already scanned, no alert to avoid spam, just return
+                    return prev;
+                }
+
+                // Consistency Check
+                if (prev.length > 0) {
+                    if (prev[0].inventory_id !== rollData.inventory_id) {
+                        alert(`Xatolik! Aralash partiya. \nKutilmoqda: ${prev[0].inventory?.item_name}\nTopildi: ${rollData.inventory?.item_name}`);
+                        return prev;
+                    }
+                }
+                return [...prev, rollData];
+            });
+
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    // Clear selection when changing rows
+    useEffect(() => {
+        setSelectedRollIds([]);
+    }, [expandedRowId]);
+
+    const toggleRollSelection = (rollId) => {
+        setSelectedRollIds(prev =>
+            prev.includes(rollId)
+                ? prev.filter(id => id !== rollId)
+                : [...prev, rollId]
+        );
+    };
+
+    const handleBulkChiqim = (item, rolls) => {
+        if (!rolls || rolls.length === 0) return;
+
+        const totalWeight = rolls.reduce((sum, r) => sum + Number(r.weight), 0);
+
+        // Find if they are all same batch? Usually yes if from same item.
+        setOutboundData({
+            inventory_id: item.id,
+            quantity: totalWeight,
+            inventory_name: item.item_name,
+            selected_rolls: rolls,
+            reason: 'Kesimga' // Default
+        });
+        setShowOutboundModal(true);
+    };
 
     // NEW: Local Inventory state to handle missing 'source' via logs
     const [localInventory, setLocalInventory] = useState([]);
@@ -913,6 +1022,12 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                 <RotateCcw size={18} />
                             </button>
                         )}
+                        <button
+                            onClick={() => { setShowScanner(true); setScannedRolls([]); }}
+                            className="px-4 py-4 rounded-2xl border border-[var(--border-color)] text-emerald-500 font-bold hover:bg-emerald-500/10 transition-all flex items-center gap-2"
+                        >
+                            <Scan size={20} /> <span className="hidden sm:inline">Scan</span>
+                        </button>
                         <button className="px-6 py-4 rounded-2xl border border-[var(--border-color)] text-[var(--text-secondary)] font-bold hover:bg-[var(--bg-card-hover)] transition-all">Filtrlar</button>
                         {subTab === 'kirim' && (
                             <button
@@ -1103,6 +1218,17 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                             <div className="flex items-center gap-3">
                                                                 <ScrollText size={18} className="text-indigo-400" />
                                                                 <h4 className="font-bold text-sm text-[var(--text-primary)]">Rulonlar Ro'yxati</h4>
+                                                                {selectedRollIds.length > 0 && (
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            const selectedRolls = itemRolls.filter(r => selectedRollIds.includes(r.id));
+                                                                            handleBulkChiqim(item, selectedRolls);
+                                                                        }}
+                                                                        className="ml-4 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-lg text-xs font-bold transition-colors animate-in fade-in zoom-in"
+                                                                    >
+                                                                        Tanlanganlarni Chiqim Qilish ({selectedRollIds.length})
+                                                                    </button>
+                                                                )}
                                                             </div>
                                                             <span className="text-xs text-[var(--text-secondary)] font-bold">Jami: {itemRolls.length} ta rulon</span>
                                                         </div>
@@ -1110,6 +1236,21 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                         <table className="w-full text-left text-sm">
                                                             <thead className="text-[10px] uppercase text-[var(--text-secondary)] font-bold border-b border-[var(--border-color)] bg-[var(--bg-card)]">
                                                                 <tr>
+                                                                    <th className="px-6 py-3 w-10">
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                                                                            checked={itemRolls.filter(r => r.status !== 'used').length > 0 && itemRolls.filter(r => r.status !== 'used').every(r => selectedRollIds.includes(r.id))}
+                                                                            onChange={(e) => {
+                                                                                if (e.target.checked) {
+                                                                                    const allIds = itemRolls.filter(r => r.status !== 'used').map(r => r.id);
+                                                                                    setSelectedRollIds(allIds);
+                                                                                } else {
+                                                                                    setSelectedRollIds([]);
+                                                                                }
+                                                                            }}
+                                                                        />
+                                                                    </th>
                                                                     <th className="px-6 py-3">ID Raqam</th>
                                                                     <th className="px-6 py-3 text-right">Og'irlik (Kg)</th>
                                                                     <th className="px-6 py-3 text-center">Holati</th>
@@ -1124,6 +1265,16 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                                 ) : (
                                                                     itemRolls.map(roll => (
                                                                         <tr key={roll.id} className="hover:bg-[var(--bg-card-hover)]">
+                                                                            <td className="px-6 py-3 w-10">
+                                                                                {roll.status !== 'used' && (
+                                                                                    <input
+                                                                                        type="checkbox"
+                                                                                        checked={selectedRollIds.includes(roll.id)}
+                                                                                        onChange={() => toggleRollSelection(roll.id)}
+                                                                                        className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                                                                                    />
+                                                                                )}
+                                                                            </td>
                                                                             <td className="px-6 py-3 font-mono font-bold text-[var(--text-primary)]">{roll.roll_number}</td>
                                                                             <td className="px-6 py-3 text-right font-medium">{roll.weight}</td>
                                                                             <td className="px-6 py-3 text-center">
@@ -1911,6 +2062,68 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                 </div>
             )
             }
+            {/* SCANNER MODAL */}
+            {showScanner && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                    <div className="bg-[var(--bg-card)] w-full max-w-lg rounded-3xl border border-[var(--border-color)] shadow-2xl relative flex flex-col max-h-[90vh]">
+                        <div className="p-6 border-b border-[var(--border-color)] flex justify-between items-center">
+                            <h3 className="text-xl font-black text-[var(--text-primary)] flex items-center gap-2"><QrCode className="text-indigo-500" /> QR Skaner</h3>
+                            <button onClick={() => setShowScanner(false)} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-body)] p-2 rounded-full transition-colors">
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <div className="p-6 flex-1 overflow-y-auto">
+                            <div id="reader" className="w-full rounded-2xl overflow-hidden border-2 border-dashed border-indigo-500/30 bg-black min-h-[250px]"></div>
+
+                            <div className="mt-6">
+                                <h4 className="font-bold text-sm text-[var(--text-primary)] mb-3 flex justify-between items-center">
+                                    <span>Skan qilinganlar</span>
+                                    <span className="bg-indigo-500/10 text-indigo-500 px-2 py-0.5 rounded text-xs">{scannedRolls.length} ta</span>
+                                </h4>
+                                <div className="space-y-2 max-h-40 overflow-y-auto custom-scrollbar bg-[var(--bg-body)] p-2 rounded-xl border border-[var(--border-color)]">
+                                    {scannedRolls.map((r, i) => (
+                                        <div key={i} className="flex justify-between items-center p-3 bg-[var(--bg-card)] rounded-lg border border-[var(--border-color)] hover:border-indigo-500/30 transition-colors">
+                                            <div>
+                                                <div className="font-mono font-bold text-xs text-[var(--text-primary)]">{r.roll_number || r.roll_id?.substring(0, 8)}</div>
+                                                <div className="text-[10px] text-[var(--text-secondary)] font-bold">{r.inventory?.item_name}</div>
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <div className="font-black text-emerald-500 text-sm">{r.weight} kg</div>
+                                                <button
+                                                    onClick={() => setScannedRolls(scannedRolls.filter((_, idx) => idx !== i))}
+                                                    className="text-[var(--text-secondary)] hover:text-rose-500 p-1"
+                                                >
+                                                    <X size={14} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {scannedRolls.length === 0 && (
+                                        <div className="text-center text-[var(--text-secondary)] text-xs py-8 opacity-50 font-bold">Kamerani rulon QR kodiga qarating</div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-6 border-t border-[var(--border-color)] bg-[var(--bg-card)] rounded-b-3xl">
+                            <button
+                                disabled={scannedRolls.length === 0}
+                                onClick={() => {
+                                    if (scannedRolls.length === 0) return;
+                                    const first = scannedRolls[0];
+                                    handleBulkChiqim(first.inventory, scannedRolls);
+                                    setShowScanner(false);
+                                }}
+                                className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black rounded-2xl uppercase tracking-widest shadow-lg shadow-indigo-600/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+                            >
+                                <ArrowUpRight size={18} />
+                                Chiqim Qilish ({scannedRolls.reduce((a, b) => a + Number(b.weight), 0).toFixed(1)} kg)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div >
     );
 };
