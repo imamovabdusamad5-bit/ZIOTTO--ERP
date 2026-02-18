@@ -900,7 +900,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                     const fetchOutbound = async () => {
                                         const { data } = await supabase
                                             .from('inventory_logs')
-                                            .select(`*, inventory (item_name, color, batch_number)`)
+                                            .select('*')
                                             .eq('type', 'Out')
                                             .order('created_at', { ascending: false });
                                         setOutboundLogs(data || []);
@@ -979,7 +979,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                 );
                             })}
                             {filteredOutboundLogs.length === 0 && (
-                                <tr><td colSpan="10" className="p-10 text-center text-[var(--text-secondary)]">Chiqimlar mavjud emas</td></tr>
+                                <tr><td colSpan="10" className="p-10 text-center text-[var(--text-secondary)]">Chiqimlar mavjud emas (debug: {outboundLogs.length} ta)</td></tr>
                             )}
                         </tbody>
                     </table>
