@@ -28,16 +28,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                 setLoading(true);
                 const { data, error } = await supabase
                     .from('inventory_logs')
-                    .select(`
-                        *,
-                        inventory (
-                            item_name,
-                            color,
-                            batch_number,
-                            material_types,
-                            type_specs
-                        )
-                    `)
+                    .select('*')
                     .eq('type', 'Out')
                     .order('created_at', { ascending: false });
 
@@ -645,7 +636,6 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                         color_code: cleanColorCode,
                         batch_number: cleanBatch,
                         reference_id: inboundData.reference_id || null, // Optional if just name used
-                        reference_id: inboundData.reference_id || null, // Optional if just name used
                         // source: inboundData.source, // REMOVED: Column does not exist
                         last_updated: new Date()
                     }])
@@ -781,13 +771,15 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                 if (ord) finalReason += ` (Buyurtma: #${ord.order_number})`;
             }
 
-            await supabase.from('inventory_logs').insert([{
+            const { error: logError } = await supabase.from('inventory_logs').insert([{
                 inventory_id: item.id,
                 type: 'Out',
                 quantity: Number(outboundData.quantity),
                 reason: finalReason,
                 batch_number: item.batch_number
             }]);
+
+            if (logError) throw logError;
 
             alert('Chiqim bajarildi!');
             setShowOutboundModal(false);
@@ -830,7 +822,8 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
     const filteredOutboundLogs = outboundLogs.filter(log => {
         if (!searchTerm) return true;
         const lowSearch = searchTerm.toLowerCase();
-        const item = log.inventory || {};
+        const propItem = (inventory || []).find(i => i.id === log.inventory_id);
+        const item = propItem || log.inventory || {};
         const reason = log.reason || '';
 
         return (
@@ -907,7 +900,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                     const fetchOutbound = async () => {
                                         const { data } = await supabase
                                             .from('inventory_logs')
-                                            .select(`*, inventory (item_name, color, batch_number, material_types, type_specs)`)
+                                            .select(`*, inventory (item_name, color, batch_number)`)
                                             .eq('type', 'Out')
                                             .order('created_at', { ascending: false });
                                         setOutboundLogs(data || []);
@@ -953,7 +946,8 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                         </thead>
                         <tbody className="divide-y divide-[var(--border-color)]">
                             {filteredOutboundLogs.map(log => {
-                                const item = log.inventory || {};
+                                const propItem = (inventory || []).find(i => i.id === log.inventory_id);
+                                const item = propItem || log.inventory || {};
                                 const reason = log.reason || '';
                                 const extract = (k) => {
                                     const m = reason.match(new RegExp(`\\[${k}: (.*?)\\]`));
@@ -1486,7 +1480,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                     )}
                                 </div>
 
-                                <div className="mt-4 flex gap-2 pb-20">
+                                <div className="mt-4 flex gap-2 mb-24">
                                     <button
                                         onClick={() => setInboundData({ ...inboundData, rolls: [...inboundData.rolls, { weight: '' }] })}
                                         className="flex-1 py-4 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[var(--bg-card-hover)] transition-all shadow-sm"
