@@ -2,7 +2,6 @@
 import {
     ArrowUpRight, ArrowDownLeft, ScrollText, QrCode, Printer, Trash2, CircleCheck, RotateCcw, ChevronDown, ChevronUp, Edit, X
 } from 'lucide-react';
-import { Html5QrcodeScanner } from 'html5-qrcode';
 import { supabase } from '../../lib/supabase';
 
 const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
@@ -49,29 +48,12 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
 
     useEffect(() => {
         let scanner = null;
+        // Scanner Disabled
+        /*
         if (showScanner) {
-            // Small timeout to ensure DOM element exists
-            setTimeout(() => {
-                try {
-                    const element = document.getElementById("reader");
-                    if (!element) return;
-
-                    scanner = new Html5QrcodeScanner(
-                        "reader",
-                        { fps: 10, qrbox: { width: 250, height: 250 } },
-                        /* verbose= */ false
-                    );
-
-                    scanner.render(async (decodedText) => {
-                        handleScanSuccess(decodedText);
-                    }, (error) => {
-                        // ignore
-                    });
-                } catch (e) {
-                    console.error(e);
-                }
-            }, 100);
+          // ...
         }
+        */
 
         return () => {
             if (scanner) {
@@ -2075,7 +2057,22 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                         </div>
 
                         <div className="p-6 flex-1 overflow-y-auto">
-                            <div id="reader" className="w-full rounded-2xl overflow-hidden border-2 border-dashed border-indigo-500/30 bg-black min-h-[250px]"></div>
+                            <div className="w-full rounded-2xl overflow-hidden border-2 border-dashed border-indigo-500/30 bg-[var(--bg-body)] min-h-[250px] flex flex-col items-center justify-center p-6 text-center">
+                                <QrCode size={48} className="text-indigo-500/50 mb-4" />
+                                <p className="text-[var(--text-primary)] font-bold">Kamerada nosozlik</p>
+                                <p className="text-xs text-[var(--text-secondary)] mb-4">Brauzerda kamera ochilmadi. ID raqamni qo'lda kiriting:</p>
+                                <input
+                                    type="text"
+                                    placeholder="ID Scan..."
+                                    className="bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm w-full text-center font-mono font-bold"
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            handleScanSuccess(e.target.value);
+                                            e.target.value = '';
+                                        }
+                                    }}
+                                />
+                            </div>
 
                             <div className="mt-6">
                                 <h4 className="font-bold text-sm text-[var(--text-primary)] mb-3 flex justify-between items-center">
