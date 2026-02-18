@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 import {
-    ArrowUpRight, ArrowDownLeft, ScrollText, QrCode, Printer, Trash2, CircleCheck, RotateCcw, ChevronDown, ChevronUp, Edit, X, Scan
+    ArrowUpRight, ArrowDownLeft, ScrollText, QrCode, Printer, Trash2, CircleCheck, RotateCcw, ChevronDown, ChevronUp, Edit, X
 } from 'lucide-react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import { supabase } from '../../lib/supabase';
@@ -52,23 +52,24 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
         if (showScanner) {
             // Small timeout to ensure DOM element exists
             setTimeout(() => {
-                scanner = new Html5QrcodeScanner(
-                    "reader",
-                    { fps: 10, qrbox: { width: 250, height: 250 } },
-                    /* verbose= */ false
-                );
+                try {
+                    const element = document.getElementById("reader");
+                    if (!element) return;
 
-                scanner.render(async (decodedText) => {
-                    // Check if already scanned (local robust check)
-                    // Note: accessing scannedRolls inside closure might be stale, use functional update or ref.
-                    // But here we rely on async fetch anyway.
+                    scanner = new Html5QrcodeScanner(
+                        "reader",
+                        { fps: 10, qrbox: { width: 250, height: 250 } },
+                        /* verbose= */ false
+                    );
 
-                    // Since closure issue, checking 'scannedRolls' directly might see empty array always if useEffect doesn't update.
-                    // We must be careful. Ideally use a ref for scannedRolls or separate handler.
-                    handleScanSuccess(decodedText);
-                }, (error) => {
-                    // ignore
-                });
+                    scanner.render(async (decodedText) => {
+                        handleScanSuccess(decodedText);
+                    }, (error) => {
+                        // ignore
+                    });
+                } catch (e) {
+                    console.error(e);
+                }
             }, 100);
         }
 
@@ -1026,7 +1027,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                             onClick={() => { setShowScanner(true); setScannedRolls([]); }}
                             className="px-4 py-4 rounded-2xl border border-[var(--border-color)] text-emerald-500 font-bold hover:bg-emerald-500/10 transition-all flex items-center gap-2"
                         >
-                            <Scan size={20} /> <span className="hidden sm:inline">Scan</span>
+                            <QrCode size={20} /> <span className="hidden sm:inline">Scan</span>
                         </button>
                         <button className="px-6 py-4 rounded-2xl border border-[var(--border-color)] text-[var(--text-secondary)] font-bold hover:bg-[var(--bg-card-hover)] transition-all">Filtrlar</button>
                         {subTab === 'kirim' && (
