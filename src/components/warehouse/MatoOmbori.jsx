@@ -85,17 +85,46 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
     // Solution: Use a Ref or just fetch DB and then check duplication in existing state via functional update.
     const handleScanSuccess = async (decodedText) => {
         try {
-            // First Validations
-            // 1. Check DB for this ID
+            let scanId = decodedText;
+            try {
+                // Attempt to parse validation data if QR contains JSON
+                const parsed = JSON.parse(decodedText);
+                if (parsed.id) scanId = parsed.id;
+            } catch (e) {
+                // Not JSON, continue with raw text
+            }
+
+            // check if already scanned
+            setScannedRolls(prev => {
+                if (prev.some(r => r.id === scanId)) {
+                    return prev;
+                }
+                return prev; // We need to fetch data first, but let's check duplicates after fetch to be safe
+            });
+
+            // Fetch roll data
             const { data: rollData, error } = await supabase
                 .from('inventory_rolls')
-                .select(`*, inventory!inner(*)`) // Join inventory
-                .or(`id.eq.${decodedText},roll_id.eq.${decodedText}`)
+                .select(`*, inventory!inner(*)`)
+                .eq('id', scanId)
                 .single();
 
             if (error || !rollData) {
                 console.warn('Scan Error:', error);
-                alert('Rulon topilmadi: ' + decodedText);
+                // Try searching by roll_number if ID fail (fallback for legacy)
+                const { data: rollByNum } = await supabase
+                    .from('inventory_rolls')
+                    .select(`*, inventory!inner(*)`)
+                    .eq('roll_number', scanId)
+                    .single();
+
+                if (rollByNum) {
+                    // Proceed with rollByNum
+                    addScannedRoll(rollByNum);
+                    return;
+                }
+
+                alert('Rulon topilmadi: ' + (decodedText.length > 20 ? 'QR Kod' : decodedText));
                 return;
             }
 
@@ -104,25 +133,26 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                 return;
             }
 
-            setScannedRolls(prev => {
-                if (prev.some(r => r.id === rollData.id)) {
-                    // Already scanned, no alert to avoid spam, just return
-                    return prev;
-                }
-
-                // Consistency Check
-                if (prev.length > 0) {
-                    if (prev[0].inventory_id !== rollData.inventory_id) {
-                        alert(`Xatolik! Aralash partiya. \nKutilmoqda: ${prev[0].inventory?.item_name}\nTopildi: ${rollData.inventory?.item_name}`);
-                        return prev;
-                    }
-                }
-                return [...prev, rollData];
-            });
+            addScannedRoll(rollData);
 
         } catch (e) {
             console.error(e);
         }
+    };
+
+    const addScannedRoll = (rollData) => {
+        setScannedRolls(prev => {
+            if (prev.some(r => r.id === rollData.id)) return prev;
+
+            // Consistency Check
+            if (prev.length > 0) {
+                if (prev[0].inventory_id !== rollData.inventory_id) {
+                    alert(`Xatolik! Aralash partiya. \nKutilmoqda: ${prev[0].inventory?.item_name}\nTopildi: ${rollData.inventory?.item_name}`);
+                    return prev;
+                }
+            }
+            return [...prev, rollData];
+        });
     };
 
     // Clear selection when changing rows
@@ -633,8 +663,18 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
     };
 
     const handlePrintAllRolls = (item, rolls) => {
+        // Deduplicate rolls to prevent double printing
+        const uniqueRolls = [];
+        const seenIds = new Set();
+        rolls.forEach(r => {
+            if (!seenIds.has(r.id)) {
+                seenIds.add(r.id);
+                uniqueRolls.push(r);
+            }
+        });
+
         const printWindow = window.open('', '_blank');
-        const content = rolls.map(roll => {
+        const content = uniqueRolls.map(roll => {
             const qrData = JSON.stringify({
                 id: roll.id,
                 name: item.item_name,
