@@ -50,6 +50,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
     // Scanner State
     const [showScanner, setShowScanner] = useState(false);
     const [scannedRolls, setScannedRolls] = useState([]);
+    const [rollSourceMap, setRollSourceMap] = useState({}); // Stores id -> source (string)
 
     useEffect(() => {
         let scanner = null;
@@ -584,24 +585,71 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
     // --- LOGIC: Fetch Rolls and Toggle Expansion ---
     const fetchRolls = async (inventoryId) => {
         setLoading(true);
-        const { data, error } = await supabase
-            .from('inventory_rolls')
-            .select('*')
-            .eq('inventory_id', inventoryId)
-            .order('id', { ascending: true });
+        try {
+            // 1. Fetch Rolls
+            const { data: rollsData, error: rollsError } = await supabase
+                .from('inventory_rolls')
+                .select('*')
+                .eq('inventory_id', inventoryId)
+                .order('id', { ascending: true });
 
-        setLoading(false);
-        if (error) {
-            console.error("Error fetching rolls:", error);
-            setItemRolls([]);
-        } else {
+            if (rollsError) throw rollsError;
+
+            // 2. Fetch Logs for Source Detection
+            const { data: logsData, error: logsError } = await supabase
+                .from('inventory_logs')
+                .select('created_at, reason, type')
+                .eq('inventory_id', inventoryId)
+                .order('created_at', { ascending: true });
+
+            if (!logsError && logsData) {
+                const newSourceMap = {};
+                rollsData.forEach(roll => {
+                    const rollTime = new Date(roll.created_at).getTime();
+
+                    // Find closest log by time difference
+                    let bestLog = null;
+                    let minDiff = 60000; // 60s threshold
+
+                    logsData.forEach(log => {
+                        const logTime = new Date(log.created_at).getTime();
+                        const diff = Math.abs(logTime - rollTime);
+                        if (diff < minDiff && (log.type === 'In' || log.type === 'Correction')) {
+                            minDiff = diff;
+                            bestLog = log;
+                        }
+                    });
+
+                    if (bestLog && bestLog.reason) {
+                        const reasonUpper = bestLog.reason.toUpperCase();
+                        if (reasonUpper.includes('KESIM')) {
+                            newSourceMap[roll.id] = "KESIM";
+                        } else if (reasonUpper.includes("E'ZONUR")) {
+                            newSourceMap[roll.id] = "E'ZONUR";
+                        } else if (reasonUpper.includes("FABRIKA")) {
+                            newSourceMap[roll.id] = "FABRIKA";
+                        } else {
+                            const parts = bestLog.reason.split('|');
+                            if (parts.length > 0) newSourceMap[roll.id] = parts[0].trim().toUpperCase();
+                        }
+                    }
+                });
+                setRollSourceMap(prev => ({ ...prev, ...newSourceMap }));
+            }
+
             // Sort by roll number numerically if possible
-            const sorted = (data || []).sort((a, b) => {
+            const sorted = (rollsData || []).sort((a, b) => {
                 const aNum = parseInt(a.roll_number.split('-').pop());
                 const bNum = parseInt(b.roll_number.split('-').pop());
                 return (aNum && bNum) ? aNum - bNum : a.roll_number.localeCompare(b.roll_number);
             });
             setItemRolls(sorted);
+
+        } catch (error) {
+            console.error("Error fetching rolls:", error);
+            setItemRolls([]);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -1425,7 +1473,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                                                     </div>
                                                                                 </td>
                                                                                 <td className="px-6 py-3 text-center font-bold text-[10px] uppercase text-[var(--text-secondary)]">
-                                                                                    {item.source || "E'ZONUR"}
+                                                                                    {rollSourceMap[roll.id] || item.source || "E'ZONUR"}
                                                                                 </td>
                                                                                 <td className="px-6 py-3 text-right">
                                                                                     <button onClick={() => handlePrintQR(roll, item)} className="text-[var(--text-secondary)] hover:text-indigo-400 transition-colors"><QrCode size={16} /></button>
