@@ -1667,7 +1667,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                         required
                                     />
                                     <datalist id="model-suggestions">
-                                        {(orders || []).map(o => <option key={o.id} value={o.model_name || o.order_number} />)}
+                                        {(orders || []).map(o => <option key={o.id} value={o.models?.name || o.models?.model_name || o.model_name || o.order_number} />)}
                                     </datalist>
                                 </div>
                                 <div>
