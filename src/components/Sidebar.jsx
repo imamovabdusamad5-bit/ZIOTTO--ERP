@@ -23,7 +23,7 @@ import {
     ShieldCheck
 } from 'lucide-react';
 
-const menuItems = [
+export const menuItems = [
     { path: '/', name: 'Boshqaruv', icon: LayoutDashboard, roles: ['admin'] },
     { path: '/modelxona', name: 'Modelxona', icon: FileText, roles: ['admin', 'planning'], permKey: 'planning' }, // Modelxona often falls under planning or admin
     { path: '/reja', name: 'Planlama (BOM)', icon: ClipboardList, roles: ['admin', 'planning'], permKey: 'planning' },
@@ -62,6 +62,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     const [mobileOpen, setMobileOpen] = useState(false);
 
     const filteredMenu = menuItems.filter(item => {
+        // console.log('DEBUG PERMS:', profile?.role, item.name, item.permKey, profile?.permissions);
         if (!profile) return false;
         if (profile.role === 'admin') return true;
 

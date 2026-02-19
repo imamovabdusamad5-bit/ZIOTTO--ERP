@@ -23,11 +23,51 @@ import Vishefka from './pages/Vishefka';
 
 import ZiyoChat from './components/ZiyoChat';
 
+import { menuItems } from './components/Sidebar';
+
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return null;
   if (!user) return <Navigate to="/login" />;
   return children;
+};
+
+// New Role Based Guard
+const RoleGuard = ({ children, path }) => {
+  const { profile, loading } = useAuth();
+
+  if (loading) return null;
+  if (!profile) return <Navigate to="/login" />;
+
+  // Admin always has access
+  if (profile.role === 'admin') return children;
+
+  // Find the menu item for this path
+  // Handle sub-paths if necessary, but for now exact match or parent match
+  const item = menuItems.find(i => i.path === path || (i.subItems && i.subItems.some(s => s.path.startsWith(path))));
+
+  if (!item) {
+    // If no rule defined, assume strictly protected or public?
+    // For safety, if it's not in the menu, it might be public or hidden.
+    // But we are using this guard explicitly.
+    // Let's assume passed path IS the key.
+    return children;
+  }
+
+  const permKey = item.permKey || item.path.split('?')[0].replace('/', '');
+
+  // 1. Check Permissions Object
+  if (profile.permissions && profile.permissions[permKey]) {
+    return children;
+  }
+
+  // 2. Check Role List
+  if (item.roles && item.roles.includes(profile.role)) {
+    return children;
+  }
+
+  // If we got here, access is denied
+  return <div className="p-10 text-center text-red-500 font-bold">Huquqingiz yetmaydi (403 Access Denied)</div>;
 };
 
 function App() {
@@ -40,21 +80,21 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
               <Route index element={<Dashboard />} />
-              <Route path="modelxona" element={<Modelxona />} />
-              <Route path="reja" element={<Rejalashtirish />} />
+              <Route path="modelxona" element={<RoleGuard path="/modelxona"><Modelxona /></RoleGuard>} />
+              <Route path="reja" element={<RoleGuard path="/reja"><Rejalashtirish /></RoleGuard>} />
               <Route path="ombor" element={<Ombor />} />
-              <Route path="kesim" element={<Kesim />} />
-              <Route path="taminot" element={<Taminot />} />
-              <Route path="tasnif" element={<Tasnif />} />
-              <Route path="tikuv" element={<Tikuv />} />
-              <Route path="otk" element={<OTK />} />
-              <Route path="dazmol" element={<Dazmol />} />
-              <Route path="hr" element={<HR />} />
-              <Route path="moliya" element={<Moliya />} />
-              <Route path="xodimlar" element={<Xodimlar />} />
-              <Route path="pechat" element={<Pechat />} />
-              <Route path="vishefka" element={<Vishefka />} />
-              <Route path="malumotlar" element={<Ma_lumotlar />} />
+              <Route path="kesim" element={<RoleGuard path="/kesim"><Kesim /></RoleGuard>} />
+              <Route path="taminot" element={<RoleGuard path="/taminot"><Taminot /></RoleGuard>} />
+              <Route path="tasnif" element={<RoleGuard path="/tasnif"><Tasnif /></RoleGuard>} />
+              <Route path="tikuv" element={<RoleGuard path="/tikuv"><Tikuv /></RoleGuard>} />
+              <Route path="otk" element={<RoleGuard path="/otk"><OTK /></RoleGuard>} />
+              <Route path="dazmol" element={<RoleGuard path="/dazmol"><Dazmol /></RoleGuard>} />
+              <Route path="hr" element={<RoleGuard path="/hr"><HR /></RoleGuard>} />
+              <Route path="moliya" element={<RoleGuard path="/moliya"><Moliya /></RoleGuard>} />
+              <Route path="xodimlar" element={<RoleGuard path="/xodimlar"><Xodimlar /></RoleGuard>} />
+              <Route path="pechat" element={<RoleGuard path="/pechat"><Pechat /></RoleGuard>} />
+              <Route path="vishefka" element={<RoleGuard path="/vishefka"><Vishefka /></RoleGuard>} />
+              <Route path="malumotlar" element={<RoleGuard path="/malumotlar"><Ma_lumotlar /></RoleGuard>} />
             </Route>
           </Routes>
         </BrowserRouter>
