@@ -1373,6 +1373,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                                         <th className="px-6 py-3">ID Raqam</th>
                                                                         <th className="px-6 py-3 text-right">Og'irlik (Kg)</th>
                                                                         <th className="px-6 py-3 text-center">Holati</th>
+                                                                        <th className="px-6 py-3 text-center">Kimdan</th>
                                                                         <th className="px-6 py-3 text-right">QR Kod</th>
                                                                     </tr>
                                                                 </thead>
@@ -1422,6 +1423,9 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                                                             </button>
                                                                                         )}
                                                                                     </div>
+                                                                                </td>
+                                                                                <td className="px-6 py-3 text-center font-bold text-[10px] uppercase text-[var(--text-secondary)]">
+                                                                                    {item.source || "E'ZONUR"}
                                                                                 </td>
                                                                                 <td className="px-6 py-3 text-right">
                                                                                     <button onClick={() => handlePrintQR(roll, item)} className="text-[var(--text-secondary)] hover:text-indigo-400 transition-colors"><QrCode size={16} /></button>
