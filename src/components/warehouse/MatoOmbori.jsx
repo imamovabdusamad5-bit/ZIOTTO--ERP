@@ -2,6 +2,7 @@
 import {
     ArrowUpRight, ArrowDownLeft, ScrollText, QrCode, Printer, Trash2, CircleCheck, RotateCcw, ChevronDown, ChevronUp, Edit, X, Search, Plus, History
 } from 'lucide-react';
+import { Html5QrcodeScanner } from 'html5-qrcode';
 import { supabase } from '../../lib/supabase';
 
 const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
@@ -52,12 +53,26 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
 
     useEffect(() => {
         let scanner = null;
-        // Scanner Disabled
-        /*
         if (showScanner) {
-          // ...
+            try {
+                // Ensure DOM element exists
+                const element = document.getElementById('reader');
+                if (element) {
+                    scanner = new Html5QrcodeScanner(
+                        "reader",
+                        { fps: 10, qrbox: { width: 250, height: 250 } },
+                        /* verbose= */ false
+                    );
+                    scanner.render(handleScanSuccess, (err) => {
+                        console.warn(err);
+                    });
+                }
+            } catch (e) {
+                console.error("Scanner init error:", e);
+                alert("Kamerani ishga tushirib bo'lmadi. Iltimos brauzer ruxsatlarini tekshiring.");
+                setShowScanner(false);
+            }
         }
-        */
 
         return () => {
             if (scanner) {
@@ -1087,335 +1102,311 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                     </table>
                 </div>
             ) : (
-                <div className={`overflow-hidden bg-[var(--bg-card)] backdrop-blur-3xl rounded-3xl border border-[var(--border-color)] shadow-2xl min-h-[500px]`}>
-                    <table className="w-full text-left border-collapse">
-                        <thead className="bg-[var(--bg-sidebar-footer)] text-[var(--text-secondary)] text-[11px] font-black uppercase tracking-wider border-b border-[var(--border-color)]">
-                            <tr>
-                                <th className="px-6 py-5 text-center w-12">
-                                    <input
-                                        type="checkbox"
-                                        className="w-5 h-5 rounded-lg bg-[var(--input-bg)] border-[var(--border-color)] checked:bg-indigo-600 focus:ring-indigo-500 cursor-pointer transition-all"
-                                        checked={selectedIds.length === filteredInventory.length && filteredInventory.length > 0}
-                                        onChange={(e) => {
-                                            if (e.target.checked) setSelectedIds(filteredInventory.map(i => i.id));
-                                            else setSelectedIds([]);
-                                        }}
-                                    />
-                                </th>
-                                <th className="px-6 py-5">Sana / ID</th>
-                                <th className="px-6 py-5">Mato Turi</th>
-                                <th className="px-6 py-5">Rang</th>
-                                <th className="px-6 py-5">Turi</th>
-                                <th className="px-6 py-5">Partiya</th>
-                                <th className="px-6 py-5 text-center">Rulonlar</th>
-                                <th className="px-6 py-5 text-right">Jami Og'irlik</th>
-                                <th className="px-6 py-5">Kimdan</th>
-                                <th className="px-6 py-5 text-center">Amallar</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-[var(--border-color)]">
-                            {filteredInventory.map(item => {
-                                const isExpanded = expandedRowId === item.id;
-                                const isSelected = selectedIds.includes(item.id);
-                                const ref = references?.find(r => r.id === item.reference_id) || {};
-                                // Safe defaults
-                                const typeStr = item.material_types?.thread_type || ref.thread_type || 'Suprem 30/1';
-                                const specs = ref.grammage ? `${ref.grammage}gr | ${ref.width || '-'}sm` : (item.material_types?.grammage ? `${item.material_types.grammage}gr` : '-');
+                <div className="flex flex-col gap-4">
+                    {/* Mobile Card View */}
+                    <div className="md:hidden space-y-3 pb-20">
+                        {filteredInventory.map(item => (
+                            <div key={item.id} className="bg-[var(--bg-card)] p-4 rounded-xl border border-[var(--border-color)] shadow-sm relative overflow-hidden">
+                                {selectedIds.includes(item.id) && <div className="absolute top-0 right-0 w-3 h-3 bg-indigo-500 rounded-bl-lg"></div>}
+                                <div className="flex justify-between items-start mb-2">
+                                    <div className="flex items-center gap-3">
+                                        <input type="checkbox"
+                                            checked={selectedIds.includes(item.id)}
+                                            onChange={() => setSelectedIds(prev => prev.includes(item.id) ? prev.filter(x => x !== item.id) : [...prev, item.id])}
+                                            className="w-5 h-5 rounded border-[var(--border-color)] bg-[var(--input-bg)]"
+                                        />
+                                        <span className="font-bold text-[var(--text-primary)] text-sm">#{item.id}</span>
+                                    </div>
+                                    <span className="font-black text-indigo-400 text-lg">{item.quantity} kg</span>
+                                </div>
 
-                                // Fix Date Display - fallback to last_updated if created_at is missing
-                                const dateDisplay = item.created_at
-                                    ? new Date(item.created_at).toLocaleDateString('ru-RU')
-                                    : (item.last_updated ? new Date(item.last_updated).toLocaleDateString('ru-RU') : '-');
+                                <div className="mb-3 pl-8">
+                                    <div className="font-bold text-[var(--text-primary)] leading-tight">{item.item_name}</div>
+                                    <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)] mt-1">
+                                        <div className="w-3 h-3 rounded-full border border-[var(--border-color)]" style={{ backgroundColor: item.color_code || '#ccc' }}></div>
+                                        {item.color} | {item.material_types?.thread_type || '-'}
+                                    </div>
+                                </div>
 
-                                return (
-                                    <React.Fragment key={item.id}>
-                                        <tr className={`transition-all group ${isSelected ? 'bg-indigo-500/5' : (isExpanded ? 'bg-[var(--bg-card-hover)]' : 'hover:bg-[var(--bg-card-hover)]')}`}>
-                                            <td className="px-6 py-5 text-center">
-                                                <input
-                                                    type="checkbox"
-                                                    className="w-5 h-5 rounded-lg bg-[var(--input-bg)] border-[var(--border-color)] checked:bg-indigo-600 focus:ring-indigo-500 cursor-pointer transition-all"
-                                                    checked={isSelected}
-                                                    onChange={() => setSelectedIds(prev => prev.includes(item.id) ? prev.filter(id => id !== item.id) : [...prev, item.id])}
-                                                />
-                                            </td>
-                                            <td className="px-6 py-5">
-                                                <div className="font-bold text-[var(--text-primary)] text-sm mb-1">{dateDisplay}</div>
-                                                <div className="text-[10px] text-[var(--text-secondary)] font-mono uppercase">MAT-{item.id}</div>
-                                            </td>
-                                            <td className="px-6 py-5 font-black text-[var(--text-primary)] text-sm">{item.item_name}</td>
+                                <div className="grid grid-cols-2 gap-2 text-xs mb-3 pl-8">
+                                    <div className="bg-[var(--bg-body)] p-2 rounded text-[var(--text-secondary)]">Pr: <span className="font-bold text-[var(--text-primary)]">{item.batch_number || '-'}</span></div>
+                                    <div className="bg-[var(--bg-body)] p-2 rounded text-[var(--text-secondary)]">Mn: <span className="font-bold text-[var(--text-primary)]">{item.source || '-'}</span></div>
+                                </div>
 
-                                            <td className="px-6 py-5">
-                                                <div className="flex items-center gap-3">
-                                                    <div
-                                                        className="w-8 h-8 rounded-full border border-[var(--border-color)] shadow-sm"
-                                                        style={{ backgroundColor: item.color_code || '#ccc' }}
-                                                    ></div>
-                                                    <div>
-                                                        <div className="font-bold text-[var(--text-primary)] text-xs">{item.color}</div>
-                                                        <div className="text-[10px] text-[var(--text-secondary)] opacity-70">{item.color_code || '-'}</div>
+                                <div className="flex gap-2 pl-8">
+                                    <button onClick={() => toggleRow(item)} className={`flex-1 py-2 rounded-lg text-xs font-bold border transition-colors ${expandedRowId === item.id ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-[var(--bg-body)] text-[var(--text-secondary)] border-[var(--border-color)]'}`}>
+                                        {expandedRowId === item.id ? 'Yopish' : "Ro'yxat"}
+                                    </button>
+                                    <button onClick={() => { setSelectedItem(item); toggleRow(item); }} className="p-2 text-[var(--text-secondary)] bg-[var(--bg-body)] border border-[var(--border-color)] rounded-lg">
+                                        <QrCode size={16} />
+                                    </button>
+                                    <button onClick={() => handleEdit(item)} className="p-2 text-[var(--text-secondary)] bg-[var(--bg-body)] border border-[var(--border-color)] rounded-lg">
+                                        <Edit size={16} />
+                                    </button>
+                                </div>
+
+                                {expandedRowId === item.id && (
+                                    <div className="mt-3 pt-3 border-t border-[var(--border-color)] pl-8">
+                                        {itemRolls.length > 0 ? (
+                                            <div className="space-y-2">
+                                                {itemRolls.map(r => (
+                                                    <div key={r.id} className="flex justify-between items-center text-xs bg-[var(--bg-body)] p-2 rounded border border-[var(--border-color)]">
+                                                        <div className="font-mono">{r.roll_number}</div>
+                                                        <div className="font-bold text-emerald-500">{r.weight} kg</div>
                                                     </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-5">
-                                                <div className="font-bold text-[var(--text-primary)] text-xs">{typeStr}</div>
-                                                <div className="text-[10px] text-[var(--text-secondary)] opacity-70 mt-0.5">{specs}</div>
-                                            </td>
-                                            <td className="px-6 py-5">
-                                                <span className="bg-[var(--bg-body)] text-[var(--text-primary)] font-mono text-xs font-bold px-3 py-1.5 rounded-lg border border-[var(--border-color)]">
-                                                    {item.batch_number || 'N/A'}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-5 text-center">
-                                                <div className="flex justify-center flex-col items-center">
-                                                    <button onClick={() => toggleRow(item)} className="text-indigo-400 hover:text-indigo-300 font-bold text-xs flex items-center gap-1">
-                                                        <ScrollText size={14} /> RO'YXAT
-                                                    </button>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-5 text-right">
-                                                <div className="font-black text-indigo-400 text-lg">{item.quantity}</div>
-                                            </td>
-                                            <td className="px-6 py-5 font-bold text-[var(--text-secondary)] text-xs uppercase">{item.source || '-'}</td>
-                                            <td className="px-6 py-5">
-                                                <div className="flex items-center justify-center gap-2">
+                                                ))}
+                                                <div className="text-center pt-2">
                                                     <button onClick={() => {
-                                                        setSelectedItem(item);
-                                                        toggleRow(item);
-                                                    }} className="p-2 text-[var(--text-secondary)] hover:text-indigo-400 transition-colors"><QrCode size={16} /></button>
-                                                    <button onClick={() => {
-                                                        setSelectedItem(item);
-                                                        fetchHistory(item.id);
-                                                        setShowHistoryModal(true);
-                                                    }} className="p-2 text-[var(--text-secondary)] hover:text-sky-400 transition-colors"><History size={16} /></button>
-                                                    <button onClick={() => handleEdit(item)} className="p-2 text-[var(--text-secondary)] hover:text-amber-400 transition-colors"><Edit size={16} /></button>
-                                                    <button onClick={() => handleDelete(item)} className="p-2 text-[var(--text-secondary)] hover:text-rose-400 transition-colors"><Trash2 size={16} /></button>
-                                                    <button
-                                                        onClick={() => toggleRow(item)}
-                                                        className={`p-2 rounded-xl border border-[var(--border-color)] transition-all ${isExpanded ? 'bg-indigo-600 text-white border-indigo-600' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-body)]'}`}
-                                                    >
-                                                        {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                                                    </button>
+                                                        setSubTab('chiqim');
+                                                        handleBulkChiqim(item, itemRolls.filter(r => r.status !== 'used'));
+                                                    }} className="text-xs text-indigo-400 font-bold underline">Barchasini Chiqim Qilish</button>
                                                 </div>
-                                            </td>
-                                        </tr>
+                                            </div>
+                                        ) : <div className="text-center text-xs opacity-50 py-2">Rulonlar topilmadi</div>}
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
 
-                                        {/* EXPANDED ROW */}
-                                        {isExpanded && (
-                                            <tr className="bg-[var(--bg-body)]/50 transition-all">
-                                                <td colSpan="9" className="p-6 border-b border-[var(--border-color)]">
-                                                    <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] overflow-hidden">
-                                                        <div className="px-6 py-4 border-b border-[var(--border-color)] flex justify-between items-center bg-[var(--bg-body)]">
-                                                            <div className="flex items-center gap-3">
-                                                                <ScrollText size={18} className="text-indigo-400" />
-                                                                <h4 className="font-bold text-sm text-[var(--text-primary)]">Rulonlar Ro'yxati</h4>
-                                                                {selectedRollIds.length > 0 && (
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            const selectedRolls = itemRolls.filter(r => selectedRollIds.includes(r.id));
-                                                                            handleBulkChiqim(item, selectedRolls);
-                                                                        }}
-                                                                        className="ml-4 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-lg text-xs font-bold transition-colors animate-in fade-in zoom-in"
-                                                                    >
-                                                                        Tanlanganlarni Chiqim Qilish ({selectedRollIds.length})
-                                                                    </button>
-                                                                )}
-                                                            </div>
-                                                            <span className="text-xs text-[var(--text-secondary)] font-bold">Jami: {itemRolls.length} ta rulon</span>
-                                                        </div>
+                    <div className="hidden md:block overflow-hidden bg-[var(--bg-card)] backdrop-blur-3xl rounded-3xl border border-[var(--border-color)] shadow-2xl min-h-[500px]">
+                        <table className="w-full text-left border-collapse">
+                            <thead className="bg-[var(--bg-sidebar-footer)] text-[var(--text-secondary)] text-[11px] font-black uppercase tracking-wider border-b border-[var(--border-color)]">
+                                <tr>
+                                    <th className="px-6 py-5 text-center w-12">
+                                        <input
+                                            type="checkbox"
+                                            className="w-5 h-5 rounded-lg bg-[var(--input-bg)] border-[var(--border-color)] checked:bg-indigo-600 focus:ring-indigo-500 cursor-pointer transition-all"
+                                            checked={selectedIds.length === filteredInventory.length && filteredInventory.length > 0}
+                                            onChange={(e) => {
+                                                if (e.target.checked) setSelectedIds(filteredInventory.map(i => i.id));
+                                                else setSelectedIds([]);
+                                            }}
+                                        />
+                                    </th>
+                                    <th className="px-6 py-5">Sana / ID</th>
+                                    <th className="px-6 py-5">Mato Turi</th>
+                                    <th className="px-6 py-5">Rang</th>
+                                    <th className="px-6 py-5">Turi</th>
+                                    <th className="px-6 py-5">Partiya</th>
+                                    <th className="px-6 py-5 text-center">Rulonlar</th>
+                                    <th className="px-6 py-5 text-right">Jami Og'irlik</th>
+                                    <th className="px-6 py-5">Kimdan</th>
+                                    <th className="px-6 py-5 text-center">Amallar</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-[var(--border-color)]">
+                                {filteredInventory.map(item => {
+                                    const isExpanded = expandedRowId === item.id;
+                                    const isSelected = selectedIds.includes(item.id);
+                                    const ref = references?.find(r => r.id === item.reference_id) || {};
+                                    // Safe defaults
+                                    const typeStr = item.material_types?.thread_type || ref.thread_type || 'Suprem 30/1';
+                                    const specs = ref.grammage ? `${ref.grammage}gr | ${ref.width || '-'}sm` : (item.material_types?.grammage ? `${item.material_types.grammage}gr` : '-');
 
-                                                        <table className="w-full text-left text-sm">
-                                                            <thead className="text-[10px] uppercase text-[var(--text-secondary)] font-bold border-b border-[var(--border-color)] bg-[var(--bg-card)]">
-                                                                <tr>
-                                                                    <th className="px-6 py-3 w-10">
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-                                                                            checked={itemRolls.filter(r => r.status !== 'used').length > 0 && itemRolls.filter(r => r.status !== 'used').every(r => selectedRollIds.includes(r.id))}
-                                                                            onChange={(e) => {
-                                                                                if (e.target.checked) {
-                                                                                    const allIds = itemRolls.filter(r => r.status !== 'used').map(r => r.id);
-                                                                                    setSelectedRollIds(allIds);
-                                                                                } else {
-                                                                                    setSelectedRollIds([]);
-                                                                                }
-                                                                            }}
-                                                                        />
-                                                                    </th>
-                                                                    <th className="px-6 py-3">ID Raqam</th>
-                                                                    <th className="px-6 py-3 text-right">Og'irlik (Kg)</th>
-                                                                    <th className="px-6 py-3 text-center">Holati</th>
-                                                                    <th className="px-6 py-3 text-right">QR Kod</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody className="divide-y divide-[var(--border-color)]">
-                                                                {loading ? (
-                                                                    <tr><td colSpan="4" className="p-8 text-center text-[var(--text-secondary)]">Yuklanmoqda...</td></tr>
-                                                                ) : itemRolls.length === 0 ? (
-                                                                    <tr><td colSpan="4" className="p-8 text-center text-[var(--text-secondary)]">Poylar mavjud emas</td></tr>
-                                                                ) : (
-                                                                    itemRolls.map(roll => (
-                                                                        <tr key={roll.id} className="hover:bg-[var(--bg-card-hover)]">
-                                                                            <td className="px-6 py-3 w-10">
-                                                                                {roll.status !== 'used' && (
-                                                                                    <input
-                                                                                        type="checkbox"
-                                                                                        checked={selectedRollIds.includes(roll.id)}
-                                                                                        onChange={() => toggleRollSelection(roll.id)}
-                                                                                        className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-                                                                                    />
-                                                                                )}
-                                                                            </td>
-                                                                            <td className="px-6 py-3 font-mono font-bold text-[var(--text-primary)]">{roll.roll_number}</td>
-                                                                            <td className="px-6 py-3 text-right font-medium">{roll.weight}</td>
-                                                                            <td className="px-6 py-3 text-center">
-                                                                                <div className="flex items-center justify-center gap-3">
-                                                                                    <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${roll.status === 'used'
-                                                                                        ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
-                                                                                        : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
-                                                                                        }`}>
-                                                                                        {roll.status === 'used' ? 'Ishlatilgan' : 'Omborda'}
-                                                                                    </span>
-                                                                                    {roll.status !== 'used' && (
-                                                                                        <button
-                                                                                            onClick={() => {
-                                                                                                setOutboundData({
-                                                                                                    inventory_id: item.id,
-                                                                                                    quantity: roll.weight, // Preset weight
-                                                                                                    inventory_name: item.item_name,
-                                                                                                    selected_rolls: [roll],
-                                                                                                    reason: 'Kesimga'
-                                                                                                });
-                                                                                                setShowOutboundModal(true);
-                                                                                            }}
-                                                                                            className="flex items-center gap-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 px-2 py-1 rounded border border-amber-500/20 text-[10px] font-bold uppercase transition-colors"
-                                                                                        >
-                                                                                            <ArrowUpRight size={10} /> Chiqim
-                                                                                        </button>
-                                                                                    )}
-                                                                                </div>
-                                                                            </td>
-                                                                            <td className="px-6 py-3 text-right">
-                                                                                <button onClick={() => handlePrintQR(roll, item)} className="text-[var(--text-secondary)] hover:text-indigo-400 transition-colors"><QrCode size={16} /></button>
-                                                                            </td>
-                                                                        </tr>
-                                                                    ))
-                                                                )}
-                                                            </tbody>
-                                                        </table>
+                                    // Fix Date Display - fallback to last_updated if created_at is missing
+                                    const dateDisplay = item.created_at
+                                        ? new Date(item.created_at).toLocaleDateString('ru-RU')
+                                        : (item.last_updated ? new Date(item.last_updated).toLocaleDateString('ru-RU') : '-');
 
-                                                        <div className="p-4 border-t border-[var(--border-color)] bg-[var(--bg-body)] flex justify-end">
-                                                            <button
-                                                                onClick={() => handlePrintAllRolls(item, itemRolls)}
-                                                                className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg shadow-indigo-600/20 transition-all"
-                                                            >
-                                                                <Printer size={16} /> Barcha Rulonlarni Chop Etish
-                                                            </button>
+                                    return (
+                                        <React.Fragment key={item.id}>
+                                            <tr className={`transition-all group ${isSelected ? 'bg-indigo-500/5' : (isExpanded ? 'bg-[var(--bg-card-hover)]' : 'hover:bg-[var(--bg-card-hover)]')}`}>
+                                                <td className="px-6 py-5 text-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="w-5 h-5 rounded-lg bg-[var(--input-bg)] border-[var(--border-color)] checked:bg-indigo-600 focus:ring-indigo-500 cursor-pointer transition-all"
+                                                        checked={isSelected}
+                                                        onChange={() => setSelectedIds(prev => prev.includes(item.id) ? prev.filter(id => id !== item.id) : [...prev, item.id])}
+                                                    />
+                                                </td>
+                                                <td className="px-6 py-5">
+                                                    <div className="font-bold text-[var(--text-primary)] text-sm mb-1">{dateDisplay}</div>
+                                                    <div className="text-[10px] text-[var(--text-secondary)] font-mono uppercase">MAT-{item.id}</div>
+                                                </td>
+                                                <td className="px-6 py-5 font-black text-[var(--text-primary)] text-sm">{item.item_name}</td>
+
+                                                <td className="px-6 py-5">
+                                                    <div className="flex items-center gap-3">
+                                                        <div
+                                                            className="w-8 h-8 rounded-full border border-[var(--border-color)] shadow-sm"
+                                                            style={{ backgroundColor: item.color_code || '#ccc' }}
+                                                        ></div>
+                                                        <div>
+                                                            <div className="font-bold text-[var(--text-primary)] text-xs">{item.color}</div>
+                                                            <div className="text-[10px] text-[var(--text-secondary)] opacity-70">{item.color_code || '-'}</div>
                                                         </div>
                                                     </div>
                                                 </td>
+                                                <td className="px-6 py-5">
+                                                    <div className="font-bold text-[var(--text-primary)] text-xs">{typeStr}</div>
+                                                    <div className="text-[10px] text-[var(--text-secondary)] opacity-70 mt-0.5">{specs}</div>
+                                                </td>
+                                                <td className="px-6 py-5">
+                                                    <span className="bg-[var(--bg-body)] text-[var(--text-primary)] font-mono text-xs font-bold px-3 py-1.5 rounded-lg border border-[var(--border-color)]">
+                                                        {item.batch_number || 'N/A'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-5 text-center">
+                                                    <div className="flex justify-center flex-col items-center">
+                                                        <button onClick={() => toggleRow(item)} className="text-indigo-400 hover:text-indigo-300 font-bold text-xs flex items-center gap-1">
+                                                            <ScrollText size={14} /> RO'YXAT
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-5 text-right">
+                                                    <div className="font-black text-indigo-400 text-lg">{item.quantity}</div>
+                                                </td>
+                                                <td className="px-6 py-5 font-bold text-[var(--text-secondary)] text-xs uppercase">{item.source || '-'}</td>
+                                                <td className="px-6 py-5">
+                                                    <div className="flex items-center justify-center gap-2">
+                                                        <button onClick={() => {
+                                                            setSelectedItem(item);
+                                                            toggleRow(item);
+                                                        }} className="p-2 text-[var(--text-secondary)] hover:text-indigo-400 transition-colors"><QrCode size={16} /></button>
+                                                        <button onClick={() => {
+                                                            setSelectedItem(item);
+                                                            fetchHistory(item.id);
+                                                            setShowHistoryModal(true);
+                                                        }} className="p-2 text-[var(--text-secondary)] hover:text-sky-400 transition-colors"><History size={16} /></button>
+                                                        <button onClick={() => handleEdit(item)} className="p-2 text-[var(--text-secondary)] hover:text-amber-400 transition-colors"><Edit size={16} /></button>
+                                                        <button onClick={() => handleDelete(item)} className="p-2 text-[var(--text-secondary)] hover:text-rose-400 transition-colors"><Trash2 size={16} /></button>
+                                                        <button
+                                                            onClick={() => toggleRow(item)}
+                                                            className={`p-2 rounded-xl border border-[var(--border-color)] transition-all ${isExpanded ? 'bg-indigo-600 text-white border-indigo-600' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-body)]'}`}
+                                                        >
+                                                            {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                                        </button>
+                                                    </div>
+                                                </td>
                                             </tr>
-                                        )}
-                                    </React.Fragment>
-                                );
-                            })}
-                        </tbody>
-                    </table>
+
+                                            {/* EXPANDED ROW */}
+                                            {isExpanded && (
+                                                <tr className="bg-[var(--bg-body)]/50 transition-all">
+                                                    <td colSpan="9" className="p-6 border-b border-[var(--border-color)]">
+                                                        <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] overflow-hidden">
+                                                            <div className="px-6 py-4 border-b border-[var(--border-color)] flex justify-between items-center bg-[var(--bg-body)]">
+                                                                <div className="flex items-center gap-3">
+                                                                    <ScrollText size={18} className="text-indigo-400" />
+                                                                    <h4 className="font-bold text-sm text-[var(--text-primary)]">Rulonlar Ro'yxati</h4>
+                                                                    {selectedRollIds.length > 0 && (
+                                                                        <button
+                                                                            onClick={() => {
+                                                                                const selectedRolls = itemRolls.filter(r => selectedRollIds.includes(r.id));
+                                                                                handleBulkChiqim(item, selectedRolls);
+                                                                            }}
+                                                                            className="ml-4 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-lg text-xs font-bold transition-colors animate-in fade-in zoom-in"
+                                                                        >
+                                                                            Tanlanganlarni Chiqim Qilish ({selectedRollIds.length})
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+                                                                <span className="text-xs text-[var(--text-secondary)] font-bold">Jami: {itemRolls.length} ta rulon</span>
+                                                            </div>
+
+                                                            <table className="w-full text-left text-sm">
+                                                                <thead className="text-[10px] uppercase text-[var(--text-secondary)] font-bold border-b border-[var(--border-color)] bg-[var(--bg-card)]">
+                                                                    <tr>
+                                                                        <th className="px-6 py-3 w-10">
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                                                                                checked={itemRolls.filter(r => r.status !== 'used').length > 0 && itemRolls.filter(r => r.status !== 'used').every(r => selectedRollIds.includes(r.id))}
+                                                                                onChange={(e) => {
+                                                                                    if (e.target.checked) {
+                                                                                        const allIds = itemRolls.filter(r => r.status !== 'used').map(r => r.id);
+                                                                                        setSelectedRollIds(allIds);
+                                                                                    } else {
+                                                                                        setSelectedRollIds([]);
+                                                                                    }
+                                                                                }}
+                                                                            />
+                                                                        </th>
+                                                                        <th className="px-6 py-3">ID Raqam</th>
+                                                                        <th className="px-6 py-3 text-right">Og'irlik (Kg)</th>
+                                                                        <th className="px-6 py-3 text-center">Holati</th>
+                                                                        <th className="px-6 py-3 text-right">QR Kod</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody className="divide-y divide-[var(--border-color)]">
+                                                                    {loading ? (
+                                                                        <tr><td colSpan="4" className="p-8 text-center text-[var(--text-secondary)]">Yuklanmoqda...</td></tr>
+                                                                    ) : itemRolls.length === 0 ? (
+                                                                        <tr><td colSpan="4" className="p-8 text-center text-[var(--text-secondary)]">Poylar mavjud emas</td></tr>
+                                                                    ) : (
+                                                                        itemRolls.map(roll => (
+                                                                            <tr key={roll.id} className="hover:bg-[var(--bg-card-hover)]">
+                                                                                <td className="px-6 py-3 w-10">
+                                                                                    {roll.status !== 'used' && (
+                                                                                        <input
+                                                                                            type="checkbox"
+                                                                                            checked={selectedRollIds.includes(roll.id)}
+                                                                                            onChange={() => toggleRollSelection(roll.id)}
+                                                                                            className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                                                                                        />
+                                                                                    )}
+                                                                                </td>
+                                                                                <td className="px-6 py-3 font-mono font-bold text-[var(--text-primary)]">{roll.roll_number}</td>
+                                                                                <td className="px-6 py-3 text-right font-medium">{roll.weight}</td>
+                                                                                <td className="px-6 py-3 text-center">
+                                                                                    <div className="flex items-center justify-center gap-3">
+                                                                                        <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${roll.status === 'used'
+                                                                                            ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
+                                                                                            : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                                                                                            }`}>
+                                                                                            {roll.status === 'used' ? 'Ishlatilgan' : 'Omborda'}
+                                                                                        </span>
+                                                                                        {roll.status !== 'used' && (
+                                                                                            <button
+                                                                                                onClick={() => {
+                                                                                                    setOutboundData({
+                                                                                                        inventory_id: item.id,
+                                                                                                        quantity: roll.weight, // Preset weight
+                                                                                                        inventory_name: item.item_name,
+                                                                                                        selected_rolls: [roll],
+                                                                                                        reason: 'Kesimga'
+                                                                                                    });
+                                                                                                    setShowOutboundModal(true);
+                                                                                                }}
+                                                                                                className="flex items-center gap-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 px-2 py-1 rounded border border-amber-500/20 text-[10px] font-bold uppercase transition-colors"
+                                                                                            >
+                                                                                                <ArrowUpRight size={10} /> Chiqim
+                                                                                            </button>
+                                                                                        )}
+                                                                                    </div>
+                                                                                </td>
+                                                                                <td className="px-6 py-3 text-right">
+                                                                                    <button onClick={() => handlePrintQR(roll, item)} className="text-[var(--text-secondary)] hover:text-indigo-400 transition-colors"><QrCode size={16} /></button>
+                                                                                </td>
+                                                                            </tr>
+                                                                        ))
+                                                                    )}
+                                                                </tbody>
+                                                            </table>
+
+                                                            <div className="p-4 border-t border-[var(--border-color)] bg-[var(--bg-body)] flex justify-end">
+                                                                <button
+                                                                    onClick={() => handlePrintAllRolls(item, itemRolls)}
+                                                                    className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg shadow-indigo-600/20 transition-all"
+                                                                >
+                                                                    <Printer size={16} /> Barcha Rulonlarni Chop Etish
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </React.Fragment>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             )}
 
-            {/* Placeholder for fetchInventory function modification */}
-            {/* This section assumes fetchInventory is defined elsewhere and this is an insertion into it */}
-            {/* The actual fetchInventory function would look something like this: */}
-            {/*
-            const fetchInventory = async () => {
-                try {
-                    let query = supabase
-                        .from('inventory')
-                        .select(`
-                            *,
-                            material_types (
-                                name,
-                                thread_type,
-                                grammage,
-                                width
-                            )
-                        `);
 
-                    // ... filters ...
-
-                    const { data, error } = await query.order('created_at', { ascending: false });
-
-                    if (error) throw error;
-
-                    // WORKAROUND: Fetch latest logs to find 'Source' if column is null
-                    // This is needed because we are temporarily saving source in logs due to missing DB column.
-                    const inventoryIds = data.map(i => i.id);
-                    if (inventoryIds.length > 0) {
-                        const { data: logs } = await supabase
-                            .from('inventory_logs')
-                            .select('inventory_id, reason')
-                            .in('inventory_id', inventoryIds)
-                            .order('created_at', { ascending: false });
-
-                        // Merge source from logs into inventory items
-                        if (logs) {
-                            data.forEach(item => {
-                                if (!item.source) {
-                                    // Find log for this item that contains "Updated ["
-                                    const log = logs.find(l => l.inventory_id === item.id && l.reason && l.reason.includes('Updated ['));
-                                    if (log) {
-                                        // Extract source from "Updated [SOURCE] | ..."
-                                        const match = log.reason.match(/Updated \[(.*?)\]/);
-                                        if (match && match[1]) {
-                                            item.source = match[1];
-                                        }
-                                    }
-                                    // Also check initial log format if needed "E'ZONUR | ..."
-                                    if (!item.source) {
-                                        const initialLog = logs.find(l => l.inventory_id === item.id && l.reason && l.reason.includes('|'));
-                                        if (initialLog) {
-                                             const parts = initialLog.reason.split('|');
-            
-            // WORKAROUND: Extract Source from Logs if missing in column
-            const inventoryIds = data.map(i => i.id);
-            if (inventoryIds.length > 0) {
-                 const { data: logs } = await supabase
-                    .from('inventory_logs')
-                    .select('inventory_id, reason')
-                    .in('inventory_id', inventoryIds)
-                    .order('created_at', { ascending: false }); // Latest first
-
-                 if (logs) {
-                    data.forEach(item => {
-                        if (!item.source) {
-                            // 1. Look for 'Correction' log with "Updated [SOURCE]"
-                            const updateLog = logs.find(l => l.inventory_id === item.id && l.reason && l.reason.includes('Updated ['));
-                            if (updateLog) {
-                                const match = updateLog.reason.match(/Updated \[(.*?)\]/);
-                                if (match && match[1]) item.source = match[1];
-                            }
-                            // 2. Look for Initial Log with "SOURCE |"
-                            if (!item.source) {
-                                const initialLog = logs.find(l => l.inventory_id === item.id && l.reason && l.reason.includes('|'));
-                                if (initialLog) {
-                                     const parts = initialLog.reason.split('|');
-                                     if (parts.length > 0) item.source = parts[0].trim();
-                                }
-                            }
-                        }
-                    });
-                 }
-            }
-
-            setInventory(data || []);
-            setFilteredInventory(data || []);
-                } catch (error) {
-                    console.error("Error fetching inventory:", error);
-                } finally {
-                    // setLoading(false);
-                }
-            };
-            */}
 
             {/* INBOUND MODAL (Redesigned) */}
             {showInboundModal && (
