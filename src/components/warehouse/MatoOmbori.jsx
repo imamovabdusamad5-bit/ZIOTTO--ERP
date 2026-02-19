@@ -52,6 +52,41 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
         }
     };
 
+    const toggleRow = async (item) => {
+        if (expandedRowId === item.id) {
+            setExpandedRowId(null);
+            setItemRolls([]);
+        } else {
+            setExpandedRowId(item.id);
+            setSelectedItem(item);
+            setLoading(true);
+            try {
+                const { data, error } = await supabase
+                    .from('inventory_rolls')
+                    .select('*')
+                    .eq('inventory_id', item.id);
+
+                if (error) throw error;
+
+                // Sort numerically
+                const sorted = (data || []).sort((a, b) => {
+                    const getNum = s => parseInt((s.roll_number || '').split('-').pop()) || 0;
+                    return getNum(a) - getNum(b);
+                });
+                setItemRolls(sorted);
+            } catch (e) {
+                console.error(e);
+                setItemRolls([]);
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+
+    const handlePrintQR = (roll, item) => {
+        alert(`QR Kod chop etish: ${roll.roll_number} (${item.item_name})`);
+    };
+
     useEffect(() => {
         if (subTab === 'chiqim') {
             const fetchOutbound = async () => {
@@ -1123,7 +1158,10 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                         type="checkbox"
                                         className="w-5 h-5 rounded-lg bg-[var(--input-bg)] border-[var(--border-color)] checked:bg-indigo-600 focus:ring-indigo-500 cursor-pointer transition-all"
                                         checked={selectedIds.length === filteredInventory.length && filteredInventory.length > 0}
-                                        onChange={handleSelectAll}
+                                        onChange={(e) => {
+                                            if (e.target.checked) setSelectedIds(filteredInventory.map(i => i.id));
+                                            else setSelectedIds([]);
+                                        }}
                                     />
                                 </th>
                                 <th className="px-6 py-5">Sana / ID</th>
@@ -1159,7 +1197,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                     type="checkbox"
                                                     className="w-5 h-5 rounded-lg bg-[var(--input-bg)] border-[var(--border-color)] checked:bg-indigo-600 focus:ring-indigo-500 cursor-pointer transition-all"
                                                     checked={isSelected}
-                                                    onChange={() => handleSelectRow(item.id)}
+                                                    onChange={() => setSelectedIds(prev => prev.includes(item.id) ? prev.filter(id => id !== item.id) : [...prev, item.id])}
                                                 />
                                             </td>
                                             <td className="px-6 py-5">
