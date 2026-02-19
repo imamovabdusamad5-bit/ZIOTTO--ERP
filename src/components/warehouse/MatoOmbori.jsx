@@ -1070,7 +1070,14 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                     const m = reason.match(new RegExp(`\\[${k}: (.*?)\\]`));
                                     return m ? m[1] : '-';
                                 };
-                                const model = extract('Model');
+                                const extractedModel = extract('Model');
+                                let model = extractedModel;
+                                // Try to resolve Model Name if it looks like an Order Number
+                                const matchedOrder = (orders || []).find(o => o.order_number === model || o.model_name === model);
+                                if (matchedOrder) {
+                                    model = matchedOrder.models?.name || matchedOrder.model_name || model;
+                                }
+
                                 const part = extract('Qism');
                                 const age = extract('Yosh');
                                 const cutter = extract('Bichuvchi');
@@ -2055,21 +2062,25 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                         </div>
 
                         <div className="p-6 flex-1 overflow-y-auto">
-                            <div className="w-full rounded-2xl overflow-hidden border-2 border-dashed border-indigo-500/30 bg-[var(--bg-body)] min-h-[250px] flex flex-col items-center justify-center p-6 text-center">
-                                <QrCode size={48} className="text-indigo-500/50 mb-4" />
-                                <p className="text-[var(--text-primary)] font-bold">Kamerada nosozlik</p>
-                                <p className="text-xs text-[var(--text-secondary)] mb-4">Brauzerda kamera ochilmadi. ID raqamni qo'lda kiriting:</p>
-                                <input
-                                    type="text"
-                                    placeholder="ID Scan..."
-                                    className="bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm w-full text-center font-mono font-bold"
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
-                                            handleScanSuccess(e.target.value);
-                                            e.target.value = '';
-                                        }
-                                    }}
-                                />
+                            <div className="w-full rounded-2xl overflow-hidden border-2 border-dashed border-indigo-500/30 bg-[var(--bg-body)] min-h-[250px] p-6 text-center">
+                                {/* SCANNER UI - THIS DIV IS REQUIRED FOR CAMERA */}
+                                <div id="reader" className="w-full min-h-[200px]"></div>
+
+                                {/* MANUAL INPUT FALLBACK */}
+                                <div className="mt-4 pt-4 border-t border-[var(--border-color)]">
+                                    <p className="text-xs text-[var(--text-secondary)] mb-2 font-bold uppercase tracking-widest">Yoki ID raqam</p>
+                                    <input
+                                        type="text"
+                                        placeholder="Scan ID..."
+                                        className="bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm w-full text-center font-mono font-bold outline-none focus:border-indigo-500 transition-colors"
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                handleScanSuccess(e.target.value);
+                                                e.target.value = '';
+                                            }
+                                        }}
+                                    />
+                                </div>
                             </div>
 
                             <div className="mt-6">
