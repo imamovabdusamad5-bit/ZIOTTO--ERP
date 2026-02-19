@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 import {
-    ArrowUpRight, ArrowDownLeft, ScrollText, QrCode, Printer, Trash2, CircleCheck, RotateCcw, ChevronDown, ChevronUp, Edit, X, Search, Plus
+    ArrowUpRight, ArrowDownLeft, ScrollText, QrCode, Printer, Trash2, CircleCheck, RotateCcw, ChevronDown, ChevronUp, Edit, X, Search, Plus, History
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
@@ -23,69 +23,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
 
     // Missing States Restored
     const [selectedIds, setSelectedIds] = useState([]);
-    const [outboundData, setOutboundData] = useState({
-        quantity: '',
-        reason: '',
-        inventory_id: null,
-        inventory_name: '',
-        selected_rolls: []
-    });
 
-    const handleBulkDelete = async () => {
-        if (!window.confirm(`Haqiqatan ham ${selectedIds.length} ta elementni o'chirmoqchimisiz?`)) return;
-
-        setLoading(true);
-        try {
-            await supabase.from('material_requests').delete().in('inventory_id', selectedIds);
-            await supabase.from('inventory_logs').delete().in('inventory_id', selectedIds);
-            await supabase.from('inventory_rolls').delete().in('inventory_id', selectedIds);
-            const { error } = await supabase.from('inventory').delete().in('id', selectedIds);
-
-            if (error) throw error;
-
-            setSelectedIds([]);
-            onRefresh();
-        } catch (e) {
-            alert('Xatolik: ' + e.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const toggleRow = async (item) => {
-        if (expandedRowId === item.id) {
-            setExpandedRowId(null);
-            setItemRolls([]);
-        } else {
-            setExpandedRowId(item.id);
-            setSelectedItem(item);
-            setLoading(true);
-            try {
-                const { data, error } = await supabase
-                    .from('inventory_rolls')
-                    .select('*')
-                    .eq('inventory_id', item.id);
-
-                if (error) throw error;
-
-                // Sort numerically
-                const sorted = (data || []).sort((a, b) => {
-                    const getNum = s => parseInt((s.roll_number || '').split('-').pop()) || 0;
-                    return getNum(a) - getNum(b);
-                });
-                setItemRolls(sorted);
-            } catch (e) {
-                console.error(e);
-                setItemRolls([]);
-            } finally {
-                setLoading(false);
-            }
-        }
-    };
-
-    const handlePrintQR = (roll, item) => {
-        alert(`QR Kod chop etish: ${roll.roll_number} (${item.item_name})`);
-    };
 
     useEffect(() => {
         if (subTab === 'chiqim') {
