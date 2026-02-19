@@ -25,31 +25,32 @@ import {
 
 const menuItems = [
     { path: '/', name: 'Boshqaruv', icon: LayoutDashboard, roles: ['admin'] },
-    { path: '/modelxona', name: 'Modelxona', icon: FileText, roles: ['admin', 'planning'] },
-    { path: '/reja', name: 'Planlama (BOM)', icon: ClipboardList, roles: ['admin', 'planning'] },
-    { path: '/taminot', name: 'Ta\'minot', icon: Truck, roles: ['admin', 'planning', 'supply'] },
+    { path: '/modelxona', name: 'Modelxona', icon: FileText, roles: ['admin', 'planning'], permKey: 'planning' }, // Modelxona often falls under planning or admin
+    { path: '/reja', name: 'Planlama (BOM)', icon: ClipboardList, roles: ['admin', 'planning'], permKey: 'planning' },
+    { path: '/taminot', name: 'Ta\'minot', icon: Truck, roles: ['admin', 'planning', 'supply'], permKey: 'supply' },
     { path: '/malumotlar', name: 'Ma\'lumotlar', icon: Settings, roles: ['admin'] },
     {
         path: '/ombor',
         name: 'Ombor',
         icon: Warehouse,
         roles: ['admin', 'planning', 'warehouse'],
+        permKey: 'warehouse',
         subItems: [
             { path: '/ombor?tab=Mato', name: 'Mato Ombori' },
             { path: '/ombor?tab=Aksessuar', name: 'Aksessuar Ombori' },
             { path: '/ombor?tab=Tayyor Mahsulot', name: 'Tayyor Mahsulot Ombori' },
         ]
     },
-    { path: '/kesim', name: 'Kesim', icon: Scissors, roles: ['admin', 'planning', 'cutting'] },
-    { path: '/tasnif', name: 'Tasnif', icon: Layers, roles: ['admin', 'sorting'] },
-    { path: '/pechat', name: 'Pechat & Naqsh', icon: Printer, roles: ['admin', 'printing'] },
-    { path: '/vishefka', name: 'Vishefka', icon: Scissors, roles: ['admin', 'printing'] }, // Use Scissors as placeholder or Activity
-    { path: '/tikuv', name: 'Tikuv', icon: Shirt, roles: ['admin', 'sewing'] },
-    { path: '/otk', name: 'OTK (Sifat)', icon: CircleCheck, roles: ['admin', 'otk'] },
-    { path: '/dazmol', name: 'Dazmol & Qadoq', icon: Package, roles: ['admin', 'ironing'] },
-    { path: '/hr', name: 'HR (Kadrlar)', icon: Users, roles: ['admin', 'planning', 'director', 'hr_manager', 'tikuv', 'bichuv'] },
-    { path: '/xodimlar', name: 'Xodimlar & Huquqlar', icon: ShieldCheck, roles: ['admin', 'planning'] },
-    { path: '/moliya', name: 'Moliya & Tannarx', icon: Banknote, roles: ['admin'] },
+    { path: '/kesim', name: 'Kesim', icon: Scissors, roles: ['admin', 'planning', 'cutting'], permKey: 'cutting' },
+    { path: '/tasnif', name: 'Tasnif', icon: Layers, roles: ['admin', 'sorting'], permKey: 'sorting' },
+    { path: '/pechat', name: 'Pechat & Naqsh', icon: Printer, roles: ['admin', 'printing'], permKey: 'printing' },
+    { path: '/vishefka', name: 'Vishefka', icon: Scissors, roles: ['admin', 'printing'], permKey: 'printing' },
+    { path: '/tikuv', name: 'Tikuv', icon: Shirt, roles: ['admin', 'sewing'], permKey: 'sewing' },
+    { path: '/otk', name: 'OTK (Sifat)', icon: CircleCheck, roles: ['admin', 'otk'], permKey: 'otk' },
+    { path: '/dazmol', name: 'Dazmol & Qadoq', icon: Package, roles: ['admin', 'ironing'], permKey: 'ironing' },
+    { path: '/hr', name: 'HR (Kadrlar)', icon: Users, roles: ['admin', 'planning', 'director', 'hr_manager', 'tikuv', 'bichuv'], permKey: 'hr' }, // hr might need to be added to Xodimlar if missing
+    { path: '/xodimlar', name: 'Xodimlar & Huquqlar', icon: ShieldCheck, roles: ['admin', 'planning'], permKey: 'admin' }, // Restricted usually
+    { path: '/moliya', name: 'Moliya & Tannarx', icon: Banknote, roles: ['admin'], permKey: 'finance' },
 ];
 
 const Sidebar = ({ isOpen, onClose }) => {
@@ -64,17 +65,17 @@ const Sidebar = ({ isOpen, onClose }) => {
         if (!profile) return false;
         if (profile.role === 'admin') return true;
 
-        // Extract base path for permission naming
-        const basePath = item.path.split('?')[0].replace('/', '');
+        // Extract permission key: prefer explicit permKey, else fallback to path
+        const permKey = item.permKey || item.path.split('?')[0].replace('/', '');
 
         // Special case for dashboard
         if (item.path === '/') return true;
 
         // Check granular permissions (any permission: 'read' or 'full')
         // Safe check for permissions object presence
-        if (profile.permissions && profile.permissions[basePath]) return true;
+        if (profile.permissions && profile.permissions[permKey]) return true;
 
-        // Fallback to role-based access
+        // Fallback to role-based access (for legacy standard roles)
         return item.roles?.includes(profile.role);
     });
 
