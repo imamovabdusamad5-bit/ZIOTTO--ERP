@@ -21,6 +21,37 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
         cutter: 'Mastura' // Default as requested
     });
 
+    // Missing States Restored
+    const [selectedIds, setSelectedIds] = useState([]);
+    const [outboundData, setOutboundData] = useState({
+        quantity: '',
+        reason: '',
+        inventory_id: null,
+        inventory_name: '',
+        selected_rolls: []
+    });
+
+    const handleBulkDelete = async () => {
+        if (!window.confirm(`Haqiqatan ham ${selectedIds.length} ta elementni o'chirmoqchimisiz?`)) return;
+
+        setLoading(true);
+        try {
+            await supabase.from('material_requests').delete().in('inventory_id', selectedIds);
+            await supabase.from('inventory_logs').delete().in('inventory_id', selectedIds);
+            await supabase.from('inventory_rolls').delete().in('inventory_id', selectedIds);
+            const { error } = await supabase.from('inventory').delete().in('id', selectedIds);
+
+            if (error) throw error;
+
+            setSelectedIds([]);
+            onRefresh();
+        } catch (e) {
+            alert('Xatolik: ' + e.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
         if (subTab === 'chiqim') {
             const fetchOutbound = async () => {
