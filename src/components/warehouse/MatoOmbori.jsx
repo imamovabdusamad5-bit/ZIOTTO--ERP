@@ -604,34 +604,48 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
 
             if (!logsError && logsData) {
                 const newSourceMap = {};
-                rollsData.forEach(roll => {
-                    const rollTime = new Date(roll.created_at).getTime();
+                // Strategy: Sequence Matching (Weight Accumulation)
+                // This correctly maps rolls to logs even if timestamps are identical or missing.
+                const inLogs = logsData.filter(l =>
+                    (l.type === 'In') ||
+                    (l.type === 'Correction' && l.quantity > 0)
+                ).sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
-                    // Find closest log by time difference
-                    let bestLog = null;
-                    let minDiff = 60000; // 60s threshold
+                // Sort rolls by ID (Insertion Order preserves physical order)
+                const sortedRollsById = [...rollsData].sort((a, b) => a.id - b.id);
 
-                    logsData.forEach(log => {
-                        const logTime = new Date(log.created_at).getTime();
-                        const diff = Math.abs(logTime - rollTime);
-                        if (diff < minDiff && (log.type === 'In' || log.type === 'Correction')) {
-                            minDiff = diff;
-                            bestLog = log;
+                let rollIndex = 0;
+
+                inLogs.forEach(log => {
+                    const logQty = Number(log.quantity);
+                    let currentQty = 0;
+
+                    // Parse Source from Log
+                    let source = "E'ZONUR";
+                    if (log.reason) {
+                        const upper = log.reason.toUpperCase();
+                        if (upper.includes("KESIM")) source = "KESIM";
+                        else if (upper.includes("FABRIKA")) source = "FABRIKA";
+                        else if (upper.includes("E'ZONUR")) source = "E'ZONUR";
+                        else {
+                            const parts = log.reason.split('|');
+                            if (parts.length > 0) source = parts[0].trim().toUpperCase();
                         }
-                    });
+                    }
 
-                    if (bestLog && bestLog.reason) {
-                        const reasonUpper = bestLog.reason.toUpperCase();
-                        if (reasonUpper.includes('KESIM')) {
-                            newSourceMap[roll.id] = "KESIM";
-                        } else if (reasonUpper.includes("E'ZONUR")) {
-                            newSourceMap[roll.id] = "E'ZONUR";
-                        } else if (reasonUpper.includes("FABRIKA")) {
-                            newSourceMap[roll.id] = "FABRIKA";
-                        } else {
-                            const parts = bestLog.reason.split('|');
-                            if (parts.length > 0) newSourceMap[roll.id] = parts[0].trim().toUpperCase();
-                        }
+                    while (rollIndex < sortedRollsById.length) {
+                        const roll = sortedRollsById[rollIndex];
+                        const rWeight = Number(roll.weight);
+
+                        // If adding this roll exceeds log quantity significantly, it belongs to next log
+                        if (currentQty + rWeight > logQty + 1.0) break;
+
+                        newSourceMap[roll.id] = source;
+                        currentQty += rWeight;
+                        rollIndex++;
+
+                        // If filled log quota, stop
+                        if (Math.abs(currentQty - logQty) < 1.0) break;
                     }
                 });
                 setRollSourceMap(prev => ({ ...prev, ...newSourceMap }));
