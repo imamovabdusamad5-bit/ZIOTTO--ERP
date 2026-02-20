@@ -70,7 +70,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                 setLoading(true);
                 const { data, error } = await supabase
                     .from('inventory_logs')
-                    .select('*')
+                    .select('*, inventory(*)')
                     .eq('type', 'Out')
                     .order('created_at', { ascending: false });
 
@@ -96,10 +96,17 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
     }).filter(i => (i.category || '').toLowerCase().includes('aksessuar'));
 
     const filteredOutboundLogs = outboundLogs.filter(log => {
-        if (!searchTerm) return true;
-        const lowSearch = searchTerm.toLowerCase();
         const propItem = (inventory || []).find(i => i.id === log.inventory_id);
         const item = propItem || log.inventory || {};
+
+        // Filter out non-accessory items
+        if (!(item.category || '').toLowerCase().includes('aksessuar')) {
+            return false;
+        }
+
+        if (!searchTerm) return true;
+
+        const lowSearch = searchTerm.toLowerCase();
         const reason = log.reason || '';
 
         return (
@@ -451,7 +458,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                 onClick={() => {
                                     setLoading(true);
                                     const fetchOutbound = async () => {
-                                        const { data } = await supabase.from('inventory_logs').select('*').eq('type', 'Out').order('created_at', { ascending: false });
+                                        const { data } = await supabase.from('inventory_logs').select('*, inventory(*)').eq('type', 'Out').order('created_at', { ascending: false });
                                         setOutboundLogs(data || []);
                                         setLoading(false);
                                     };
