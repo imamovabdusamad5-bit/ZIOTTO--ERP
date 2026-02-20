@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import {
     Package, Search, Plus, History, CircleArrowDown,
-    ArrowUpRight, Trash2, X, ArrowDownLeft, RotateCcw, Edit
+    ArrowUpRight, Trash2, X, ArrowDownLeft, RotateCcw, Edit,
+    QrCode, Printer, ChevronDown, ChevronUp
 } from 'lucide-react';
+import { Html5QrcodeScanner } from 'html5-qrcode';
+import { QRCodeSVG } from 'qrcode.react';
 import { supabase } from '../../lib/supabase';
 
 const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
@@ -10,6 +13,89 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
     const [showInboundModal, setShowInboundModal] = useState(false);
     const [showOutboundModal, setShowOutboundModal] = useState(false);
     const [loading, setLoading] = useState(false);
+
+    // Grouping & Scanner
+    const [expandedGroups, setExpandedGroups] = useState({});
+    const [showScanner, setShowScanner] = useState(false);
+
+    useEffect(() => {
+        let scanner = null;
+        if (showScanner) {
+            try {
+                const element = document.getElementById('reader');
+                if (element) {
+                    scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 250 } }, false);
+                    scanner.render((decodedText) => {
+                        const code = decodedText.trim();
+                        // Possible codes: 'AKS-uuid', 'UUID', 'ReferenceCode'
+                        const item = inventory.find(i =>
+                            i.id === code ||
+                            `AKS-${i.id}` === code ||
+                            Object.values(references || {}).some(r => r.code === code && r.id === i.reference_id)
+                        );
+                        if (item) {
+                            setOutboundData(prev => ({ ...prev, inventory_id: item.id }));
+                            setShowOutboundModal(true);
+                            scanner.clear();
+                            setShowScanner(false);
+                        } else {
+                            alert("Bunday Aksessuar (ID yoki Kod) topilmadi: " + code);
+                            scanner.clear();
+                            setShowScanner(false);
+                        }
+                    }, (error) => { });
+                }
+            } catch (e) { console.error('Scanner init error:', e); }
+        }
+        return () => { if (scanner) scanner.clear().catch(e => console.error(e)); };
+    }, [showScanner, inventory, references]);
+
+    const toggleGroup = (name) => {
+        setExpandedGroups(prev => ({ ...prev, [name]: !prev[name] }));
+    };
+
+    const handlePrintQR = (item, codeText) => {
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) return alert("Brauzerda yangi oyna ochishga ruxsat bering!");
+
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>Aksessuar QR - ${codeText}</title>
+                    <style>
+                        body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: sans-serif; background: #fff; }
+                        .qr-card { text-align: center; border: 2px solid #000; padding: 20px; border-radius: 12px; }
+                        .title { font-weight: 900; font-size: 24px; margin-bottom: 5px; text-transform: uppercase; }
+                        .code { font-size: 14px; color: #555; margin-top: 10px; opacity: 0.8; }
+                        canvas { margin: 10px auto; display: block; }
+                    </style>
+                </head>
+                <body>
+                    <div class="qr-card">
+                        <div class="title">${item.item_name}</div>
+                        <div id="qr-container"></div>
+                        <div class="code">${codeText}</div>
+                    </div>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+                    <script>
+                        new QRCode(document.getElementById("qr-container"), {
+                            text: "${codeText}",
+                            width: 200,
+                            height: 200,
+                            colorDark : "#000000",
+                            colorLight : "#ffffff",
+                            correctLevel : QRCode.CorrectLevel.H
+                        });
+                        setTimeout(() => {
+                            window.print();
+                            window.close();
+                        }, 500);
+                    </script>
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
+    };
 
     // New States from MatoOmbori
     const [subTab, setSubTab] = useState('kirim'); // 'kirim' | 'chiqim'
@@ -516,13 +602,36 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                         )}
                         <button className="px-6 py-4 rounded-2xl border border-[var(--border-color)] text-[var(--text-secondary)] font-bold hover:bg-[var(--bg-card-hover)] transition-all">Filtrlar</button>
                         {subTab === 'kirim' && (
-                            <button
-                                onClick={() => setShowInboundModal(true)}
-                                className="flex items-center gap-2 bg-purple-600 text-white px-8 py-4 rounded-[2rem] hover:bg-purple-500 transition-all shadow-xl shadow-purple-600/20 font-black uppercase text-xs tracking-widest border border-purple-400/20 whitespace-nowrap"
-                            >
-                                <Plus size={18} /> Yangi Kirim
-                            </button>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => setShowScanner(true)}
+                                    className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-[2rem] hover:shadow-[0_0_20px_rgba(79,70,229,0.5)] transition-all font-black uppercase text-xs tracking-widest border border-indigo-400/20 whitespace-nowrap"
+                                >
+                                    <QrCode size={18} /> QR Chiqim
+                                </button>
+                                <button
+                                    onClick={() => setShowInboundModal(true)}
+                                    className="flex items-center gap-2 bg-purple-600 text-white px-8 py-4 rounded-[2rem] hover:bg-purple-500 transition-all shadow-xl shadow-purple-600/20 font-black uppercase text-xs tracking-widest border border-purple-400/20 whitespace-nowrap"
+                                >
+                                    <Plus size={18} /> Yangi Kirim
+                                </button>
+                            </div>
                         )}
+                    </div>
+                </div>
+            )}
+
+            {showScanner && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-[var(--bg-card)] max-w-lg w-full rounded-[2.5rem] p-8 shadow-2xl border border-[var(--border-color)]">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-xl font-black text-[var(--text-primary)] flex items-center gap-3"><QrCode className="text-purple-400" /> QR Skaner</h3>
+                            <button onClick={() => setShowScanner(false)} className="p-2 text-[var(--text-secondary)] hover:text-white hover:bg-white/10 rounded-full transition-all">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div id="reader" className="w-full bg-[var(--input-bg)] rounded-2xl overflow-hidden border border-purple-500/20 shadow-inner"></div>
+                        <p className="text-center text-xs text-purple-400 font-bold mt-4 animate-pulse">Kamerani QR kodga qarating...</p>
                     </div>
                 </div>
             )}
@@ -628,64 +737,86 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-[var(--border-color)]">
-                                {filteredInventory.map(item => {
-                                    const isSelected = selectedIds.includes(item.id);
-                                    const dateDisplay = item.created_at
-                                        ? new Date(item.created_at).toLocaleDateString('ru-RU')
-                                        : (item.last_updated ? new Date(item.last_updated).toLocaleDateString('ru-RU') : '-');
-
-                                    const refItem = references?.find(r => r.id === item.reference_id) || {};
-                                    const codeToDisplay = refItem.code || `AKS-${item.id}`;
-
-                                    return (
-                                        <tr key={item.id} className={`hover:bg-[var(--bg-card-hover)] transition-colors group ${isSelected ? 'bg-purple-500/5' : ''}`}>
+                                {Object.values(filteredInventory.reduce((acc, item) => {
+                                    const key = item.item_name || "Noma'lum";
+                                    if (!acc[key]) acc[key] = { name: key, items: [], total: 0, unit: item.unit };
+                                    acc[key].items.push(item);
+                                    acc[key].total += Number(item.quantity) || 0;
+                                    return acc;
+                                }, {})).map(group => (
+                                    <React.Fragment key={group.name}>
+                                        <tr onClick={() => toggleGroup(group.name)} className="cursor-pointer hover:bg-[var(--bg-card-hover)] transition-colors group bg-[var(--bg-body)] border-b-2 border-[var(--border-color)]">
                                             <td className="px-6 py-5 text-center">
-                                                <input
-                                                    type="checkbox"
-                                                    className="w-5 h-5 rounded-lg bg-[var(--input-bg)] border-[var(--border-color)] checked:bg-purple-600 focus:ring-purple-500 cursor-pointer transition-all"
-                                                    checked={isSelected}
-                                                    onChange={() => setSelectedIds(prev => prev.includes(item.id) ? prev.filter(id => id !== item.id) : [...prev, item.id])}
-                                                />
+                                                {expandedGroups[group.name] ? <ChevronUp size={20} className="text-purple-400 mx-auto" /> : <ChevronDown size={20} className="text-[var(--text-secondary)] mx-auto group-hover:text-purple-400 transition-colors" />}
                                             </td>
-                                            <td className="px-6 py-5 text-xs text-[var(--text-primary)] font-bold">{dateDisplay}</td>
-                                            <td className="px-6 py-5 font-black text-[var(--text-primary)] text-xs">{item.item_name}</td>
-                                            <td className="px-6 py-5 text-[10px] text-[var(--text-secondary)] font-mono uppercase" title={`Asl ID: AKS-${item.id}`}>{codeToDisplay}</td>
-                                            <td className="px-6 py-5 text-right font-black text-purple-400 text-sm">{Number(item.quantity).toFixed(2)}</td>
-                                            <td className="px-6 py-5 text-center text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest">{item.unit}</td>
-                                            <td className="px-6 py-5">
-                                                <div className="text-[10px] text-[var(--text-secondary)] flex flex-col gap-1">
-                                                    {(item.color || item.batch_number) ? (
-                                                        <>
-                                                            {item.color && <span><span className="font-bold opacity-70">Rangi:</span> {item.color}</span>}
-                                                            {item.batch_number && <span><span className="font-bold opacity-70">Partiya:</span> {item.batch_number}</span>}
-                                                        </>
-                                                    ) : (
-                                                        <span className="opacity-50 italic">-</span>
-                                                    )}
-                                                </div>
+                                            <td className="px-6 py-5 text-sm text-[var(--text-primary)] font-bold">
+                                                {group.items.length > 0 ? (group.items[0].created_at ? new Date(group.items[0].created_at).toLocaleDateString('ru-RU') : (group.items[0].last_updated ? new Date(group.items[0].last_updated).toLocaleDateString('ru-RU') : '-')) : '-'}
                                             </td>
-                                            <td className="px-6 py-5">
-                                                <div className="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <button onClick={() => {
-                                                        setOutboundData({
-                                                            inventory_id: item.id,
-                                                            quantity: '',
-                                                            reason: 'Ishlab chiqarishga'
-                                                        });
-                                                        setShowOutboundModal(true);
-                                                    }} className="p-2 text-[var(--text-secondary)] hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all" title="Chiqim"><ArrowUpRight size={16} /></button>
-                                                    <button onClick={() => {
-                                                        setSelectedItem(item);
-                                                        fetchHistory(item.id);
-                                                        setShowHistoryModal(true);
-                                                    }} className="p-2 text-[var(--text-secondary)] hover:text-sky-400 hover:bg-sky-500/10 rounded-xl transition-all" title="Tarix"><History size={16} /></button>
-                                                    <button onClick={() => handleEdit(item)} className="p-2 text-[var(--text-secondary)] hover:text-amber-400 hover:bg-amber-500/10 rounded-xl transition-all" title="Tahrir"><Edit size={16} /></button>
-                                                    <button onClick={() => handleDelete(item)} className="p-2 text-[var(--text-secondary)] hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all" title="O'chirish"><Trash2 size={16} /></button>
-                                                </div>
+                                            <td className="px-6 py-5 font-black text-white text-base tracking-wide flex items-center gap-2">
+                                                {group.name}
+                                                <span className="text-[10px] font-bold text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded-full border border-purple-500/30 shadow-[0_0_10px_rgba(168,85,247,0.2)]">{group.items.length} xil</span>
                                             </td>
+                                            <td className="px-6 py-5 text-sm text-[var(--text-secondary)] font-mono uppercase">-</td>
+                                            <td className="px-6 py-5 text-right font-black text-purple-400 text-lg">{group.total.toFixed(2)}</td>
+                                            <td className="px-6 py-5 text-center text-xs text-[var(--text-secondary)] font-bold uppercase tracking-widest">{group.unit}</td>
+                                            <td className="px-6 py-5 text-xs text-[var(--text-secondary)] italic opacity-50">Jamlangan ko'rinish</td>
+                                            <td className="px-6 py-5 text-center text-xs text-[var(--text-secondary)] font-bold">UMUMIY JAMI</td>
                                         </tr>
-                                    );
-                                })}
+                                        {expandedGroups[group.name] && group.items.map(item => {
+                                            const isSelected = selectedIds.includes(item.id);
+                                            const dateDisplay = item.created_at
+                                                ? new Date(item.created_at).toLocaleDateString('ru-RU')
+                                                : (item.last_updated ? new Date(item.last_updated).toLocaleDateString('ru-RU') : '-');
+                                            const refItem = references?.find(r => r.id === item.reference_id) || {};
+                                            const codeToDisplay = refItem.code || `AKS-${item.id}`;
+
+                                            return (
+                                                <tr key={item.id} className={`hover:bg-[var(--bg-card-hover)] transition-colors group ${isSelected ? 'bg-purple-500/10' : ''}`}>
+                                                    <td className="px-6 py-4 text-center">
+                                                        <input
+                                                            type="checkbox"
+                                                            className="w-5 h-5 rounded-lg bg-[var(--input-bg)] border-[var(--border-color)] checked:bg-purple-600 focus:ring-purple-500 cursor-pointer transition-all"
+                                                            checked={isSelected}
+                                                            onChange={(e) => { e.stopPropagation(); setSelectedIds(prev => prev.includes(item.id) ? prev.filter(id => id !== item.id) : [...prev, item.id]); }}
+                                                        />
+                                                    </td>
+                                                    <td className="px-6 py-4 text-sm text-[var(--text-primary)] font-bold">{dateDisplay}</td>
+                                                    <td className="px-6 py-4 font-black text-[var(--text-secondary)] text-sm pl-12 flex items-center gap-2 opacity-70">
+                                                        <ArrowDownLeft size={14} className="opacity-50" /> {item.item_name}
+                                                    </td>
+                                                    <td className="px-6 py-4 text-xs text-purple-300 font-mono uppercase bg-purple-500/5 rounded-lg px-2" title={`Asl ID: AKS-${item.id}`}>{codeToDisplay}</td>
+                                                    <td className="px-6 py-4 text-right font-black text-white text-base">{Number(item.quantity).toFixed(2)}</td>
+                                                    <td className="px-6 py-4 text-center text-xs text-[var(--text-secondary)] font-bold uppercase tracking-widest">{item.unit}</td>
+                                                    <td className="px-6 py-4">
+                                                        <div className="text-xs text-[var(--text-secondary)] flex flex-col gap-1">
+                                                            {(item.color || item.batch_number) ? (
+                                                                <>
+                                                                    {item.color && <span><span className="font-bold opacity-70">Rangi:</span> {item.color}</span>}
+                                                                    {item.batch_number && <span><span className="font-bold opacity-70">Partiya:</span> {item.batch_number}</span>}
+                                                                </>
+                                                            ) : (
+                                                                <span className="opacity-50 italic">-</span>
+                                                            )}
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4">
+                                                        <div className="flex items-center justify-center gap-2 transition-opacity">
+                                                            <button onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setOutboundData({ inventory_id: item.id, quantity: '', reason: 'Ishlab chiqarishga' });
+                                                                setShowOutboundModal(true);
+                                                            }} className="p-2 text-[var(--text-secondary)] hover:text-green-400 hover:bg-green-500/10 rounded-xl transition-all border border-transparent hover:border-green-500/30" title="Chiqim"><ArrowUpRight size={18} /></button>
+                                                            <button onClick={(e) => { e.stopPropagation(); handlePrintQR(item, codeToDisplay); }} className="p-2 text-[var(--text-secondary)] hover:text-indigo-400 hover:bg-indigo-500/10 rounded-xl transition-all border border-transparent hover:border-indigo-500/30" title="QR Chop etish"><Printer size={18} /></button>
+                                                            <button onClick={(e) => { e.stopPropagation(); setSelectedItem(item); fetchHistory(item.id); setShowHistoryModal(true); }} className="p-2 text-[var(--text-secondary)] hover:text-sky-400 hover:bg-sky-500/10 rounded-xl transition-all border border-transparent hover:border-sky-500/30" title="Tarix"><History size={18} /></button>
+                                                            <button onClick={(e) => { e.stopPropagation(); handleEdit(item); }} className="p-2 text-[var(--text-secondary)] hover:text-amber-400 hover:bg-amber-500/10 rounded-xl transition-all border border-transparent hover:border-amber-500/30" title="Tahrir"><Edit size={18} /></button>
+                                                            <button onClick={(e) => { e.stopPropagation(); handleDelete(item); }} className="p-2 text-[var(--text-secondary)] hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all border border-transparent hover:border-rose-500/30" title="O'chirish"><Trash2 size={18} /></button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </React.Fragment>
+                                ))}
                             </tbody>
                         </table>
 
