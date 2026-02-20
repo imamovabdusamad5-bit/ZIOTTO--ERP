@@ -40,6 +40,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
         color: '',
         color_code: '',
         quantity: '',
+        quantities: {}, // Added for multi-size input
         unit: 'dona',
         batch_number: '',
         reason: 'Yangi aksessuar',
@@ -122,8 +123,6 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
         try {
             setLoading(true);
             const cleanName = inboundData.selected_material_name.trim();
-            const cleanColor = '';
-            const cleanBatch = '';
             const actionDate = inboundData.date ? new Date(inboundData.date).toISOString() : new Date().toISOString();
 
             if (!cleanName) {
@@ -131,64 +130,90 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                 setLoading(false);
                 return;
             }
-            if (!inboundData.quantity || Number(inboundData.quantity) <= 0) {
-                alert('Iltimos, to\'g\'ri miqdor kiriting!');
-                setLoading(false);
-                return;
+
+            const refGroup = references?.filter(r => r.name === cleanName && r.type === 'Aksessuar') || [];
+
+            let itemsToProcess = [];
+
+            if (refGroup.length > 0) {
+                // If we have references, we use the `quantities` map
+                for (const ref of refGroup) {
+                    const qty = Number(inboundData.quantities[ref.id] || 0);
+                    if (qty > 0) {
+                        itemsToProcess.push({
+                            refId: ref.id,
+                            qty: qty,
+                            unit: ref.unit || inboundData.unit,
+                            code: ref.code || ''
+                        });
+                    }
+                }
+            } else {
+                // Single item fallback
+                const qty = Number(inboundData.quantity || 0);
+                if (qty > 0) {
+                    itemsToProcess.push({
+                        refId: null,
+                        qty: qty,
+                        unit: inboundData.unit,
+                        code: ''
+                    });
+                }
             }
 
-            const ref = references.find(r => r.name === inboundData.selected_material_name);
-            const refId = ref ? ref.id : null;
-            const unit = inboundData.unit || (ref ? ref.unit : 'dona');
-
-            // Check existing
-            const { data: existing } = await supabase.from('inventory')
-                .select('*')
-                .eq('item_name', cleanName)
-                .eq('color', cleanColor)
-                .eq('batch_number', cleanBatch)
-                .filter('category', 'ilike', 'Aksessuar')
-                .maybeSingle();
-
-            let inventoryId;
-            if (existing) {
-                const { error: updateError } = await supabase.from('inventory').update({
-                    quantity: Number(existing.quantity || 0) + Number(inboundData.quantity),
-                    source: inboundData.source || existing.source,
-                    last_updated: new Date()
-                }).eq('id', existing.id);
-                if (updateError) throw updateError;
-                inventoryId = existing.id;
-            } else {
-                const { data: created, error } = await supabase.from('inventory').insert([{
-                    item_name: cleanName,
-                    category: 'Aksessuar',
-                    quantity: Number(inboundData.quantity),
-                    unit: unit,
-                    color: cleanColor,
-                    color_code: '',
-                    batch_number: cleanBatch,
-                    reference_id: refId,
-                    last_updated: new Date(),
-                    created_at: actionDate,
-                    source: inboundData.source
-                }]).select().single();
-                if (error) throw error;
-                inventoryId = created.id;
+            if (itemsToProcess.length === 0) {
+                alert('Iltimos, qabul qilinayotgan miqdorni kiriting!');
+                setLoading(false);
+                return;
             }
 
             const sourceStr = inboundData.source ? `${inboundData.source} | ` : '';
             const finalNote = `${sourceStr}${inboundData.note || inboundData.reason}`;
 
-            const { error: logError } = await supabase.from('inventory_logs').insert([{
-                inventory_id: inventoryId,
-                type: 'In',
-                quantity: Number(inboundData.quantity),
-                reason: finalNote,
-                batch_number: cleanBatch,
-                created_at: actionDate
-            }]);
-            if (logError) throw logError;
+            for (const item of itemsToProcess) {
+                // Check existing
+                const { data: existing } = await supabase.from('inventory')
+                    .select('*')
+                    .eq('item_name', cleanName)
+                    .eq('reference_id', item.refId) // Match exactly by reference if it exists
+                    .is('color', null) // Ensure we match simple accessory
+                    .is('batch_number', null)
+                    .filter('category', 'ilike', 'Aksessuar')
+                    .maybeSingle();
+
+                let inventoryId;
+                if (existing) {
+                    const { error: updateError } = await supabase.from('inventory').update({
+                        quantity: Number(existing.quantity || 0) + item.qty,
+                        source: inboundData.source || existing.source,
+                        last_updated: new Date()
+                    }).eq('id', existing.id);
+                    if (updateError) throw updateError;
+                    inventoryId = existing.id;
+                } else {
+                    const { data: created, error } = await supabase.from('inventory').insert([{
+                        item_name: cleanName,
+                        category: 'Aksessuar',
+                        quantity: item.qty,
+                        unit: item.unit,
+                        reference_id: item.refId,
+                        last_updated: new Date(),
+                        created_at: actionDate,
+                        source: inboundData.source
+                    }]).select().single();
+                    if (error) throw error;
+                    inventoryId = created.id;
+                }
+
+                const { error: logError } = await supabase.from('inventory_logs').insert([{
+                    inventory_id: inventoryId,
+                    type: 'In',
+                    quantity: item.qty,
+                    reason: finalNote,
+                    created_at: actionDate
+                }]);
+                if (logError) throw logError;
+            }
 
             // Success feedback
             setShowInboundModal(false);
@@ -198,6 +223,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                 color: '',
                 color_code: '',
                 quantity: '',
+                quantities: {},
                 unit: 'dona',
                 batch_number: '',
                 reason: 'Yangi aksessuar',
@@ -528,6 +554,8 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                             {filteredOutboundLogs.map(log => {
                                 const propItem = (inventory || []).find(i => i.id === log.inventory_id);
                                 const item = propItem || log.inventory || {};
+                                const refItem = references?.find(r => r.id === item.reference_id) || {};
+                                const codeToDisplay = refItem.code || `AKS-${item.id}`;
                                 const reason = log.reason || '';
                                 const extract = (k) => {
                                     const m = reason.match(new RegExp(`\\[${k}: (.*?)\\]`));
@@ -550,7 +578,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                             {new Date(log.created_at).toLocaleDateString('ru-RU')}
                                         </td>
                                         <td className="px-6 py-5 font-black text-xs text-[var(--text-primary)]">{item.item_name || '-'}</td>
-                                        <td className="px-6 py-5 text-[10px] text-[var(--text-secondary)] font-mono uppercase">AKS-{item.id}</td>
+                                        <td className="px-6 py-5 text-[10px] text-[var(--text-secondary)] font-mono uppercase" title={`Asl ID: AKS-${item.id}`}>{codeToDisplay}</td>
                                         <td className="px-6 py-5 text-right font-black text-rose-500 text-sm">{log.quantity}</td>
                                         <td className="px-6 py-5 text-center text-[10px] font-bold text-[var(--text-secondary)] uppercase">{item.unit || 'dona'}</td>
                                         <td className="px-6 py-5 text-xs font-bold text-[var(--text-primary)]">{extract('Bichuvchi')}</td>
@@ -607,6 +635,9 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                         ? new Date(item.created_at).toLocaleDateString('ru-RU')
                                         : (item.last_updated ? new Date(item.last_updated).toLocaleDateString('ru-RU') : '-');
 
+                                    const refItem = references?.find(r => r.id === item.reference_id) || {};
+                                    const codeToDisplay = refItem.code || `AKS-${item.id}`;
+
                                     return (
                                         <tr key={item.id} className={`hover:bg-[var(--bg-card-hover)] transition-colors group ${isSelected ? 'bg-purple-500/5' : ''}`}>
                                             <td className="px-6 py-5 text-center">
@@ -619,14 +650,20 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                             </td>
                                             <td className="px-6 py-5 text-xs text-[var(--text-primary)] font-bold">{dateDisplay}</td>
                                             <td className="px-6 py-5 font-black text-[var(--text-primary)] text-xs">{item.item_name}</td>
-                                            <td className="px-6 py-5 text-[10px] text-[var(--text-secondary)] font-mono uppercase">AKS-{item.id}</td>
+                                            <td className="px-6 py-5 text-[10px] text-[var(--text-secondary)] font-mono uppercase" title={`Asl ID: AKS-${item.id}`}>{codeToDisplay}</td>
                                             <td className="px-6 py-5 text-right font-black text-purple-400 text-sm">{Number(item.quantity).toFixed(2)}</td>
                                             <td className="px-6 py-5 text-center text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest">{item.unit}</td>
                                             <td className="px-6 py-5 text-xs font-bold text-[var(--text-secondary)] uppercase">{item.source || '-'}</td>
                                             <td className="px-6 py-5">
                                                 <div className="text-[10px] text-[var(--text-secondary)] flex flex-col gap-1">
-                                                    {item.color && <span><span className="font-bold opacity-70">Rangi:</span> {item.color}</span>}
-                                                    {item.batch_number && <span><span className="font-bold opacity-70">Partiya:</span> {item.batch_number}</span>}
+                                                    {(item.color || item.batch_number) ? (
+                                                        <>
+                                                            {item.color && <span><span className="font-bold opacity-70">Rangi:</span> {item.color}</span>}
+                                                            {item.batch_number && <span><span className="font-bold opacity-70">Partiya:</span> {item.batch_number}</span>}
+                                                        </>
+                                                    ) : (
+                                                        <span className="opacity-50 italic">-</span>
+                                                    )}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-5">
@@ -730,31 +767,65 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                             <option value="Qaytim" />
                                         </datalist>
                                     </div>
-                                    <div className="col-span-2">
-                                        <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Miqdor va Birlik</label>
-                                        <div className="relative">
-                                            <input
-                                                type="number"
-                                                className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 font-bold pr-20 shadow-inner"
-                                                value={inboundData.quantity}
-                                                onChange={e => setInboundData({ ...inboundData, quantity: e.target.value })}
-                                                placeholder="0.00"
-                                                required
-                                            />
-                                            <select
-                                                className="absolute right-1 top-1 bottom-1 bg-[var(--bg-card)] text-xs text-[var(--text-secondary)] font-bold outline-none border-l border-[var(--border-color)] pl-2 rounded-r-xl"
-                                                value={inboundData.unit}
-                                                onChange={e => setInboundData({ ...inboundData, unit: e.target.value })}
-                                            >
-                                                <option value="dona">dona</option>
-                                                <option value="kg">kg</option>
-                                                <option value="metr">metr</option>
-                                                <option value="rulon">rulon</option>
-                                                <option value="quti">quti</option>
-                                                <option value="komplekt">komplekt</option>
-                                            </select>
-                                        </div>
-                                    </div>
+                                    {(() => {
+                                        const selectedRefs = references?.filter(r => r.name === inboundData.selected_material_name && r.type === 'Aksessuar') || [];
+
+                                        if (selectedRefs.length > 0) {
+                                            return (
+                                                <div className="col-span-2 mt-2">
+                                                    <label className="text-xs text-[var(--text-secondary)] mb-2 block font-bold">Miqdorlar (O'lcham/ID bo'yicha)</label>
+                                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 bg-[var(--bg-body)] p-4 rounded-2xl border border-[var(--border-color)]">
+                                                        {selectedRefs.map(ref => (
+                                                            <div key={ref.id} className="bg-[var(--bg-card)] p-3 rounded-xl shadow-sm border border-[var(--border-color)]">
+                                                                <div className="text-[10px] text-purple-400 font-black mb-1 truncate uppercase" title={ref.code || 'Asosiy'}>{ref.code || 'Asosiy'}</div>
+                                                                <div className="relative">
+                                                                    <input
+                                                                        type="number"
+                                                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-lg p-2 text-sm font-black text-[var(--text-primary)] outline-none focus:border-purple-500 shadow-inner pr-10"
+                                                                        value={inboundData.quantities?.[ref.id] || ''}
+                                                                        onChange={e => setInboundData({
+                                                                            ...inboundData,
+                                                                            quantities: { ...inboundData.quantities, [ref.id]: e.target.value }
+                                                                        })}
+                                                                        placeholder="0"
+                                                                    />
+                                                                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-[var(--text-secondary)] font-bold">{ref.unit || inboundData.unit}</span>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            );
+                                        }
+
+                                        return (
+                                            <div className="col-span-2">
+                                                <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Miqdor va Birlik</label>
+                                                <div className="relative">
+                                                    <input
+                                                        type="number"
+                                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 font-bold pr-20 shadow-inner"
+                                                        value={inboundData.quantity}
+                                                        onChange={e => setInboundData({ ...inboundData, quantity: e.target.value })}
+                                                        placeholder="0.00"
+                                                        required={!inboundData.selected_material_name}
+                                                    />
+                                                    <select
+                                                        className="absolute right-1 top-1 bottom-1 bg-[var(--bg-card)] text-xs text-[var(--text-secondary)] font-bold outline-none border-l border-[var(--border-color)] pl-2 rounded-r-xl"
+                                                        value={inboundData.unit}
+                                                        onChange={e => setInboundData({ ...inboundData, unit: e.target.value })}
+                                                    >
+                                                        <option value="dona">dona</option>
+                                                        <option value="kg">kg</option>
+                                                        <option value="metr">metr</option>
+                                                        <option value="rulon">rulon</option>
+                                                        <option value="quti">quti</option>
+                                                        <option value="komplekt">komplekt</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        );
+                                    })()}
                                 </div>
 
                                 <div>
