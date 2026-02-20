@@ -198,7 +198,6 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                         unit: item.unit,
                         reference_id: item.refId,
                         last_updated: new Date(),
-                        created_at: actionDate,
                         source: inboundData.source
                     }]).select().single();
                     if (error) throw error;
