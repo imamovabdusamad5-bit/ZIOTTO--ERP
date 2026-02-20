@@ -1412,7 +1412,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-5 text-right">
-                                                    <div className="font-black text-indigo-400 text-lg">{Number(item.quantity).toFixed(2)}</div>
+                                                    <div className="font-black text-indigo-400 text-lg">{Number(item.quantity).toFixed(2)} <span className="text-xs text-[var(--text-secondary)] font-bold">kg</span></div>
                                                 </td>
                                                 <td className="px-6 py-5 font-bold text-[var(--text-secondary)] text-xs uppercase">{item.source || '-'}</td>
                                                 <td className="px-6 py-5">
