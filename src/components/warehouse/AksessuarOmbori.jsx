@@ -34,11 +34,10 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
         note: ''
     });
 
-    // Inbound State
     const [inboundData, setInboundData] = useState({
         date: new Date().toISOString().split('T')[0],
         selected_material_name: '',
-        color: 'Asosiy',
+        color: '',
         color_code: '',
         quantity: '',
         unit: 'dona',
@@ -123,8 +122,9 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
         try {
             setLoading(true);
             const cleanName = inboundData.selected_material_name.trim();
-            const cleanColor = inboundData.color.trim();
-            const cleanBatch = inboundData.batch_number.trim();
+            const cleanColor = '';
+            const cleanBatch = '';
+            const actionDate = inboundData.date ? new Date(inboundData.date).toISOString() : new Date().toISOString();
 
             if (!cleanName) {
                 alert('Iltimos, aksessuar nomini tanlang!');
@@ -154,7 +154,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
             if (existing) {
                 const { error: updateError } = await supabase.from('inventory').update({
                     quantity: Number(existing.quantity || 0) + Number(inboundData.quantity),
-                    color_code: inboundData.color_code || existing.color_code,
+                    source: inboundData.source || existing.source,
                     last_updated: new Date()
                 }).eq('id', existing.id);
                 if (updateError) throw updateError;
@@ -166,10 +166,12 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                     quantity: Number(inboundData.quantity),
                     unit: unit,
                     color: cleanColor,
-                    color_code: inboundData.color_code.trim(),
+                    color_code: '',
                     batch_number: cleanBatch,
                     reference_id: refId,
-                    last_updated: new Date()
+                    last_updated: new Date(),
+                    created_at: actionDate,
+                    source: inboundData.source
                 }]).select().single();
                 if (error) throw error;
                 inventoryId = created.id;
@@ -183,7 +185,8 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                 type: 'In',
                 quantity: Number(inboundData.quantity),
                 reason: finalNote,
-                batch_number: cleanBatch
+                batch_number: cleanBatch,
+                created_at: actionDate
             }]);
             if (logError) throw logError;
 
@@ -192,7 +195,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
             setInboundData({
                 date: new Date().toISOString().split('T')[0],
                 selected_material_name: '',
-                color: 'Asosiy',
+                color: '',
                 color_code: '',
                 quantity: '',
                 unit: 'dona',
@@ -676,6 +679,16 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
+                                        <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Sana</label>
+                                        <input
+                                            type="date"
+                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 font-bold shadow-inner"
+                                            value={inboundData.date}
+                                            onChange={e => setInboundData({ ...inboundData, date: e.target.value })}
+                                            required
+                                        />
+                                    </div>
+                                    <div>
                                         <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Nomi</label>
                                         <select
                                             className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 transition-all font-bold appearance-none cursor-pointer placeholder-[var(--text-secondary)] shadow-inner"
@@ -694,57 +707,42 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Partiya / Seriya</label>
+                                        <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">ID</label>
                                         <input
                                             type="text"
-                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 font-bold"
-                                            value={inboundData.batch_number}
-                                            onChange={e => setInboundData({ ...inboundData, batch_number: e.target.value })}
-                                            placeholder="Majburiy emas"
+                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-secondary)] font-mono font-bold cursor-not-allowed opacity-70"
+                                            value="Saqlanganda beriladi"
+                                            disabled
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Rangi</label>
+                                        <label className="text-xs font-bold text-[var(--text-secondary)] mb-1 block">Kimdan (Manba)</label>
                                         <input
-                                            type="text"
-                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 font-bold"
-                                            value={inboundData.color}
-                                            onChange={e => setInboundData({ ...inboundData, color: e.target.value })}
-                                            placeholder="Asosiy"
+                                            list="in-source-suggestions"
+                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 font-bold shadow-inner"
+                                            value={inboundData.source || ''}
+                                            onChange={e => setInboundData({ ...inboundData, source: e.target.value })}
+                                            placeholder="Sotuvchi o'rnini yozing..."
                                         />
+                                        <datalist id="in-source-suggestions">
+                                            <option value="Bozor" />
+                                            <option value="E'zonur" />
+                                            <option value="Qaytim" />
+                                        </datalist>
                                     </div>
-                                    <div className="flex gap-2 items-end">
-                                        <div className="flex-1">
-                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Kod (Pantone)</label>
-                                            <input
-                                                type="text"
-                                                className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 font-mono font-bold"
-                                                value={inboundData.color_code}
-                                                onChange={e => setInboundData({ ...inboundData, color_code: e.target.value })}
-                                                placeholder="#FFF"
-                                            />
-                                        </div>
-                                        <input
-                                            type="color"
-                                            className="w-12 h-11 rounded-xl bg-transparent border border-[var(--border-color)] cursor-pointer p-1"
-                                            value={inboundData.color_code || '#cccccc'}
-                                            onChange={e => setInboundData({ ...inboundData, color_code: e.target.value })}
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Miqdor</label>
+                                    <div className="col-span-2">
+                                        <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Miqdor va Birlik</label>
                                         <div className="relative">
                                             <input
                                                 type="number"
-                                                className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 font-bold pr-16"
+                                                className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 font-bold pr-20 shadow-inner"
                                                 value={inboundData.quantity}
                                                 onChange={e => setInboundData({ ...inboundData, quantity: e.target.value })}
                                                 placeholder="0.00"
                                                 required
                                             />
                                             <select
-                                                className="absolute right-1 top-1 bottom-1 bg-transparent text-xs text-[var(--text-secondary)] font-bold outline-none border-l border-[var(--border-color)] pl-2"
+                                                className="absolute right-1 top-1 bottom-1 bg-[var(--bg-card)] text-xs text-[var(--text-secondary)] font-bold outline-none border-l border-[var(--border-color)] pl-2 rounded-r-xl"
                                                 value={inboundData.unit}
                                                 onChange={e => setInboundData({ ...inboundData, unit: e.target.value })}
                                             >
@@ -753,24 +751,9 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                                 <option value="metr">metr</option>
                                                 <option value="rulon">rulon</option>
                                                 <option value="quti">quti</option>
+                                                <option value="komplekt">komplekt</option>
                                             </select>
                                         </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="text-xs font-bold text-[var(--text-secondary)] mb-1 block">Kimdan (Manba)</label>
-                                        <input
-                                            list="in-source-suggestions"
-                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 font-bold"
-                                            value={inboundData.source || ''}
-                                            onChange={e => setInboundData({ ...inboundData, source: e.target.value })}
-                                            placeholder="Sotuvchi yoki ta'minotchi..."
-                                        />
-                                        <datalist id="in-source-suggestions">
-                                            <option value="Bozor" />
-                                            <option value="E'zonur" />
-                                            <option value="Qaytim" />
-                                        </datalist>
                                     </div>
                                 </div>
 
