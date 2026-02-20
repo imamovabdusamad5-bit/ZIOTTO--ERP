@@ -97,6 +97,71 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
         printWindow.document.close();
     };
 
+    const handlePrintAllQRs = (items) => {
+        if (!items || items.length === 0) return;
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) return alert("Brauzerda yangi oyna ochishga ruxsat bering!");
+
+        let qrContainers = items.map((item, index) => {
+            const refItem = references?.find(r => r.id === item.reference_id) || {};
+            const codeText = refItem.code || `AKS-${item.id}`;
+            return `
+                <div class="qr-card">
+                    <div class="title">${item.item_name}</div>
+                    <div id="qr-container-${index}"></div>
+                    <div class="code">${codeText}</div>
+                </div>
+            `;
+        }).join('');
+
+        let qrScripts = items.map((item, index) => {
+            const refItem = references?.find(r => r.id === item.reference_id) || {};
+            const codeText = refItem.code || `AKS-${item.id}`;
+            return `
+                new QRCode(document.getElementById("qr-container-${index}"), {
+                    text: "${codeText}",
+                    width: 150,
+                    height: 150,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+            `;
+        }).join('');
+
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>Aksessuar QRs</title>
+                    <style>
+                        body { margin: 0; font-family: sans-serif; background: #fff; padding: 20px; }
+                        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+                        .qr-card { text-align: center; border: 2px solid #000; padding: 15px; border-radius: 12px; page-break-inside: avoid; }
+                        .title { font-weight: 900; font-size: 16px; margin-bottom: 5px; text-transform: uppercase; }
+                        .code { font-size: 12px; color: #555; margin-top: 10px; opacity: 0.8; }
+                        canvas { margin: 10px auto; display: block; }
+                    </style>
+                </head>
+                <body>
+                    <div class="grid">
+                        ${qrContainers}
+                    </div>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+                    <script>
+                        window.onload = function() {
+                            ${qrScripts}
+                            setTimeout(() => {
+                                window.print();
+                                window.close();
+                            }, 1000);
+                        };
+                    </script>
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
+    };
+
     // New States from MatoOmbori
     const [subTab, setSubTab] = useState('kirim'); // 'kirim' | 'chiqim'
     const [outboundLogs, setOutboundLogs] = useState([]);
@@ -762,59 +827,107 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                             <td className="px-6 py-5 text-xs text-[var(--text-secondary)] italic opacity-50">Jamlangan ko'rinish</td>
                                             <td className="px-6 py-5 text-center text-xs text-[var(--text-secondary)] font-bold">UMUMIY JAMI</td>
                                         </tr>
-                                        {expandedGroups[group.name] && group.items.map(item => {
-                                            const isSelected = selectedIds.includes(item.id);
-                                            const dateDisplay = item.created_at
-                                                ? new Date(item.created_at).toLocaleDateString('ru-RU')
-                                                : (item.last_updated ? new Date(item.last_updated).toLocaleDateString('ru-RU') : '-');
-                                            const refItem = references?.find(r => r.id === item.reference_id) || {};
-                                            const codeToDisplay = refItem.code || `AKS-${item.id}`;
+                                        {expandedGroups[group.name] && (
+                                            <tr className="bg-[var(--bg-body)]/50 transition-all">
+                                                <td colSpan="8" className="p-6 border-b border-[var(--border-color)]">
+                                                    <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] overflow-hidden">
+                                                        <div className="px-6 py-4 border-b border-[var(--border-color)] flex justify-between items-center bg-[var(--bg-body)]">
+                                                            <div className="flex items-center gap-3">
+                                                                <Package size={18} className="text-purple-400" />
+                                                                <h4 className="font-bold text-sm text-[var(--text-primary)]">Aksessuarlar Ro'yxati</h4>
+                                                            </div>
+                                                            <div className="flex items-center gap-3">
+                                                                <span className="text-xs text-[var(--text-secondary)] font-bold">Jami: {group.items.length} xil</span>
+                                                                <button onClick={(e) => { e.stopPropagation(); handlePrintAllQRs(group.items); }} className="p-2 bg-indigo-500/10 text-indigo-400 hover:text-white hover:bg-indigo-500 rounded-xl transition-all border border-indigo-500/20 shadow-sm flex items-center gap-2 text-xs font-bold" title="Barcha QR kodelarni Chop etish"><Printer size={16} /> Barchasini chop etish</button>
+                                                            </div>
+                                                        </div>
 
-                                            return (
-                                                <tr key={item.id} className={`hover:bg-[var(--bg-card-hover)] transition-colors group ${isSelected ? 'bg-purple-500/10' : ''}`}>
-                                                    <td className="px-6 py-4 text-center">
-                                                        <input
-                                                            type="checkbox"
-                                                            className="w-5 h-5 rounded-lg bg-[var(--input-bg)] border-[var(--border-color)] checked:bg-purple-600 focus:ring-purple-500 cursor-pointer transition-all"
-                                                            checked={isSelected}
-                                                            onChange={(e) => { e.stopPropagation(); setSelectedIds(prev => prev.includes(item.id) ? prev.filter(id => id !== item.id) : [...prev, item.id]); }}
-                                                        />
-                                                    </td>
-                                                    <td className="px-6 py-4 text-sm text-[var(--text-primary)] font-bold">{dateDisplay}</td>
-                                                    <td className="px-6 py-4 font-black text-[var(--text-secondary)] text-sm pl-12 flex items-center gap-2 opacity-70">
-                                                        <ArrowDownLeft size={14} className="opacity-50" /> {item.item_name}
-                                                    </td>
-                                                    <td className="px-6 py-4 text-xs text-purple-300 font-mono uppercase bg-purple-500/5 rounded-lg px-2" title={`Asl ID: AKS-${item.id}`}>{codeToDisplay}</td>
-                                                    <td className="px-6 py-4 text-right font-black text-white text-base">{Number(item.quantity).toFixed(2)}</td>
-                                                    <td className="px-6 py-4 text-center text-xs text-[var(--text-secondary)] font-bold uppercase tracking-widest">{item.unit}</td>
-                                                    <td className="px-6 py-4">
-                                                        <div className="text-xs text-[var(--text-secondary)] flex flex-col gap-1">
-                                                            {(item.color || item.batch_number) ? (
-                                                                <>
-                                                                    {item.color && <span><span className="font-bold opacity-70">Rangi:</span> {item.color}</span>}
-                                                                    {item.batch_number && <span><span className="font-bold opacity-70">Partiya:</span> {item.batch_number}</span>}
-                                                                </>
-                                                            ) : (
-                                                                <span className="opacity-50 italic">-</span>
-                                                            )}
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                        <div className="flex items-center justify-center gap-2 transition-opacity">
-                                                            <button onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                setOutboundData({ inventory_id: item.id, quantity: '', reason: 'Ishlab chiqarishga' });
-                                                                setShowOutboundModal(true);
-                                                            }} className="p-2 text-[var(--text-secondary)] hover:text-green-400 hover:bg-green-500/10 rounded-xl transition-all border border-transparent hover:border-green-500/30" title="Chiqim"><ArrowUpRight size={18} /></button>
-                                                            <button onClick={(e) => { e.stopPropagation(); handlePrintQR(item, codeToDisplay); }} className="p-2 text-[var(--text-secondary)] hover:text-indigo-400 hover:bg-indigo-500/10 rounded-xl transition-all border border-transparent hover:border-indigo-500/30" title="QR Chop etish"><Printer size={18} /></button>
-                                                            <button onClick={(e) => { e.stopPropagation(); setSelectedItem(item); fetchHistory(item.id); setShowHistoryModal(true); }} className="p-2 text-[var(--text-secondary)] hover:text-sky-400 hover:bg-sky-500/10 rounded-xl transition-all border border-transparent hover:border-sky-500/30" title="Tarix"><History size={18} /></button>
-                                                            <button onClick={(e) => { e.stopPropagation(); handleEdit(item); }} className="p-2 text-[var(--text-secondary)] hover:text-amber-400 hover:bg-amber-500/10 rounded-xl transition-all border border-transparent hover:border-amber-500/30" title="Tahrir"><Edit size={18} /></button>
-                                                            <button onClick={(e) => { e.stopPropagation(); handleDelete(item); }} className="p-2 text-[var(--text-secondary)] hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all border border-transparent hover:border-rose-500/30" title="O'chirish"><Trash2 size={18} /></button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })}
+                                                        <table className="w-full text-left text-sm">
+                                                            <thead className="text-[10px] uppercase text-[var(--text-secondary)] font-bold border-b border-[var(--border-color)] bg-[var(--bg-card)]">
+                                                                <tr>
+                                                                    <th className="px-6 py-3 w-10 text-center">
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            className="w-4 h-4 rounded border-[var(--border-color)] bg-[var(--input-bg)] text-purple-600 focus:ring-purple-500 cursor-pointer"
+                                                                            checked={group.items.length > 0 && group.items.every(i => selectedIds.includes(i.id))}
+                                                                            onChange={(e) => {
+                                                                                if (e.target.checked) {
+                                                                                    const ids = group.items.map(i => i.id);
+                                                                                    setSelectedIds(prev => [...new Set([...prev, ...ids])]);
+                                                                                } else {
+                                                                                    const ids = group.items.map(i => i.id);
+                                                                                    setSelectedIds(prev => prev.filter(id => !ids.includes(id)));
+                                                                                }
+                                                                            }}
+                                                                        />
+                                                                    </th>
+                                                                    <th className="px-6 py-3">Sana</th>
+                                                                    <th className="px-6 py-3">Nomi</th>
+                                                                    <th className="px-6 py-3">ID / KOD</th>
+                                                                    <th className="px-6 py-3 text-right">Soni</th>
+                                                                    <th className="px-6 py-3 text-center">Birligi</th>
+                                                                    <th className="px-6 py-3">Qo'shimcha</th>
+                                                                    <th className="px-6 py-3 text-center">Amallar</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody className="divide-y divide-[var(--border-color)]">
+                                                                {group.items.map(item => {
+                                                                    const isSelected = selectedIds.includes(item.id);
+                                                                    const dateDisplay = item.created_at
+                                                                        ? new Date(item.created_at).toLocaleDateString('ru-RU')
+                                                                        : (item.last_updated ? new Date(item.last_updated).toLocaleDateString('ru-RU') : '-');
+                                                                    const refItem = references?.find(r => r.id === item.reference_id) || {};
+                                                                    const codeToDisplay = refItem.code || `AKS-${item.id}`;
+
+                                                                    return (
+                                                                        <tr key={item.id} className={`hover:bg-[var(--bg-card-hover)] transition-colors ${isSelected ? 'bg-purple-500/5' : ''}`}>
+                                                                            <td className="px-6 py-3 text-center">
+                                                                                <input
+                                                                                    type="checkbox"
+                                                                                    className="w-4 h-4 rounded border-[var(--border-color)] bg-[var(--input-bg)] text-purple-600 focus:ring-purple-500 cursor-pointer transition-all"
+                                                                                    checked={isSelected}
+                                                                                    onChange={(e) => { e.stopPropagation(); setSelectedIds(prev => prev.includes(item.id) ? prev.filter(id => id !== item.id) : [...prev, item.id]); }}
+                                                                                />
+                                                                            </td>
+                                                                            <td className="px-6 py-3 text-xs text-[var(--text-primary)] font-bold">{dateDisplay}</td>
+                                                                            <td className="px-6 py-3 font-medium text-[var(--text-secondary)] text-sm">{item.item_name}</td>
+                                                                            <td className="px-6 py-3 text-xs text-purple-300 font-mono uppercase bg-purple-500/5 rounded-lg inline-block my-1 px-2" title={`Asl ID: AKS-${item.id}`}>{codeToDisplay}</td>
+                                                                            <td className="px-6 py-3 text-right font-black text-[var(--text-primary)] text-sm">{Number(item.quantity).toFixed(2)}</td>
+                                                                            <td className="px-6 py-3 text-center text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest">{item.unit}</td>
+                                                                            <td className="px-6 py-3">
+                                                                                <div className="text-[10px] text-[var(--text-secondary)] flex flex-col gap-0.5">
+                                                                                    {(item.color || item.batch_number) ? (
+                                                                                        <>
+                                                                                            {item.color && <span><span className="font-bold opacity-70">Rangi:</span> {item.color}</span>}
+                                                                                            {item.batch_number && <span><span className="font-bold opacity-70">Partiya:</span> {item.batch_number}</span>}
+                                                                                        </>
+                                                                                    ) : (
+                                                                                        <span className="opacity-50 italic">-</span>
+                                                                                    )}
+                                                                                </div>
+                                                                            </td>
+                                                                            <td className="px-6 py-3">
+                                                                                <div className="flex items-center justify-center gap-1.5 transition-opacity">
+                                                                                    <button onClick={(e) => {
+                                                                                        e.stopPropagation();
+                                                                                        setOutboundData({ inventory_id: item.id, quantity: '', reason: 'Ishlab chiqarishga' });
+                                                                                        setShowOutboundModal(true);
+                                                                                    }} className="p-1.5 text-[var(--text-secondary)] hover:text-green-400 hover:bg-green-500/10 rounded-lg transition-all border border-transparent hover:border-green-500/30" title="Chiqim"><ArrowUpRight size={14} /></button>
+                                                                                    <button onClick={(e) => { e.stopPropagation(); handlePrintQR(item, codeToDisplay); }} className="p-1.5 text-[var(--text-secondary)] hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all border border-transparent hover:border-indigo-500/30" title="QR Chop etish"><Printer size={14} /></button>
+                                                                                    <button onClick={(e) => { e.stopPropagation(); setSelectedItem(item); fetchHistory(item.id); setShowHistoryModal(true); }} className="p-1.5 text-[var(--text-secondary)] hover:text-sky-400 hover:bg-sky-500/10 rounded-lg transition-all border border-transparent hover:border-sky-500/30" title="Tarix"><History size={14} /></button>
+                                                                                    <button onClick={(e) => { e.stopPropagation(); handleEdit(item); }} className="p-1.5 text-[var(--text-secondary)] hover:text-amber-400 hover:bg-amber-500/10 rounded-lg transition-all border border-transparent hover:border-amber-500/30" title="Tahrir"><Edit size={14} /></button>
+                                                                                    <button onClick={(e) => { e.stopPropagation(); handleDelete(item); }} className="p-1.5 text-[var(--text-secondary)] hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all border border-transparent hover:border-rose-500/30" title="O'chirish"><Trash2 size={14} /></button>
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>
+                                                                    );
+                                                                })}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )}
                                     </React.Fragment>
                                 ))}
                             </tbody>
