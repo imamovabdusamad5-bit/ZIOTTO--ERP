@@ -145,13 +145,13 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
         setScannedRolls(prev => {
             if (prev.some(r => r.id === rollData.id)) return prev;
 
-            // Consistency Check
-            if (prev.length > 0) {
-                if (prev[0].inventory_id !== rollData.inventory_id) {
-                    alert(`Xatolik! Aralash partiya. \nKutilmoqda: ${prev[0].inventory?.item_name}\nTopildi: ${rollData.inventory?.item_name}`);
-                    return prev;
-                }
-            }
+            // Consistency Check REMOVED to allow mixed batches
+            // if (prev.length > 0) {
+            //     if (prev[0].inventory_id !== rollData.inventory_id) {
+            //         alert(`Xatolik! Aralash partiya. \nKutilmoqda: ${prev[0].inventory?.item_name}\nTopildi: ${rollData.inventory?.item_name}`);
+            //         return prev;
+            //     }
+            // }
             return [...prev, rollData];
         });
     };
@@ -174,11 +174,11 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
 
         const totalWeight = rolls.reduce((sum, r) => sum + Number(r.weight), 0);
 
-        // Find if they are all same batch? Usually yes if from same item.
+        // Allow mixed items (item might be null or just one of them)
         setOutboundData({
-            inventory_id: item.id,
-            quantity: totalWeight,
-            inventory_name: item.item_name,
+            inventory_id: item ? item.id : 'MIXED', // Flag for mixed
+            quantity: totalWeight, // Display total
+            inventory_name: item ? item.item_name : 'Aralash Partiya',
             selected_rolls: rolls,
             reason: 'Kesimga' // Default
         });
@@ -941,31 +941,38 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
         e.preventDefault();
         try {
             setLoading(true);
-            const item = inventory.find(i => i.id === outboundData.inventory_id);
 
-            // 1. Checks
-            if (Number(outboundData.quantity) > Number(item.quantity)) {
-                alert('Omborda yetarli mato yo\'q!');
-                setLoading(false);
-                return;
-            }
+            // Group rolls by inventory_id to handle Mixed Batches
+            const rollsByInventory = {};
 
-            // 2. Rolls Update
+            // If we have selected rolls, use them to group
             if (outboundData.selected_rolls.length > 0) {
-                const rollIds = outboundData.selected_rolls.map(r => r.id);
-                const { error } = await supabase.from('inventory_rolls')
-                    .update({ status: 'used' })
-                    .in('id', rollIds);
-
-                if (error) throw error;
+                outboundData.selected_rolls.forEach(r => {
+                    if (!rollsByInventory[r.inventory_id]) rollsByInventory[r.inventory_id] = [];
+                    rollsByInventory[r.inventory_id].push(r);
+                });
+            } else {
+                // Fallback for manual non-roll outbound (single item)
+                if (outboundData.inventory_id && outboundData.inventory_id !== 'MIXED') {
+                    rollsByInventory[outboundData.inventory_id] = [];
+                }
             }
 
-            // 3. Inventory Update
-            const newQty = Number(item.quantity) - Number(outboundData.quantity);
-            await supabase.from('inventory').update({ quantity: newQty, last_updated: new Date() }).eq('id', item.id);
+            const inventoryIds = Object.keys(rollsByInventory);
 
-            // 4. Log
-            let finalReason = outboundData.reason || '';
+            if (inventoryIds.length === 0) {
+                // Pure manual outbound without rolls?
+                // Current logic supports this found in original handleChiqim
+                // Let's support it for backward compat if inventory_id is set
+                if (outboundData.inventory_id && outboundData.inventory_id !== 'MIXED') {
+                    inventoryIds.push(outboundData.inventory_id);
+                } else {
+                    throw new Error("Chiqim qilish uchun ma'lumot yetarli emas");
+                }
+            }
+
+            // Common Reason
+            let finalReasonBase = outboundData.reason || '';
             const extraInfo = [];
             if (outboundExtra.model) extraInfo.push(`[Model: ${outboundExtra.model}]`);
             if (outboundExtra.part) extraInfo.push(`[Qism: ${outboundExtra.part}]`);
@@ -973,23 +980,59 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
             if (outboundExtra.cutter) extraInfo.push(`[Bichuvchi: ${outboundExtra.cutter}]`);
 
             if (extraInfo.length > 0) {
-                finalReason = `${extraInfo.join(' ')} ${finalReason}`;
+                finalReasonBase = `${extraInfo.join(' ')} ${finalReasonBase}`;
             }
 
             if (outboundData.order_id) {
                 const ord = orders.find(o => o.id == outboundData.order_id);
-                if (ord) finalReason += ` (Buyurtma: #${ord.order_number})`;
+                if (ord) finalReasonBase += ` (Buyurtma: #${ord.order_number})`;
             }
 
-            const { error: logError } = await supabase.from('inventory_logs').insert([{
-                inventory_id: item.id,
-                type: 'Out',
-                quantity: Number(outboundData.quantity),
-                reason: finalReason,
-                batch_number: item.batch_number
-            }]);
+            // Process each inventory group
+            for (const invId of inventoryIds) {
+                const groupRolls = rollsByInventory[invId] || [];
+                const item = inventory.find(i => i.id == invId);
 
-            if (logError) throw logError;
+                if (!item) continue;
+
+                // Calculate quantity for this group
+                // If rolls exist, sum them. If not (manual), use outboundData.quantity (only if single item)
+                let qtyToDeduct = 0;
+                if (groupRolls.length > 0) {
+                    qtyToDeduct = groupRolls.reduce((sum, r) => sum + Number(r.weight), 0);
+                } else if (inventoryIds.length === 1) {
+                    qtyToDeduct = Number(outboundData.quantity);
+                }
+
+                // Check stock
+                if (qtyToDeduct > Number(item.quantity)) {
+                    throw new Error(`"${item.item_name}" (Partiya: ${item.batch_number}) uchun yetarli qoldiq yo'q! So'raldi: ${qtyToDeduct}, Bor: ${item.quantity}`);
+                }
+
+                // 2. Rolls Update
+                if (groupRolls.length > 0) {
+                    const rollIds = groupRolls.map(r => r.id);
+                    const { error } = await supabase.from('inventory_rolls')
+                        .update({ status: 'used' })
+                        .in('id', rollIds);
+                    if (error) throw error;
+                }
+
+                // 3. Inventory Update
+                const newQty = Number(item.quantity) - qtyToDeduct;
+                await supabase.from('inventory').update({ quantity: newQty, last_updated: new Date() }).eq('id', item.id);
+
+                // 4. Log
+                const { error: logError } = await supabase.from('inventory_logs').insert([{
+                    inventory_id: item.id,
+                    type: 'Out',
+                    quantity: qtyToDeduct,
+                    reason: finalReasonBase,
+                    batch_number: item.batch_number
+                }]);
+
+                if (logError) throw logError;
+            }
 
             alert('Chiqim bajarildi!');
             setShowOutboundModal(false);
@@ -997,12 +1040,11 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
             setOutboundExtra({ model: '', part: '', age: '', cutter: 'Mastura' });
             onRefresh();
 
-            // Refresh expanded row data if needed
-            if (expandedRowId === item.id) {
-                fetchRolls(item.id);
-            }
+            // Refresh actions
+            if (expandedRowId) fetchRolls(expandedRowId);
 
         } catch (error) {
+            console.error(error);
             alert('Xatolik: ' + error.message);
         } finally {
             setLoading(false);
@@ -2221,8 +2263,16 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                 disabled={scannedRolls.length === 0}
                                 onClick={() => {
                                     if (scannedRolls.length === 0) return;
-                                    const first = scannedRolls[0];
-                                    handleBulkChiqim(first.inventory, scannedRolls);
+
+                                    // Check if mixed
+                                    const firstInvId = scannedRolls[0].inventory_id;
+                                    const isMixed = scannedRolls.some(r => r.inventory_id !== firstInvId);
+
+                                    // If mixed, pass null (so handleBulkChiqim sets 'MIXED' / 'Aralash Partiya')
+                                    // Otherwise pass the inventory object of the first roll
+                                    const itemParams = isMixed ? null : scannedRolls[0].inventory;
+
+                                    handleBulkChiqim(itemParams, scannedRolls);
                                     setShowScanner(false);
                                 }}
                                 className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black rounded-2xl uppercase tracking-widest shadow-lg shadow-indigo-600/20 active:scale-95 transition-all flex items-center justify-center gap-2"
