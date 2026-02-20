@@ -185,7 +185,6 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                 if (existing) {
                     const { error: updateError } = await supabase.from('inventory').update({
                         quantity: Number(existing.quantity || 0) + item.qty,
-                        source: inboundData.source || existing.source,
                         last_updated: new Date()
                     }).eq('id', existing.id);
                     if (updateError) throw updateError;
@@ -197,8 +196,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                         quantity: item.qty,
                         unit: item.unit,
                         reference_id: item.refId,
-                        last_updated: new Date(),
-                        source: inboundData.source
+                        last_updated: new Date()
                     }]).select().single();
                     if (error) throw error;
                     inventoryId = created.id;
@@ -610,20 +608,22 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                         <input
                                             type="checkbox"
                                             className="w-5 h-5 rounded-lg bg-[var(--input-bg)] border-[var(--border-color)] checked:bg-purple-600 focus:ring-purple-500 cursor-pointer transition-all"
-                                            checked={selectedIds.length === filteredInventory.length && filteredInventory.length > 0}
+                                            checked={filteredInventory.length > 0 && selectedIds.length === filteredInventory.length}
                                             onChange={(e) => {
-                                                if (e.target.checked) setSelectedIds(filteredInventory.map(i => i.id));
-                                                else setSelectedIds([]);
+                                                if (e.target.checked) {
+                                                    setSelectedIds(filteredInventory.map(i => i.id));
+                                                } else {
+                                                    setSelectedIds([]);
+                                                }
                                             }}
                                         />
                                     </th>
                                     <th className="px-6 py-5">Sana</th>
-                                    <th className="px-6 py-5">Nomi</th>
+                                    <th className="px-6 py-5 font-black text-white">Nomi</th>
                                     <th className="px-6 py-5">ID</th>
                                     <th className="px-6 py-5 text-right">Soni</th>
                                     <th className="px-6 py-5 text-center">Birligi</th>
-                                    <th className="px-6 py-5">Kimdan</th>
-                                    <th className="px-6 py-5">Izoh</th>
+                                    <th className="px-6 py-5">Qo'shimcha</th>
                                     <th className="px-6 py-5 text-center">Amallar</th>
                                 </tr>
                             </thead>
@@ -652,7 +652,6 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                             <td className="px-6 py-5 text-[10px] text-[var(--text-secondary)] font-mono uppercase" title={`Asl ID: AKS-${item.id}`}>{codeToDisplay}</td>
                                             <td className="px-6 py-5 text-right font-black text-purple-400 text-sm">{Number(item.quantity).toFixed(2)}</td>
                                             <td className="px-6 py-5 text-center text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest">{item.unit}</td>
-                                            <td className="px-6 py-5 text-xs font-bold text-[var(--text-secondary)] uppercase">{item.source || '-'}</td>
                                             <td className="px-6 py-5">
                                                 <div className="text-[10px] text-[var(--text-secondary)] flex flex-col gap-1">
                                                     {(item.color || item.batch_number) ? (
