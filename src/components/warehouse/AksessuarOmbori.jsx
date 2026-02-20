@@ -300,6 +300,25 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
         }
     };
 
+    const handleDeleteLog = async (log) => {
+        if (!window.confirm("Kiritilgan amaliyotni bekor qilmoqchimisiz? (Miqdor omborga qaytariladi/ayriladi)")) return;
+        try {
+            setLoading(true);
+            const item = (inventory || []).find(i => i.id === log.inventory_id);
+            if (item) {
+                const modifier = log.type === 'Out' ? 1 : -1;
+                const newQty = Number(item.quantity) + (Number(log.quantity) * modifier);
+                await supabase.from('inventory').update({ quantity: newQty, last_updated: new Date() }).eq('id', item.id);
+            }
+            await supabase.from('inventory_logs').delete().eq('id', log.id);
+            onRefresh();
+        } catch (error) {
+            alert('Xato: ' + error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const fetchHistory = async (itemId) => {
         setLoading(true);
         const { data, error } = await supabase
@@ -491,13 +510,15 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                             <tr>
                                 <th className="px-6 py-5">Sana</th>
                                 <th className="px-6 py-5">Nomi</th>
-                                <th className="px-6 py-5">Rang</th>
-                                <th className="px-6 py-5">Partiya</th>
-                                <th className="px-6 py-5 text-right">Jami Chiqim</th>
+                                <th className="px-6 py-5">ID</th>
+                                <th className="px-6 py-5 text-right">Soni</th>
+                                <th className="px-6 py-5 text-center">Birligi</th>
+                                <th className="px-6 py-5">Kimga</th>
                                 <th className="px-6 py-5">Model</th>
                                 <th className="px-6 py-5">Qism</th>
-                                <th className="px-6 py-5">Yosh</th>
-                                <th className="px-6 py-5">Bichuvchi</th>
+                                <th className="px-6 py-5">Buyurtma ID</th>
+                                <th className="px-6 py-5">Buyurtma Soni</th>
+                                <th className="px-6 py-5 text-center">Amallar</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-[var(--border-color)]">
@@ -511,24 +532,34 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                 };
                                 const extractedModel = extract('Model');
                                 let model = extractedModel;
+                                let orderId = '-';
+                                let orderQuantity = '-';
                                 const matchedOrder = (orders || []).find(o => o.order_number === model || o.model_name === model);
                                 if (matchedOrder) {
                                     model = matchedOrder.models?.name || matchedOrder.model_name || model;
+                                    orderId = matchedOrder.order_number || matchedOrder.id;
+                                    orderQuantity = matchedOrder.quantity || '-';
                                 }
 
                                 return (
                                     <tr key={log.id} className="hover:bg-[var(--bg-card-hover)] transition-colors">
-                                        <td className="px-6 py-5 text-sm font-bold text-[var(--text-primary)]">
+                                        <td className="px-6 py-5 text-xs font-bold text-[var(--text-primary)]">
                                             {new Date(log.created_at).toLocaleDateString('ru-RU')}
                                         </td>
-                                        <td className="px-6 py-5 font-black text-sm text-[var(--text-primary)]">{item.item_name || '-'}</td>
-                                        <td className="px-6 py-5 text-xs font-bold text-[var(--text-primary)]">{item.color || '-'}</td>
-                                        <td className="px-6 py-5 text-xs font-mono text-[var(--text-secondary)]">{log.batch_number || item.batch_number || '-'}</td>
-                                        <td className="px-6 py-5 text-right font-black text-rose-500 text-lg">{log.quantity} <span className="text-xs">{item.unit || 'dona'}</span></td>
+                                        <td className="px-6 py-5 font-black text-xs text-[var(--text-primary)]">{item.item_name || '-'}</td>
+                                        <td className="px-6 py-5 text-[10px] text-[var(--text-secondary)] font-mono uppercase">AKS-{item.id}</td>
+                                        <td className="px-6 py-5 text-right font-black text-rose-500 text-sm">{log.quantity}</td>
+                                        <td className="px-6 py-5 text-center text-[10px] font-bold text-[var(--text-secondary)] uppercase">{item.unit || 'dona'}</td>
+                                        <td className="px-6 py-5 text-xs font-bold text-[var(--text-primary)]">{extract('Bichuvchi')}</td>
                                         <td className="px-6 py-5 text-xs font-bold text-purple-400">{model}</td>
                                         <td className="px-6 py-5 text-xs text-[var(--text-primary)]">{extract('Qism')}</td>
-                                        <td className="px-6 py-5 text-xs text-[var(--text-secondary)]">{extract('Yosh')}</td>
-                                        <td className="px-6 py-5 text-xs font-bold text-[var(--text-primary)]">{extract('Bichuvchi')}</td>
+                                        <td className="px-6 py-5 text-[10px] text-[var(--text-secondary)] font-mono">#{orderId}</td>
+                                        <td className="px-6 py-5 text-xs font-bold text-[var(--text-primary)]">{orderQuantity}</td>
+                                        <td className="px-6 py-5 text-center">
+                                            <button onClick={() => handleDeleteLog(log)} className="p-2 text-[var(--text-secondary)] hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all" title="O'chirish">
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </td>
                                     </tr>
                                 );
                             })}
@@ -556,12 +587,13 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                             }}
                                         />
                                     </th>
-                                    <th className="px-6 py-5">Sana / ID</th>
+                                    <th className="px-6 py-5">Sana</th>
                                     <th className="px-6 py-5">Nomi</th>
-                                    <th className="px-6 py-5">Rangi</th>
-                                    <th className="px-6 py-5">Partiya / Kimdan</th>
-                                    <th className="px-6 py-5 text-right">Miqdor</th>
-                                    <th className="px-6 py-5 text-center">Birlik</th>
+                                    <th className="px-6 py-5">ID</th>
+                                    <th className="px-6 py-5 text-right">Soni</th>
+                                    <th className="px-6 py-5 text-center">Birligi</th>
+                                    <th className="px-6 py-5">Kimdan</th>
+                                    <th className="px-6 py-5">Izoh</th>
                                     <th className="px-6 py-5 text-center">Amallar</th>
                                 </tr>
                             </thead>
@@ -582,31 +614,18 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                                     onChange={() => setSelectedIds(prev => prev.includes(item.id) ? prev.filter(id => id !== item.id) : [...prev, item.id])}
                                                 />
                                             </td>
+                                            <td className="px-6 py-5 text-xs text-[var(--text-primary)] font-bold">{dateDisplay}</td>
+                                            <td className="px-6 py-5 font-black text-[var(--text-primary)] text-xs">{item.item_name}</td>
+                                            <td className="px-6 py-5 text-[10px] text-[var(--text-secondary)] font-mono uppercase">AKS-{item.id}</td>
+                                            <td className="px-6 py-5 text-right font-black text-purple-400 text-sm">{Number(item.quantity).toFixed(2)}</td>
+                                            <td className="px-6 py-5 text-center text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest">{item.unit}</td>
+                                            <td className="px-6 py-5 text-xs font-bold text-[var(--text-secondary)] uppercase">{item.source || '-'}</td>
                                             <td className="px-6 py-5">
-                                                <div className="font-bold text-[var(--text-primary)] text-sm mb-1">{dateDisplay}</div>
-                                                <div className="text-[10px] text-[var(--text-secondary)] font-mono uppercase">AKS-{item.id}</div>
-                                            </td>
-                                            <td className="px-6 py-5 font-black text-[var(--text-primary)]">{item.item_name}</td>
-                                            <td className="px-6 py-5">
-                                                <div className="flex items-center gap-3">
-                                                    <div
-                                                        className="w-8 h-8 rounded-full border border-[var(--border-color)] shadow-sm"
-                                                        style={{ backgroundColor: item.color_code || '#ccc' }}
-                                                    ></div>
-                                                    <div>
-                                                        <div className="font-bold text-[var(--text-primary)] text-xs">{item.color}</div>
-                                                        <div className="text-[10px] text-[var(--text-secondary)] opacity-70 font-mono">{item.color_code || '-'}</div>
-                                                    </div>
+                                                <div className="text-[10px] text-[var(--text-secondary)] flex flex-col gap-1">
+                                                    {item.color && <span><span className="font-bold opacity-70">Rangi:</span> {item.color}</span>}
+                                                    {item.batch_number && <span><span className="font-bold opacity-70">Partiya:</span> {item.batch_number}</span>}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-5">
-                                                <div className="font-bold font-mono text-xs px-2 py-1 bg-[var(--bg-body)] rounded border border-[var(--border-color)] inline-block mb-1">{item.batch_number || '-'}</div>
-                                                <div className="text-[10px] text-[var(--text-secondary)] uppercase font-bold">{item.source || '-'}</div>
-                                            </td>
-                                            <td className="px-6 py-5 text-right">
-                                                <div className="font-black text-purple-400 text-lg">{Number(item.quantity).toFixed(2)}</div>
-                                            </td>
-                                            <td className="px-6 py-5 text-center text-xs text-[var(--text-secondary)] font-bold uppercase tracking-widest">{item.unit}</td>
                                             <td className="px-6 py-5">
                                                 <div className="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                                     <button onClick={() => {
