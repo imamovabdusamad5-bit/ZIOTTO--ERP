@@ -130,16 +130,25 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
             }
 
             if (rollData.status === 'used') {
-                alert(`Diqqat! Bu rulon ishlatilgan: ${rollData.roll_number}`);
+                // Prevent spamming alerts for the same roll
+                if (window.lastAlertedRoll !== rollData.id) {
+                    alert(`Diqqat! Bu rulon ishlatilgan: ${rollData.roll_number}`);
+                    window.lastAlertedRoll = rollData.id;
+                    // Reset after 3 seconds to allow re-alert if scanned again later
+                    setTimeout(() => { window.lastAlertedRoll = null; }, 3000);
+                }
                 return;
             }
 
+            // Reset alert cache on success
+            window.lastAlertedRoll = null;
             addScannedRoll(rollData);
 
         } catch (e) {
             console.error(e);
         }
     };
+
 
     const addScannedRoll = (rollData) => {
         setScannedRolls(prev => {
@@ -1803,7 +1812,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                 </div>
                                 <div className="flex justify-between items-end border-t border-[var(--border-color)] pt-4">
                                     <span className="font-bold text-sm">Jami Og'irlik:</span>
-                                    <span className="text-3xl font-black text-[var(--text-primary)]">{outboundData.quantity} <span className="text-sm text-[var(--text-secondary)]">kg</span></span>
+                                    <span className="text-3xl font-black text-[var(--text-primary)]">{Number(outboundData.quantity).toFixed(2)} <span className="text-sm text-[var(--text-secondary)]">kg</span></span>
                                 </div>
                             </div>
 
@@ -1873,7 +1882,20 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                     placeholder="Masalan: Kesim bo'limiga"
                                 />
                             </div>
-                            <button className="w-full py-4 bg-rose-600 hover:bg-rose-500 text-white rounded-xl font-black uppercase shadow-lg shadow-rose-600/30 transition-all active:scale-95">Tasdiqlash</button>
+                            <div className="flex gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setShowOutboundModal(false);
+                                        setShowScanner(true);
+                                    }}
+                                    className="flex-1 py-4 bg-[var(--bg-body)] border border-[var(--border-color)] text-[var(--text-secondary)] rounded-xl font-bold uppercase transition-all hover:bg-[var(--bg-card)] flex items-center justify-center gap-2"
+                                >
+                                    <QrCode size={20} />
+                                    <span className="text-xs">Qo'shish</span>
+                                </button>
+                                <button className="flex-[3] py-4 bg-rose-600 hover:bg-rose-500 text-white rounded-xl font-black uppercase shadow-lg shadow-rose-600/30 transition-all active:scale-95">Tasdiqlash</button>
+                            </div>
                         </form>
                     </div>
                 </div>
