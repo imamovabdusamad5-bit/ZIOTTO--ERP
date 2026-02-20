@@ -1274,7 +1274,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                         />
                                         <span className="font-bold text-[var(--text-primary)] text-sm">#{item.id}</span>
                                     </div>
-                                    <span className="font-black text-indigo-400 text-lg">{item.quantity} kg</span>
+                                    <span className="font-black text-indigo-400 text-lg">{Number(item.quantity).toFixed(2)} kg</span>
                                 </div>
 
                                 <div className="mb-3 pl-8">
@@ -1309,7 +1309,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                 {itemRolls.map(r => (
                                                     <div key={r.id} className="flex justify-between items-center text-xs bg-[var(--bg-body)] p-2 rounded border border-[var(--border-color)]">
                                                         <div className="font-mono">{r.roll_number}</div>
-                                                        <div className="font-bold text-emerald-500">{r.weight} kg</div>
+                                                        <div className="font-bold text-emerald-500">{Number(r.weight).toFixed(2)} kg</div>
                                                     </div>
                                                 ))}
                                                 <div className="text-center pt-2">
@@ -1412,7 +1412,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-5 text-right">
-                                                    <div className="font-black text-indigo-400 text-lg">{item.quantity}</div>
+                                                    <div className="font-black text-indigo-400 text-lg">{Number(item.quantity).toFixed(2)}</div>
                                                 </td>
                                                 <td className="px-6 py-5 font-bold text-[var(--text-secondary)] text-xs uppercase">{item.source || '-'}</td>
                                                 <td className="px-6 py-5">
@@ -1506,7 +1506,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                                                     )}
                                                                                 </td>
                                                                                 <td className="px-6 py-3 font-mono font-bold text-[var(--text-primary)]">{roll.roll_number}</td>
-                                                                                <td className="px-6 py-3 text-right font-medium">{roll.weight}</td>
+                                                                                <td className="px-6 py-3 text-right font-medium">{Number(roll.weight).toFixed(2)}</td>
                                                                                 <td className="px-6 py-3 text-center">
                                                                                     <div className="flex items-center justify-center gap-3">
                                                                                         <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${roll.status === 'used'
@@ -1807,7 +1807,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                 <div className="text-[10px] uppercase font-black text-[var(--text-secondary)] mb-2">Tanlangan Rulonlar:</div>
                                 <div className="flex flex-wrap gap-2 mb-4">
                                     {outboundData.selected_rolls.map(r => (
-                                        <span key={r.id} className="bg-[var(--bg-card)] border border-[var(--border-color)] px-2 py-1 rounded text-xs font-bold">{r.roll_number} ({r.weight}kg)</span>
+                                        <span key={r.id} className="bg-[var(--bg-card)] border border-[var(--border-color)] px-2 py-1 rounded text-xs font-bold">{r.roll_number} ({Number(r.weight).toFixed(2)}kg)</span>
                                     ))}
                                 </div>
                                 <div className="flex justify-between items-end border-t border-[var(--border-color)] pt-4">
@@ -1930,16 +1930,16 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                     <>
                                         <div className="bg-[var(--bg-card)] p-4 rounded-2xl border border-[var(--border-color)] shadow-sm">
                                             <div className="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-1">Jami Kirim</div>
-                                            <div className="text-2xl font-black text-[var(--text-primary)]">+{totalIn.toLocaleString()} <span className="text-xs text-[var(--text-secondary)]">kg</span></div>
+                                            <div className="text-2xl font-black text-[var(--text-primary)]">+{totalIn.toFixed(2)} <span className="text-xs text-[var(--text-secondary)]">kg</span></div>
                                         </div>
                                         <div className="bg-[var(--bg-card)] p-4 rounded-2xl border border-[var(--border-color)] shadow-sm">
                                             <div className="text-[10px] font-black uppercase tracking-widest text-rose-500 mb-1">Jami Chiqim</div>
-                                            <div className="text-2xl font-black text-[var(--text-primary)]">-{totalOut.toLocaleString()} <span className="text-xs text-[var(--text-secondary)]">kg</span></div>
+                                            <div className="text-2xl font-black text-[var(--text-primary)]">-{totalOut.toFixed(2)} <span className="text-xs text-[var(--text-secondary)]">kg</span></div>
                                         </div>
                                         <div className="bg-[var(--bg-card)] p-4 rounded-2xl border border-[var(--border-color)] shadow-sm relative overflow-hidden">
                                             <div className="absolute top-0 right-0 w-16 h-16 bg-indigo-500/10 rounded-bl-full -mr-4 -mt-4"></div>
                                             <div className="text-[10px] font-black uppercase tracking-widest text-indigo-500 mb-1">Joriy Qoldiq</div>
-                                            <div className="text-2xl font-black text-[var(--text-primary)]">{currentBalance.toLocaleString()} <span className="text-xs text-[var(--text-secondary)]">kg</span></div>
+                                            <div className="text-2xl font-black text-[var(--text-primary)]">{currentBalance.toFixed(2)} <span className="text-xs text-[var(--text-secondary)]">kg</span></div>
                                         </div>
                                     </>
                                 );
@@ -1968,7 +1968,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                         </div>
                                     </div>
                                     <div className={`text-lg font-black ${h.type === 'In' ? 'text-emerald-500' : 'text-rose-500'}`}>
-                                        {h.type === 'In' ? '+' : '-'}{h.quantity} <span className="text-xs text-[var(--text-secondary)] font-bold">kg</span>
+                                        {h.type === 'In' ? '+' : '-'}{Number(h.quantity).toFixed(2)} <span className="text-xs text-[var(--text-secondary)] font-bold">kg</span>
                                     </div>
                                 </div>
                             ))}
@@ -2263,7 +2263,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                 <div className="text-[10px] text-[var(--text-secondary)] font-bold">{r.inventory?.item_name}</div>
                                             </div>
                                             <div className="flex items-center gap-3">
-                                                <div className="font-black text-emerald-500 text-sm">{r.weight} kg</div>
+                                                <div className="font-black text-emerald-500 text-sm">{Number(r.weight).toFixed(2)} kg</div>
                                                 <button
                                                     onClick={() => setScannedRolls(scannedRolls.filter((_, idx) => idx !== i))}
                                                     className="text-[var(--text-secondary)] hover:text-rose-500 p-1"
