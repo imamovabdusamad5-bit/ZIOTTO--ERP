@@ -264,11 +264,13 @@ const Ma_lumotlar = () => {
                                     </select>
                                 </div>
                                 <div className="lg:col-span-1">
-                                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">MATO</label>
+                                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
+                                        {formData.type === 'Mato' ? 'MATO' : 'MAHSULOT NOMI'}
+                                    </label>
                                     <input
                                         required
                                         type="text"
-                                        placeholder="Masalan: 2IP, SUPREM, KASHKORSA"
+                                        placeholder={formData.type === 'Mato' ? "Masalan: 2IP, SUPREM, KASHKORSA" : "Masalan: IP, SHEVRON, ZAMOK"}
                                         className="w-full px-4 py-4 bg-black/40 border border-white/10 rounded-2xl text-white focus:border-indigo-500 outline-none transition-all font-black text-lg"
                                         value={formData.name}
                                         onChange={e => setFormData({ ...formData, name: e.target.value })}
@@ -276,41 +278,40 @@ const Ma_lumotlar = () => {
                                 </div>
 
                                 {formData.type === 'Mato' && (
-                                    <>
-                                        <div className="lg:col-span-1">
-                                            <label className="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-2">MATO TURI (Ip Turi)</label>
-                                            <input
-                                                type="text"
-                                                placeholder="Masalan: 30/1, 20/1, 24/1"
-                                                className="w-full px-4 py-4 bg-black/40 border border-indigo-500/20 rounded-2xl text-indigo-400 focus:border-indigo-500 outline-none transition-all font-mono font-black text-lg"
-                                                value={formData.thread_type}
-                                                onChange={e => setFormData({ ...formData, thread_type: e.target.value })}
-                                            />
-                                        </div>
-                                        <div className="lg:col-span-1">
-                                            <label className="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-2">
-                                                {formData.type === 'Mato' ? 'ZICHLIGI (Grammaj)' : 'BIRLIK OG\'IRLIGI (Gramm)'}
-                                            </label>
-                                            <div className="relative">
-                                                <input
-                                                    type="number"
-                                                    placeholder={formData.type === 'Mato' ? "180" : "5"}
-                                                    className="w-full px-4 py-4 pr-12 bg-black/40 border border-indigo-500/20 rounded-2xl text-indigo-400 focus:border-indigo-500 outline-none transition-all font-mono font-black text-lg"
-                                                    value={formData.grammage}
-                                                    onChange={e => setFormData({ ...formData, grammage: e.target.value })}
-                                                />
-                                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">
-                                                    {formData.type === 'Mato' ? 'gr/m²' : 'gr'}
-                                                </span>
-                                            </div>
-                                            {formData.type !== 'Mato' && (
-                                                <p className="text-[9px] text-gray-400 mt-1">
-                                                    * Modelxonada donani kg ga o'tkazish uchun ishlatiladi.
-                                                </p>
-                                            )}
-                                        </div>
-                                    </>
+                                    <div className="lg:col-span-1">
+                                        <label className="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-2">MATO TURI (Ip Turi)</label>
+                                        <input
+                                            type="text"
+                                            placeholder="Masalan: 30/1, 20/1, 24/1"
+                                            className="w-full px-4 py-4 bg-black/40 border border-indigo-500/20 rounded-2xl text-indigo-400 focus:border-indigo-500 outline-none transition-all font-mono font-black text-lg"
+                                            value={formData.thread_type}
+                                            onChange={e => setFormData({ ...formData, thread_type: e.target.value })}
+                                        />
+                                    </div>
                                 )}
+
+                                <div className="lg:col-span-1">
+                                    <label className="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-2">
+                                        {formData.type === 'Mato' ? 'ZICHLIGI (Grammaj)' : 'BIRLIK OG\'IRLIGI (Gramm)'}
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            type="number"
+                                            placeholder={formData.type === 'Mato' ? "180" : "5"}
+                                            className="w-full px-4 py-4 pr-12 bg-black/40 border border-indigo-500/20 rounded-2xl text-indigo-400 focus:border-indigo-500 outline-none transition-all font-mono font-black text-lg"
+                                            value={formData.grammage}
+                                            onChange={e => setFormData({ ...formData, grammage: e.target.value })}
+                                        />
+                                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">
+                                            {formData.type === 'Mato' ? 'gr/m²' : 'gr'}
+                                        </span>
+                                    </div>
+                                    {formData.type !== 'Mato' && (
+                                        <p className="text-[9px] text-gray-400 mt-1">
+                                            * Modelxonada donani kg ga o'tkazish uchun ishlatiladi.
+                                        </p>
+                                    )}
+                                </div>
 
                                 <div className="lg:col-span-1">
                                     <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Artikul Kodi (Ixtiyoriy)</label>

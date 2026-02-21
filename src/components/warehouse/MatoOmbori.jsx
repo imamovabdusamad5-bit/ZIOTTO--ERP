@@ -504,7 +504,6 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                     // Update existing
                     await supabase.from('inventory_rolls').update({
                         weight: roll.weight,
-                        roll_number: roll.roll_number, // User currently can't edit name, but if we allow re-sequencing... let's keep it simple
                         // Ensure batch number in roll_number matches new batch number?
                         // If batch_number changed, we should technically rename ALL rolls.
                         // Let's doing it:
