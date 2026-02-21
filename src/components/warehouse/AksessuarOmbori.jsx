@@ -4,7 +4,7 @@ import {
     ArrowUpRight, Trash2, X, ArrowDownLeft, RotateCcw, Edit,
     QrCode, Printer, ChevronDown, ChevronUp
 } from 'lucide-react';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { Html5Qrcode } from 'html5-qrcode';
 import { QRCodeSVG } from 'qrcode.react';
 import { supabase } from '../../lib/supabase';
 
@@ -19,35 +19,42 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
     const [showScanner, setShowScanner] = useState(false);
 
     useEffect(() => {
-        let scanner = null;
+        let html5QrCode = null;
         if (showScanner) {
-            try {
-                const element = document.getElementById('reader');
-                if (element) {
-                    scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 250 } }, false);
-                    scanner.render((decodedText) => {
-                        const code = decodedText.trim();
-                        // Possible codes: 'AKS-uuid', 'UUID', 'ReferenceCode'
-                        const item = inventory.find(i =>
-                            i.id === code ||
-                            `AKS-${i.id}` === code ||
-                            Object.values(references || {}).some(r => r.code === code && r.id === i.reference_id)
-                        );
-                        if (item) {
-                            setOutboundData(prev => ({ ...prev, inventory_id: item.id }));
-                            setShowOutboundModal(true);
-                            scanner.clear();
-                            setShowScanner(false);
-                        } else {
-                            alert("Bunday Aksessuar (ID yoki Kod) topilmadi: " + code);
-                            scanner.clear();
-                            setShowScanner(false);
-                        }
-                    }, (error) => { });
+            const startScanner = async () => {
+                try {
+                    await new Promise(resolve => setTimeout(resolve, 100)); // allow render
+                    html5QrCode = new Html5Qrcode("reader");
+                    await html5QrCode.start(
+                        { facingMode: "environment" },
+                        { fps: 10, qrbox: { width: 250, height: 250 } },
+                        (decodedText) => {
+                            const code = decodedText.trim();
+                            const item = inventory.find(i =>
+                                i.id === code ||
+                                `AKS-${i.id}` === code ||
+                                Object.values(references || {}).some(r => r.code === code && r.id === i.reference_id)
+                            );
+                            if (item) {
+                                setOutboundData(prev => ({ ...prev, inventory_id: item.id }));
+                                setShowOutboundModal(true);
+                                setShowScanner(false);
+                            } else {
+                                alert("Bunday Aksessuar (ID yoki Kod) topilmadi: " + code);
+                                setShowScanner(false);
+                            }
+                        },
+                        (error) => { /* ignore */ }
+                    );
+                } catch (err) {
+                    console.error('Scanner init error:', err);
                 }
-            } catch (e) { console.error('Scanner init error:', e); }
+            };
+            startScanner();
         }
-        return () => { if (scanner) scanner.clear().catch(e => console.error(e)); };
+        return () => {
+            if (html5QrCode && html5QrCode.isScanning) html5QrCode.stop().then(() => html5QrCode.clear()).catch(console.error);
+        };
     }, [showScanner, inventory, references]);
 
     const toggleGroup = (name) => {
@@ -891,7 +898,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                                                             </td>
                                                                             <td className="px-6 py-3 text-xs text-[var(--text-primary)] font-bold">{dateDisplay}</td>
                                                                             <td className="px-6 py-3 font-medium text-[var(--text-secondary)] text-sm">{item.item_name}</td>
-                                                                            <td className="px-6 py-3 text-xs text-purple-300 font-mono uppercase bg-purple-500/5 rounded-lg inline-block my-1 px-2" title={`Asl ID: AKS-${item.id}`}>{codeToDisplay}</td>
+                                                                            <td className="px-6 py-3 font-mono font-black text-xl text-purple-400 uppercase bg-purple-500/10 rounded-lg inline-block my-1 px-3 border border-purple-500/20 shadow-sm" title={`Asl ID: AKS-${item.id}`}>{codeToDisplay}</td>
                                                                             <td className="px-6 py-3 text-right font-black text-[var(--text-primary)] text-sm">{Number(item.quantity).toFixed(2)}</td>
                                                                             <td className="px-6 py-3 text-center text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest">{item.unit}</td>
                                                                             <td className="px-6 py-3">

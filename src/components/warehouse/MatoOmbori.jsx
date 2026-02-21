@@ -2,7 +2,7 @@
 import {
     ArrowUpRight, ArrowDownLeft, ScrollText, QrCode, Printer, Trash2, CircleCheck, RotateCcw, ChevronDown, ChevronUp, Edit, X, Search, Plus, History, Warehouse
 } from 'lucide-react';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { Html5Qrcode } from 'html5-qrcode';
 import { supabase } from '../../lib/supabase';
 
 const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
@@ -57,37 +57,34 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
     const [rollSourceMap, setRollSourceMap] = useState({}); // Stores id -> source (string)
 
     useEffect(() => {
-        let scanner = null;
+        let html5QrCode = null;
         if (showScanner) {
-            try {
-                // Ensure DOM element exists
-                const element = document.getElementById('reader');
-                if (element) {
-                    scanner = new Html5QrcodeScanner(
-                        "reader",
+            const startScanner = async () => {
+                try {
+                    // Allow UI to render the #reader div first
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    html5QrCode = new Html5Qrcode("reader");
+                    await html5QrCode.start(
+                        { facingMode: "environment" },
                         { fps: 10, qrbox: { width: 250, height: 250 } },
-                        /* verbose= */ false
+                        (decodedText) => {
+                            handleScanSuccess(decodedText);
+                        },
+                        (err) => { /* ignore frame errors */ }
                     );
-                    scanner.render(handleScanSuccess, (err) => {
-                        console.warn(err);
-                    });
+                } catch (err) {
+                    console.warn("QR Scanner error:", err);
                 }
-            } catch (e) {
-                console.error("Scanner init error:", e);
-                alert("Kamerani ishga tushirib bo'lmadi. Iltimos brauzer ruxsatlarini tekshiring.");
-                setShowScanner(false);
-            }
+            };
+            startScanner();
         }
 
         return () => {
-            if (scanner) {
-                scanner.clear().catch(e => console.error(e));
+            if (html5QrCode && html5QrCode.isScanning) {
+                html5QrCode.stop().then(() => html5QrCode.clear()).catch(console.error);
             }
         };
-    }, [showScanner]); // Only restart if showScanner toggles. ScannedRolls dependency would restart scanner constantly.
-
-    // Separate handler to avoid closure staleness if possible, but actually useEffect closure "traps" the initial state.
-    // Solution: Use a Ref or just fetch DB and then check duplication in existing state via functional update.
+    }, [showScanner]);
     const handleScanSuccess = async (decodedText) => {
         try {
             let scanId = decodedText;
@@ -1627,7 +1624,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                                                                 />
                                                                                             )}
                                                                                         </td>
-                                                                                        <td className="px-6 py-3 font-mono font-bold text-[var(--text-primary)]">{roll.roll_number}</td>
+                                                                                        <td className="px-6 py-4 font-mono font-black text-xl text-indigo-400 bg-indigo-500/5 rounded-lg border border-indigo-500/10 shadow-sm text-center">{roll.roll_number}</td>
                                                                                         <td className="px-6 py-3 text-right font-medium">{Number(roll.weight).toFixed(2)}</td>
                                                                                         <td className="px-6 py-3 text-center">
                                                                                             <div className="flex items-center justify-center gap-3">
