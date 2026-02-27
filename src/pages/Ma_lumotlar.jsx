@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Save, Trash2, Layers, Package, Activity, Search, Edit2, X } from 'lucide-react';
+import { Plus, Save, Trash2, Layers, Package, Activity, Search, Edit2, X, Grid, List } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import ImageCropper from '../components/ImageCropper';
 
@@ -9,6 +9,7 @@ const Ma_lumotlar = () => {
     const [showForm, setShowForm] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterType, setFilterType] = useState('All');
+    const [viewMode, setViewMode] = useState('grid');
 
     // Form State
     const [editingId, setEditingId] = useState(null);
@@ -356,7 +357,7 @@ const Ma_lumotlar = () => {
 
             {/* List and Filters */}
             <div className="space-y-4">
-                <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex flex-col xl:flex-row gap-4">
                     <div className="relative flex-1">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                         <input
@@ -367,56 +368,127 @@ const Ma_lumotlar = () => {
                             onChange={e => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    <div className="flex gap-2">
-                        {['All', 'Mato', 'Aksessuar'].map(type => (
+                    <div className="flex flex-wrap items-center gap-4">
+                        <div className="flex gap-1 bg-[#161b22] p-1.5 rounded-2xl border border-white/5 shadow-inner">
                             <button
-                                key={type}
-                                onClick={() => setFilterType(type)}
-                                className={`px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all ${filterType === type ? 'bg-indigo-600 text-white shadow-2xl shadow-indigo-600/20' : 'bg-[#161b22] text-gray-500 border border-white/5 hover:text-white'}`}
+                                onClick={() => setViewMode('grid')}
+                                className={`p-3 rounded-xl transition-all flex items-center gap-2 font-bold text-xs uppercase ${viewMode === 'grid' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
+                                title="Karta ko'rinishi"
                             >
-                                {type === 'All' ? 'Hammasi' : type}
+                                <Grid size={16} /> KARTALAR
                             </button>
-                        ))}
+                            <button
+                                onClick={() => setViewMode('table')}
+                                className={`p-3 rounded-xl transition-all flex items-center gap-2 font-bold text-xs uppercase ${viewMode === 'table' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
+                                title="Jadval (Excel) ko'rinishi"
+                            >
+                                <List size={16} /> JADVAL
+                            </button>
+                        </div>
+                        <div className="flex gap-2 w-full sm:w-auto overflow-x-auto hide-scrollbar">
+                            {['All', 'Mato', 'Aksessuar'].map(type => (
+                                <button
+                                    key={type}
+                                    onClick={() => setFilterType(type)}
+                                    className={`flex-1 sm:flex-none px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all whitespace-nowrap ${filterType === type ? 'bg-indigo-600 text-white shadow-2xl shadow-indigo-600/20' : 'bg-[#161b22] text-gray-500 border border-white/5 hover:text-white'}`}
+                                >
+                                    {type === 'All' ? 'Hammasi' : type}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {loading ? (
-                        <div className="col-span-full py-20 text-center"><Activity className="animate-spin mx-auto text-indigo-500" /></div>
-                    ) : filteredItems.length === 0 ? (
-                        <div className="col-span-full py-20 text-center bg-black/20 rounded-[3rem] border-2 border-dashed border-white/5 text-gray-500 font-bold uppercase tracking-widest text-[10px] italic">Ma'lumot topilmadi...</div>
-                    ) : (
-                        filteredItems.map(item => (
+                {loading ? (
+                    <div className="py-20 text-center"><Activity className="animate-spin mx-auto text-indigo-500" /></div>
+                ) : filteredItems.length === 0 ? (
+                    <div className="py-20 text-center bg-black/20 rounded-[3rem] border-2 border-dashed border-white/5 text-gray-500 font-bold uppercase tracking-widest text-[10px] italic">Ma'lumot topilmadi...</div>
+                ) : viewMode === 'grid' ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-in fade-in zoom-in-95 duration-300 relative z-0">
+                        {filteredItems.map(item => (
                             <div key={item.id} className="bg-[#161b22] p-6 rounded-[2rem] shadow-xl border border-white/5 hover:border-indigo-500/30 transition-all group relative overflow-hidden">
                                 <div className="flex items-start justify-between relative z-10">
                                     <div className="flex items-center gap-4">
-                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center overflow-hidden border border-white/5 shadow-inner ${item.type === 'Mato' ? 'bg-blue-500/10 text-blue-500' : 'bg-amber-500/10 text-amber-500'}`}>
+                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center overflow-hidden border border-white/5 shadow-inner shrink-0 ${item.type === 'Mato' ? 'bg-blue-500/10 text-blue-500' : 'bg-amber-500/10 text-amber-500'}`}>
                                             {item.image_url ? (
                                                 <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
                                             ) : (
                                                 item.type === 'Mato' ? <Layers size={24} /> : <Package size={24} />
                                             )}
                                         </div>
-                                        <div>
-                                            <h4 className="font-black text-white text-lg tracking-tight">{item.name}</h4>
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest">{item.code || 'Kod yo\'q'}</span>
-                                                <span className="w-1 h-1 bg-white/10 rounded-full"></span>
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className="font-black text-white text-lg tracking-tight truncate">{item.name}</h4>
+                                            <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                                <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest truncate max-w-[100px]">{item.code || 'Kod yo\'q'}</span>
+                                                <span className="w-1 h-1 bg-white/10 rounded-full shrink-0"></span>
                                                 <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{item.type}</span>
-                                                <span className="w-1 h-1 bg-white/10 rounded-full"></span>
+                                                <span className="w-1 h-1 bg-white/10 rounded-full shrink-0"></span>
                                                 <span className="text-[10px] font-black text-gray-400">{item.unit}</span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex gap-1">
-                                        <button onClick={() => handleEdit(item)} className="p-3 bg-white/5 text-gray-500 hover:text-indigo-400 rounded-xl transition-all"><Edit2 size={16} /></button>
-                                        <button onClick={() => handleDelete(item.id)} className="p-3 bg-white/5 text-gray-500 hover:text-rose-500 rounded-xl transition-all"><Trash2 size={16} /></button>
+                                    <div className="flex gap-1 relative z-20 shrink-0 ml-2">
+                                        <button onClick={() => handleEdit(item)} className="p-3 bg-white/5 text-gray-500 hover:text-indigo-400 rounded-xl transition-all relative z-20"><Edit2 size={16} /></button>
+                                        <button onClick={() => handleDelete(item.id)} className="p-3 bg-white/5 text-gray-500 hover:text-rose-500 rounded-xl transition-all relative z-20"><Trash2 size={16} /></button>
                                     </div>
                                 </div>
                             </div>
-                        ))
-                    )}
-                </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="overflow-x-auto bg-[#161b22] rounded-[2rem] border border-white/5 shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-300">
+                        <table className="w-full text-left border-collapse min-w-[800px]">
+                            <thead className="bg-black/40 text-gray-500 text-[10px] font-black uppercase tracking-widest border-b border-white/10">
+                                <tr>
+                                    <th className="px-6 py-5 w-16 text-center">Rasm</th>
+                                    <th className="px-6 py-5">Nomi</th>
+                                    <th className="px-6 py-5">Artikul (KOD)</th>
+                                    <th className="px-6 py-5">Turi</th>
+                                    <th className="px-6 py-5">Ip / Parametr</th>
+                                    <th className="px-6 py-5 text-center">Birligi</th>
+                                    <th className="px-6 py-5 text-center w-32">Amallar</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-white/5">
+                                {filteredItems.map(item => (
+                                    <tr key={item.id} className="hover:bg-white/5 transition-colors group">
+                                        <td className="px-6 py-4">
+                                            <div className={`w-10 h-10 mx-auto rounded-xl flex items-center justify-center overflow-hidden border border-white/5 shadow-inner ${item.type === 'Mato' ? 'bg-blue-500/10 text-blue-500' : 'bg-amber-500/10 text-amber-500'}`}>
+                                                {item.image_url ? (
+                                                    <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    item.type === 'Mato' ? <Layers size={16} /> : <Package size={16} />
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 font-black text-white text-sm">{item.name}</td>
+                                        <td className="px-6 py-4 text-xs font-mono font-black text-indigo-400 bg-indigo-500/5 rounded-lg w-max px-2 py-1 my-2 border border-indigo-500/10 shadow-sm inline-block">{item.code || '-'}</td>
+                                        <td className="px-6 py-4 text-xs font-bold text-gray-300 uppercase tracking-wider">{item.type}</td>
+                                        <td className="px-6 py-4 text-xs font-mono text-gray-400">
+                                            {item.type === 'Mato' ? (
+                                                <div className="flex items-center gap-2">
+                                                    <span className="font-bold text-white">{item.thread_type || '-'}</span>
+                                                    {item.grammage && <span className="text-[10px] font-black bg-white/5 px-2 py-1 rounded-lg text-gray-400 border border-white/5">{item.grammage} gr/m²</span>}
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center gap-2">
+                                                    {item.grammage ? <span className="text-[10px] font-black bg-white/5 px-2 py-1 rounded-lg text-gray-400 border border-white/5">{item.grammage} gr</span> : '-'}
+                                                </div>
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-widest text-center">{item.unit}</td>
+                                        <td className="px-6 py-4 text-center">
+                                            <div className="flex gap-2 justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button onClick={() => handleEdit(item)} className="p-2 bg-white/5 text-gray-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all"><Edit2 size={16} /></button>
+                                                <button onClick={() => handleDelete(item.id)} className="p-2 bg-white/5 text-gray-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all"><Trash2 size={16} /></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </div>
 
             {showCropper && (
