@@ -1418,10 +1418,17 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                             </thead>
                             <tbody className="divide-y divide-[var(--border-color)]">
                                 {Object.values(filteredInventory.reduce((acc, item) => {
-                                    const key = item.item_name || "Noma'lum";
+                                    const itemName = item.item_name || "Noma'lum";
+                                    const dateStr = item.created_at
+                                        ? new Date(item.created_at).toLocaleDateString('ru-RU')
+                                        : (item.last_updated ? new Date(item.last_updated).toLocaleDateString('ru-RU') : '-');
+                                    const key = `${itemName}_${dateStr}`;
+
                                     if (!acc[key]) {
                                         acc[key] = {
-                                            name: key,
+                                            groupKey: key,
+                                            name: itemName,
+                                            date: dateStr,
                                             items: [],
                                             totalWeight: 0,
                                             colors: new Set(),
@@ -1434,14 +1441,14 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                     if (item.color) acc[key].colors.add(item.color);
                                     return acc;
                                 }, {})).map(group => (
-                                    <React.Fragment key={group.name}>
-                                        <tr onClick={() => toggleGroup(group.name)} className="cursor-pointer hover:bg-[var(--bg-card-hover)] transition-colors group bg-[var(--bg-body)] border-b-2 border-[var(--border-color)]">
+                                    <React.Fragment key={group.groupKey}>
+                                        <tr onClick={() => toggleGroup(group.groupKey)} className="cursor-pointer hover:bg-[var(--bg-card-hover)] transition-colors group bg-[var(--bg-body)] border-b-2 border-[var(--border-color)]">
                                             <td className="px-6 py-5 text-center">
-                                                {expandedGroups[group.name] ? <ChevronUp size={20} className="text-indigo-400 mx-auto" /> : <ChevronDown size={20} className="text-[var(--text-secondary)] mx-auto group-hover:text-indigo-400 transition-colors" />}
+                                                {expandedGroups[group.groupKey] ? <ChevronUp size={20} className="text-indigo-400 mx-auto" /> : <ChevronDown size={20} className="text-[var(--text-secondary)] mx-auto group-hover:text-indigo-400 transition-colors" />}
                                             </td>
                                             <td className="px-6 py-5">
                                                 <div className="font-bold text-sm text-[var(--text-primary)]">
-                                                    {group.items.length > 0 ? (group.items[0].created_at ? new Date(group.items[0].created_at).toLocaleDateString('ru-RU') : (group.items[0].last_updated ? new Date(group.items[0].last_updated).toLocaleDateString('ru-RU') : '-')) : '-'}
+                                                    {group.date}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-5 font-black text-white text-base tracking-wide flex items-center gap-2">
@@ -1466,12 +1473,12 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                             </td>
                                             <td className="px-6 py-5 text-xs text-[var(--text-secondary)] italic opacity-50 uppercase text-center">-</td>
                                             <td className="px-6 py-5 text-center">
-                                                <button onClick={(e) => { e.stopPropagation(); handlePrintGroupRolls(group.items, group.name); }} className="bg-indigo-500/10 text-indigo-400 hover:text-white hover:bg-indigo-500 px-3 py-1.5 rounded-xl transition-all border border-indigo-500/20 shadow-sm flex items-center gap-2 text-[10px] font-bold mx-auto" title="Guruhdagi barcha rulonlarni chop etish">
+                                                <button onClick={(e) => { e.stopPropagation(); handlePrintGroupRolls(group.items, `${group.name} (${group.date})`); }} className="bg-indigo-500/10 text-indigo-400 hover:text-white hover:bg-indigo-500 px-3 py-1.5 rounded-xl transition-all border border-indigo-500/20 shadow-sm flex items-center gap-2 text-[10px] font-bold mx-auto" title="Guruhdagi barcha rulonlarni chop etish">
                                                     <Printer size={14} /> BARCHA QR
                                                 </button>
                                             </td>
                                         </tr>
-                                        {expandedGroups[group.name] && group.items.map(item => {
+                                        {expandedGroups[group.groupKey] && group.items.map(item => {
                                             const isExpanded = expandedRowId === item.id;
                                             const isSelected = selectedIds.includes(item.id);
                                             const ref = references?.find(r => r.id === item.reference_id) || {};
