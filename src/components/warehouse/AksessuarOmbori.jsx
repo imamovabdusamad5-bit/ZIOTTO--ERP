@@ -810,19 +810,24 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                             </thead>
                             <tbody className="divide-y divide-[var(--border-color)]">
                                 {Object.values(filteredInventory.reduce((acc, item) => {
-                                    const key = item.item_name || "Noma'lum";
-                                    if (!acc[key]) acc[key] = { name: key, items: [], total: 0, unit: item.unit };
+                                    const itemName = item.item_name || "Noma'lum";
+                                    const dateStr = item.created_at
+                                        ? new Date(item.created_at).toLocaleDateString('ru-RU')
+                                        : (item.last_updated ? new Date(item.last_updated).toLocaleDateString('ru-RU') : '-');
+                                    const key = `${itemName}_${dateStr}`;
+
+                                    if (!acc[key]) acc[key] = { groupKey: key, name: itemName, date: dateStr, items: [], total: 0, unit: item.unit };
                                     acc[key].items.push(item);
                                     acc[key].total += Number(item.quantity) || 0;
                                     return acc;
                                 }, {})).map(group => (
-                                    <React.Fragment key={group.name}>
-                                        <tr onClick={() => toggleGroup(group.name)} className="cursor-pointer hover:bg-[var(--bg-card-hover)] transition-colors group bg-[var(--bg-body)] border-b-2 border-[var(--border-color)]">
+                                    <React.Fragment key={group.groupKey}>
+                                        <tr onClick={() => toggleGroup(group.groupKey)} className="cursor-pointer hover:bg-[var(--bg-card-hover)] transition-colors group bg-[var(--bg-body)] border-b-2 border-[var(--border-color)]">
                                             <td className="px-6 py-5 text-center">
-                                                {expandedGroups[group.name] ? <ChevronUp size={20} className="text-purple-400 mx-auto" /> : <ChevronDown size={20} className="text-[var(--text-secondary)] mx-auto group-hover:text-purple-400 transition-colors" />}
+                                                {expandedGroups[group.groupKey] ? <ChevronUp size={20} className="text-purple-400 mx-auto" /> : <ChevronDown size={20} className="text-[var(--text-secondary)] mx-auto group-hover:text-purple-400 transition-colors" />}
                                             </td>
                                             <td className="px-6 py-5 text-sm text-[var(--text-primary)] font-bold">
-                                                {group.items.length > 0 ? (group.items[0].created_at ? new Date(group.items[0].created_at).toLocaleDateString('ru-RU') : (group.items[0].last_updated ? new Date(group.items[0].last_updated).toLocaleDateString('ru-RU') : '-')) : '-'}
+                                                {group.date}
                                             </td>
                                             <td className="px-6 py-5 font-black text-white text-base tracking-wide flex items-center gap-2">
                                                 {group.name}
@@ -834,7 +839,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                             <td className="px-6 py-5 text-xs text-[var(--text-secondary)] italic opacity-50">Jamlangan ko'rinish</td>
                                             <td className="px-6 py-5 text-center text-xs text-[var(--text-secondary)] font-bold">UMUMIY JAMI</td>
                                         </tr>
-                                        {expandedGroups[group.name] && (
+                                        {expandedGroups[group.groupKey] && (
                                             <tr className="bg-[var(--bg-body)]/50 transition-all">
                                                 <td colSpan="8" className="p-6 border-b border-[var(--border-color)]">
                                                     <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] overflow-hidden">
