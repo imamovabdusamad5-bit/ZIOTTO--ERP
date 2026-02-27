@@ -278,18 +278,18 @@ const Ma_lumotlar = () => {
                                     />
                                 </div>
 
-                                {formData.type === 'Mato' && (
-                                    <div className="lg:col-span-1">
-                                        <label className="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-2">MATO TURI (Ip Turi)</label>
-                                        <input
-                                            type="text"
-                                            placeholder="Masalan: 30/1, 20/1, 24/1"
-                                            className="w-full px-4 py-4 bg-black/40 border border-indigo-500/20 rounded-2xl text-indigo-400 focus:border-indigo-500 outline-none transition-all font-mono font-black text-lg"
-                                            value={formData.thread_type}
-                                            onChange={e => setFormData({ ...formData, thread_type: e.target.value })}
-                                        />
-                                    </div>
-                                )}
+                                <div className="lg:col-span-1">
+                                    <label className="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-2">
+                                        {formData.type === 'Mato' ? 'MATO TURI (Ip Turi)' : 'IZOH'}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        placeholder={formData.type === 'Mato' ? "Masalan: 30/1, 20/1, 24/1" : "Qo'shimcha izoh..."}
+                                        className="w-full px-4 py-4 bg-black/40 border border-indigo-500/20 rounded-2xl text-indigo-400 focus:border-indigo-500 outline-none transition-all font-mono font-black text-lg"
+                                        value={formData.thread_type}
+                                        onChange={e => setFormData({ ...formData, thread_type: e.target.value })}
+                                    />
+                                </div>
 
                                 <div className="lg:col-span-1">
                                     <label className="block text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-2">
@@ -444,7 +444,7 @@ const Ma_lumotlar = () => {
                                     <th className="px-6 py-5">Nomi</th>
                                     <th className="px-6 py-5">Artikul (KOD)</th>
                                     <th className="px-6 py-5">Turi</th>
-                                    <th className="px-6 py-5">Ip / Parametr</th>
+                                    <th className="px-6 py-5">Ip / Izoh</th>
                                     <th className="px-6 py-5 text-center">Birligi</th>
                                     <th className="px-6 py-5 text-center w-32">Amallar</th>
                                 </tr>
@@ -472,7 +472,8 @@ const Ma_lumotlar = () => {
                                                 </div>
                                             ) : (
                                                 <div className="flex items-center gap-2">
-                                                    {item.grammage ? <span className="text-[10px] font-black bg-white/5 px-2 py-1 rounded-lg text-gray-400 border border-white/5">{item.grammage} gr</span> : '-'}
+                                                    <span className="font-bold text-white max-w-[150px] truncate" title={item.thread_type}>{item.thread_type || '-'}</span>
+                                                    {item.grammage && <span className="text-[10px] font-black bg-white/5 px-2 py-1 rounded-lg text-gray-400 border border-white/5 shrink-0">{item.grammage} gr</span>}
                                                 </div>
                                             )}
                                         </td>
