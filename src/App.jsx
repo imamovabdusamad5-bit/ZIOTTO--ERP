@@ -20,6 +20,7 @@ import Xodimlar from './pages/Xodimlar';
 import Ma_lumotlar from './pages/Ma_lumotlar';
 import Pechat from './pages/Pechat';
 import Vishefka from './pages/Vishefka';
+import Hujjatlar from './pages/Hujjatlar';
 
 import ZiyoChat from './components/ZiyoChat';
 
@@ -95,6 +96,7 @@ function App() {
               <Route path="pechat" element={<RoleGuard path="/pechat"><Pechat /></RoleGuard>} />
               <Route path="vishefka" element={<RoleGuard path="/vishefka"><Vishefka /></RoleGuard>} />
               <Route path="malumotlar" element={<RoleGuard path="/malumotlar"><Ma_lumotlar /></RoleGuard>} />
+              <Route path="hujjatlar" element={<RoleGuard path="/hujjatlar"><Hujjatlar /></RoleGuard>} />
             </Route>
           </Routes>
         </BrowserRouter>

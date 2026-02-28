@@ -18,6 +18,7 @@ const Rejalashtirish = () => {
     const [inventory, setInventory] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
+    const [factData, setFactData] = useState({}); // { order_id: [factItems] }
 
     // --- FORM SELECTION STATE ---
     const [selectedModel, setSelectedModel] = useState(null);
@@ -140,6 +141,17 @@ const Rejalashtirish = () => {
             const { data: oRes, error } = await supabase.from('production_orders').select(`*, models(name, code)`).order('created_at', { ascending: false });
             if (error) throw error;
             if (oRes) setOrders(oRes);
+
+            // Fetch Fact Data
+            const { data: facts, error: fError } = await supabase.from('order_material_fact').select('*');
+            if (facts && !fError) {
+                const factMap = {};
+                facts.forEach(f => {
+                    if (!factMap[f.order_id]) factMap[f.order_id] = [];
+                    factMap[f.order_id].push(f);
+                });
+                setFactData(factMap);
+            }
         } catch (error) {
             console.error("Order Load Error:", error);
         } finally {
@@ -1086,50 +1098,94 @@ const Rejalashtirish = () => {
                                 </div>
                             </div>
 
-                            {/* Material Summary Section */}
-                            {order.material_summary && Object.keys(order.material_summary).length > 0 && (
-                                <div className="pt-6 border-t border-[var(--border-color)]">
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <div className="w-6 h-6 bg-amber-500/10 rounded-lg flex items-center justify-center">
-                                            <ShoppingBag size={14} className="text-amber-500" />
-                                        </div>
-                                        <h5 className="text-xs font-black text-[var(--text-primary)] uppercase tracking-widest">
-                                            Kerakli Materiallar
-                                        </h5>
+                            {/* Plan vs Fact Section */}
+                            <div className="pt-6 mt-6 border-t border-[var(--border-color)]">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <div className="w-6 h-6 bg-indigo-500/10 rounded-lg flex items-center justify-center">
+                                        <Activity size={14} className="text-indigo-500" />
                                     </div>
-                                    <div className="space-y-3 max-h-64 overflow-y-auto custom-scrollbar">
+                                    <h5 className="text-xs font-black text-[var(--text-primary)] uppercase tracking-widest">
+                                        Plan vs Fakt (Haqiqiy Ishlatish)
+                                    </h5>
+                                </div>
+
+                                <div className="bg-black/20 rounded-2xl overflow-hidden border border-white/5">
+                                    <table className="w-full text-left text-[10px]">
+                                        <thead className="bg-white/5 text-gray-500 font-bold uppercase tracking-widest">
+                                            <tr>
+                                                <th className="px-4 py-2">Material</th>
+                                                <th className="px-4 py-2 text-right">Plan</th>
+                                                <th className="px-4 py-2 text-right">Fakt</th>
+                                                <th className="px-4 py-2 text-right">Farq</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-white/5">
+                                            {/* Flatten summary items to compare with facts */}
+                                            {(() => {
+                                                const planItems = [];
+                                                if (order.material_summary) {
+                                                    Object.values(order.material_summary).flat().forEach(p => {
+                                                        const existing = planItems.find(x => x.name === p.name);
+                                                        if (existing) existing.val += p.val;
+                                                        else planItems.push({ ...p });
+                                                    });
+                                                }
+
+                                                const orderFacts = factData[order.id] || [];
+
+                                                return planItems.map((p, idx) => {
+                                                    const f = orderFacts.find(fact => fact.material_name === p.name);
+                                                    const factQty = f ? parseFloat(f.consumed_qty) : 0;
+                                                    const delta = factQty - p.val;
+                                                    const perc = p.val > 0 ? (delta / p.val) * 100 : 0;
+
+                                                    return (
+                                                        <tr key={idx} className="hover:bg-white/5">
+                                                            <td className="px-4 py-2 font-bold text-gray-400">{p.name}</td>
+                                                            <td className="px-4 py-2 text-right font-mono">{p.val.toFixed(1)}</td>
+                                                            <td className="px-4 py-2 text-right font-mono text-indigo-400">{factQty.toFixed(1)}</td>
+                                                            <td className={`px-4 py-2 text-right font-mono font-black ${delta > 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
+                                                                {delta > 0 ? '+' : ''}{delta.toFixed(1)}
+                                                                <div className="text-[8px] opacity-70">
+                                                                    ({perc > 0 ? '+' : ''}{perc.toFixed(0)}%)
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                });
+                                            })()}
+                                        </tbody>
+                                    </table>
+                                    {(!order.material_summary || Object.keys(order.material_summary).length === 0) && (
+                                        <div className="p-4 text-center text-gray-600 italic uppercase text-[8px]">Plan ma'lumotlari yo'q</div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Old Kerakli Materiallar Section (kept as detail) */}
+                            {order.material_summary && Object.keys(order.material_summary).length > 0 && (
+                                <details className="mt-4">
+                                    <summary className="text-[9px] font-bold text-gray-500 cursor-pointer hover:text-gray-300 uppercase tracking-widest outline-none">
+                                        Batafsil Plan (Ranglar bo'yicha)
+                                    </summary>
+                                    <div className="pt-4 space-y-3 max-h-48 overflow-y-auto custom-scrollbar">
                                         {Object.entries(order.material_summary).map(([color, items]) => (
                                             <div key={color} className="bg-[var(--bg-body)]/[0.03] border border-[var(--border-color)] p-4 rounded-2xl hover:border-amber-500/30 transition-all">
-                                                <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-3">
-                                                    {color}
-                                                </p>
+                                                <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-3">{color}</p>
                                                 <div className="space-y-2">
                                                     {items.map((item, idx) => (
-                                                        <div key={idx} className="flex justify-between items-center text-xs">
-                                                            <div className="flex-1">
-                                                                <span className="text-[var(--text-muted)] font-bold">{item.name}</span>
-                                                                {item.type && (
-                                                                    <span className="ml-2 text-[8px] text-[var(--text-secondary)] uppercase">({item.type})</span>
-                                                                )}
-                                                            </div>
-                                                            <div className="text-right">
-                                                                <span className="text-[var(--text-primary)] font-black">
-                                                                    {item.unit === 'dona' || item.unit === 'pcs'
-                                                                        ? Math.ceil(item.val)
-                                                                        : item.val.toFixed(2)
-                                                                    }
-                                                                </span>
-                                                                <span className="ml-1 text-[9px] text-emerald-500/70 font-bold uppercase">
-                                                                    {item.unit}
-                                                                </span>
-                                                            </div>
+                                                        <div key={idx} className="flex justify-between items-center text-[10px]">
+                                                            <span className="text-[var(--text-muted)] font-bold">{item.name}</span>
+                                                            <span className="text-[var(--text-primary)] font-black">
+                                                                {item.unit === 'dona' ? Math.ceil(item.val) : item.val.toFixed(2)} {item.unit}
+                                                            </span>
                                                         </div>
                                                     ))}
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
-                                </div>
+                                </details>
                             )}
                         </div>
                     ))}

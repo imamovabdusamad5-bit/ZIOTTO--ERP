@@ -10,6 +10,8 @@ const Modelxona = () => {
     const [expandedModel, setExpandedModel] = useState(null);
     const [references, setReferences] = useState([]);
 
+    const ALLOWED_UNITS = ['kg', 'metr', 'dona', 'pachka'];
+
     // Form State
     const [editingId, setEditingId] = useState(null); // ID of the model being edited
     const [modelInfo, setModelInfo] = useState({ name: '', code: '', age_group: '', category: '', image_url: '', notes: [] });
@@ -148,8 +150,16 @@ const Modelxona = () => {
 
         // Validation
         for (const item of bomItems) {
+            if (!item.material_type_id) {
+                alert(`Iltimos, "${item.part_name || 'Hamma'}" qism uchun materialni Tanlang (Kodi bo'lishi shart).`);
+                return;
+            }
             if (!item.consumption || isNaN(parseFloat(item.consumption))) {
                 alert(`Iltimos, "${item.part_name || 'Hamma'}" qism uchun sarf miqdorini (son ko'rinishida) kiriting.`);
+                return;
+            }
+            if (!ALLOWED_UNITS.includes(item.unit)) {
+                alert(`Iltimos, "${item.part_name || 'Hamma'}" qism uchun to'g'ri birlikni (kg, metr, dona, pachka) tanlang.`);
                 return;
             }
         }

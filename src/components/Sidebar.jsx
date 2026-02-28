@@ -27,6 +27,7 @@ export const menuItems = [
     { path: '/', name: 'Boshqaruv', icon: LayoutDashboard, roles: ['admin'] },
     { path: '/modelxona', name: 'Modelxona', icon: FileText, roles: ['admin', 'planning'], permKey: 'planning' }, // Modelxona often falls under planning or admin
     { path: '/reja', name: 'Planlama (BOM)', icon: ClipboardList, roles: ['admin', 'planning'], permKey: 'planning' },
+    { path: '/hujjatlar', name: 'Xarakatlar (Fakt)', icon: FileText, roles: ['admin', 'planning', 'warehouse', 'cutting', 'sewing'], permKey: 'warehouse' },
     { path: '/taminot', name: 'Ta\'minot', icon: Truck, roles: ['admin', 'planning', 'supply'], permKey: 'supply' },
     { path: '/malumotlar', name: 'Ma\'lumotlar', icon: Settings, roles: ['admin'] },
     {

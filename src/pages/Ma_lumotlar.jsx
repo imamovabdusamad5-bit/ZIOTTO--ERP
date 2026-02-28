@@ -326,22 +326,16 @@ const Ma_lumotlar = () => {
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">O'lchov Birligi</label>
-                                    <input
-                                        list="unit-options"
-                                        placeholder="Tanlang yoki yozing..."
+                                    <select
                                         className="w-full px-4 py-4 bg-black/40 border border-white/10 rounded-2xl text-white focus:border-indigo-500 outline-none transition-all font-bold"
                                         value={formData.unit}
                                         onChange={e => setFormData({ ...formData, unit: e.target.value })}
-                                    />
-                                    <datalist id="unit-options">
-                                        <option value="kg" />
-                                        <option value="dona" />
-                                        <option value="metr" />
-                                        <option value="pachka" />
-                                        <option value="rulon" />
-                                        <option value="litr" />
-                                        <option value="komplekt" />
-                                    </datalist>
+                                    >
+                                        <option value="kg" className="bg-[#161b22]">kg</option>
+                                        <option value="metr" className="bg-[#161b22]">metr</option>
+                                        <option value="dona" className="bg-[#161b22]">dona</option>
+                                        <option value="pachka" className="bg-[#161b22]">pachka</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
