@@ -80,8 +80,8 @@ const Tasnif = () => {
                         <Layers size={32} />
                     </div>
                     <div>
-                        <h2 className="text-3xl font-black text-white tracking-tight">Tasnif Bo'limi</h2>
-                        <p className="text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px] mt-1">Saralash va sifat nazorati</p>
+                        <h2 className="text-3xl font-black text-[var(--text-primary)] tracking-tight">Tasnif Bo'limi</h2>
+                        <p className="text-[var(--text-secondary)] font-bold uppercase tracking-[0.2em] text-[10px] mt-1">Saralash va sifat nazorati</p>
                     </div>
                 </div>
                 <div className="relative">
@@ -89,7 +89,7 @@ const Tasnif = () => {
                     <input
                         type="text"
                         placeholder="Partiya qidirish..."
-                        className="bg-[#161b22] border border-white/5 rounded-2xl pl-12 pr-6 py-4 text-sm text-white focus:border-blue-500 outline-none w-64 transition-all"
+                        className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl pl-12 pr-6 py-4 text-sm text-[var(--text-primary)] focus:border-blue-500 outline-none w-64 transition-all"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -101,7 +101,7 @@ const Tasnif = () => {
                 {loading ? (
                     <div className="col-span-full py-20 text-center"><Clock className="animate-spin mx-auto text-blue-500" /></div>
                 ) : filteredBundles.map((batch) => (
-                    <div key={batch.id} className="bg-[#161b22] border border-white/5 p-8 rounded-[2.5rem] shadow-xl hover:shadow-2xl hover:border-blue-500/30 transition-all group relative overflow-hidden">
+                    <div key={batch.id} className="bg-[var(--bg-card)] border border-[var(--border-color)] p-8 rounded-[2.5rem] shadow-xl hover:shadow-2xl hover:border-blue-500/30 transition-all group relative overflow-hidden">
                         <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:scale-110 transition-transform">
                             <Layers size={80} />
                         </div>
@@ -109,20 +109,20 @@ const Tasnif = () => {
                         <div className="flex justify-between items-start mb-6">
                             <div>
                                 <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest bg-blue-500/10 px-3 py-1 rounded-full">Saralashda</span>
-                                <h3 className="text-xl font-black text-white mt-3 tracking-tight group-hover:text-blue-400 transition-colors uppercase">
+                                <h3 className="text-xl font-black text-[var(--text-primary)] mt-3 tracking-tight group-hover:text-blue-400 transition-colors uppercase">
                                     {batch.production_orders?.models?.name || 'Noma\'lum xil'}
                                 </h3>
-                                <p className="text-xs font-mono font-bold text-gray-500 mt-1"># {batch.bundle_number}</p>
+                                <p className="text-xs font-mono font-bold text-[var(--text-secondary)] mt-1"># {batch.bundle_number}</p>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4 mb-8">
-                            <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
-                                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Miqdor</p>
-                                <p className="text-lg font-black text-white">{batch.quantity} <span className="text-[10px] text-gray-600">dona</span></p>
+                            <div className="bg-[var(--bg-header)] p-4 rounded-2xl border border-[var(--border-color)]">
+                                <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-1">Miqdor</p>
+                                <p className="text-lg font-black text-[var(--text-primary)]">{batch.quantity} <span className="text-[10px] text-[var(--text-secondary)]">dona</span></p>
                             </div>
-                            <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
-                                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Rangi & Olcham</p>
+                            <div className="bg-[var(--bg-header)] p-4 rounded-2xl border border-[var(--border-color)]">
+                                <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-1">Rangi & Olcham</p>
                                 <p className="text-sm font-black text-blue-500">{batch.color} | {batch.size}</p>
                             </div>
                         </div>
@@ -140,8 +140,8 @@ const Tasnif = () => {
                 ))}
 
                 {!loading && filteredBundles.length === 0 && (
-                    <div className="col-span-full py-20 text-center bg-white/5 rounded-[3rem] border-2 border-dashed border-white/5">
-                        <p className="text-gray-500 font-bold uppercase tracking-widest text-xs">Hozircha saralash uchun partiyalar yo'q</p>
+                    <div className="col-span-full py-20 text-center bg-[var(--bg-card)] rounded-[3rem] border-2 border-dashed border-[var(--border-color)]">
+                        <p className="text-[var(--text-secondary)] font-bold uppercase tracking-widest text-xs">Hozircha saralash uchun partiyalar yo'q</p>
                     </div>
                 )}
             </div>

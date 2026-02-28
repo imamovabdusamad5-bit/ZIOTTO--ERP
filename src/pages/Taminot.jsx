@@ -99,8 +99,8 @@ const Taminot = () => {
                         <Truck size={32} />
                     </div>
                     <div>
-                        <h2 className="text-3xl font-black text-white tracking-tight">Ta'minot Boshqaruvi</h2>
-                        <p className="text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px] mt-1">Logistika va xaridlar</p>
+                        <h2 className="text-3xl font-black text-[var(--text-primary)] tracking-tight">Ta'minot Boshqaruvi</h2>
+                        <p className="text-[var(--text-secondary)] font-bold uppercase tracking-[0.2em] text-[10px] mt-1">Logistika va xaridlar</p>
                     </div>
                 </div>
                 {hasFullAccess && (
@@ -122,20 +122,20 @@ const Taminot = () => {
                     { label: 'Kamchiligi bor stok', value: '3 xil', icon: CircleAlert, color: 'text-rose-500', bg: 'bg-rose-500/10' },
                     { label: 'Hamkorlar', value: '24 ta', icon: Users, color: 'text-blue-500', bg: 'bg-blue-500/10' },
                 ].map((stat, i) => (
-                    <div key={i} className="bg-[#161b22] border border-white/5 p-8 rounded-[2.5rem] shadow-xl group hover:border-blue-500/30 transition-all">
+                    <div key={i} className="bg-[var(--bg-card)] border border-[var(--border-color)] p-8 rounded-[2.5rem] shadow-xl group hover:border-blue-500/30 transition-all">
                         <div className="flex items-center gap-4 mb-4">
                             <div className={`p-3 rounded-2xl ${stat.bg} ${stat.color} transition-transform group-hover:scale-110`}>
                                 <stat.icon size={20} />
                             </div>
-                            <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{stat.label}</span>
+                            <span className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">{stat.label}</span>
                         </div>
-                        <p className="text-3xl font-black text-white tracking-tight">{stat.value}</p>
+                        <p className="text-3xl font-black text-[var(--text-primary)] tracking-tight">{stat.value}</p>
                     </div>
                 ))}
             </div>
 
             {/* Navigation Tabs */}
-            <div className="flex items-center gap-2 bg-[#161b22]/80 p-1.5 rounded-2xl border border-white/5 overflow-x-auto no-scrollbar">
+            <div className="flex items-center gap-2 bg-[var(--bg-card)] p-1.5 rounded-2xl border border-[var(--border-color)] overflow-x-auto no-scrollbar">
                 {[
                     { id: 'inventory', label: 'Xom-ashyo Ombori', icon: Warehouse },
                     { id: 'suppliers', label: 'Yetkazib beruvchilar', icon: Users },
@@ -147,7 +147,7 @@ const Taminot = () => {
                         onClick={() => setActiveTab(tab.id)}
                         className={`flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === tab.id
                             ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
-                            : 'text-gray-500 hover:text-white hover:bg-white/5'
+                            : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-header)]'
                             }`}
                     >
                         <tab.icon size={16} />
@@ -157,7 +157,7 @@ const Taminot = () => {
             </div>
 
             {/* Main Content Area */}
-            <div className="bg-[#161b22]/80 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] p-4 md:p-8 shadow-3xl min-h-[500px]">
+            <div className="bg-[var(--bg-card)]/80 backdrop-blur-2xl border border-[var(--border-color)] rounded-[2.5rem] p-4 md:p-8 shadow-3xl min-h-[500px]">
                 {/* Search & Filter Bar */}
                 <div className="flex flex-col md:flex-row gap-4 mb-8">
                     <div className="relative flex-1 group">
@@ -165,7 +165,7 @@ const Taminot = () => {
                         <input
                             type="text"
                             placeholder="Qidirish (Nomi, Bo'lim, Kategoriya)..."
-                            className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-gray-700 outline-none focus:border-blue-500/50 transition-all font-bold"
+                            className="w-full bg-[var(--bg-header)] border border-[var(--border-color)] rounded-2xl py-4 pl-12 pr-4 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] outline-none focus:border-blue-500/50 transition-all font-bold"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
@@ -180,7 +180,7 @@ const Taminot = () => {
                                 <div className="flex items-start justify-between mb-4">
                                     <div>
                                         <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest bg-blue-600/10 px-3 py-1 rounded-full">{item.category}</span>
-                                        <h3 className="text-xl font-black text-white mt-3 tracking-tight">{item.name}</h3>
+                                        <h3 className="text-xl font-black text-[var(--text-primary)] mt-3 tracking-tight">{item.name}</h3>
                                     </div>
                                     <ShoppingBag size={24} className="text-gray-700 group-hover:text-blue-500 transition-colors" />
                                 </div>
@@ -188,8 +188,8 @@ const Taminot = () => {
                                     <div className="flex justify-between items-end">
                                         <div>
                                             <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Joriy Qoldiq</p>
-                                            <p className={`text-3xl font-black mt-1 ${item.stock < item.min ? 'text-rose-500' : 'text-white'}`}>
-                                                {item.stock} <span className="text-sm text-gray-400 font-bold">{item.unit}</span>
+                                            <p className={`text-3xl font-black mt-1 ${item.stock < item.min ? 'text-rose-500' : 'text-[var(--text-primary)]'}`}>
+                                                {item.stock} <span className="text-sm text-[var(--text-secondary)] font-bold">{item.unit}</span>
                                             </p>
                                         </div>
                                         <div className="text-right">

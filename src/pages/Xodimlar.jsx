@@ -160,13 +160,13 @@ const Xodimlar = () => {
                         <Users size={32} />
                     </div>
                     <div>
-                        <h2 className="text-3xl font-black text-white tracking-tight">Xodimlar va Ruxsatlar</h2>
-                        <p className="text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px] mt-1">Kirish kodlari va huquqlar matritsasi</p>
+                        <h2 className="text-3xl font-black text-[var(--text-primary)] tracking-tight">Xodimlar va Ruxsatlar</h2>
+                        <p className="text-[var(--text-secondary)] font-bold uppercase tracking-[0.2em] text-[10px] mt-1">Kirish kodlari va huquqlar matritsasi</p>
                     </div>
                 </div>
                 <button
                     onClick={() => setShowAddModal(true)}
-                    className="bg-white/5 hover:bg-white/10 text-white px-6 py-3 rounded-2xl font-bold transition-all border border-white/5 flex items-center gap-2"
+                    className="bg-[var(--bg-card)] hover:bg-[var(--bg-header)] text-[var(--text-primary)] px-6 py-3 rounded-2xl font-bold transition-all border border-[var(--border-color)] flex items-center gap-2"
                 >
                     <Plus size={20} />
                     Yangi Xodim Qo'shish
@@ -174,10 +174,10 @@ const Xodimlar = () => {
             </div>
 
             {/* Matrix Table */}
-            <div className="bg-[#161b22] border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl">
+            <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-[2.5rem] overflow-hidden shadow-2xl">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
-                        <thead className="bg-white/5 uppercase tracking-[0.2em] text-[10px] font-black text-gray-400">
+                        <thead className="bg-[var(--bg-header)] uppercase tracking-[0.2em] text-[10px] font-black text-[var(--text-secondary)]">
                             <tr>
                                 <th className="px-8 py-6 border-b border-white/5">Foydalanuvchi / Bo'lim</th>
                                 <th className="px-8 py-6 border-b border-white/5">Unikal Kod</th>
@@ -185,9 +185,9 @@ const Xodimlar = () => {
                                 <th className="px-6 py-6 border-b border-white/5 text-right">Amal</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody className="divide-y divide-[var(--border-color)]">
                             {users.map((user) => (
-                                <tr key={user.id} className={`hover:bg-white/5 transition-all group ${editingId === user.id ? 'bg-indigo-600/5' : ''}`}>
+                                <tr key={user.id} className={`hover:bg-[var(--bg-header)] transition-all group ${editingId === user.id ? 'bg-indigo-600/5' : ''}`}>
                                     <td className="px-8 py-6 align-top">
                                         {editingId === user.id ? (
                                             <div className="space-y-3">
@@ -219,7 +219,7 @@ const Xodimlar = () => {
                                         ) : (
                                             <div className="flex flex-col gap-2">
                                                 <div className="flex flex-col">
-                                                    <span className="text-lg font-black text-white tracking-tight uppercase leading-none">{user.username}</span>
+                                                    <span className="text-lg font-black text-[var(--text-primary)] tracking-tight uppercase leading-none">{user.username}</span>
                                                     <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mt-1">{user.department || 'Bo\'limsiz'}</span>
                                                 </div>
                                                 <span className={`text-[9px] font-black uppercase tracking-[0.2em] px-2 py-1 rounded bg-white/5 w-fit ${user.status ? 'text-green-500' : 'text-rose-500'}`}>
@@ -298,7 +298,7 @@ const Xodimlar = () => {
 
                                         {/* Managed Departments for HR-like restriction */}
                                         {(editingId === user.id ? (editForm.permissions.hr || editForm.permissions.admin) : (user.permissions?.hr || user.permissions?.admin)) && (
-                                            <div className="mt-4 p-4 bg-white/5 rounded-3xl border border-white/5">
+                                            <div className="mt-4 p-4 bg-[var(--bg-header)] rounded-3xl border border-[var(--border-color)]">
                                                 <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-3">Boshqariladigan Bo'limlar (Restriction)</p>
                                                 <div className="flex flex-wrap gap-2">
                                                     {departments.map(d => (
@@ -360,20 +360,20 @@ const Xodimlar = () => {
 
             {/* Add User Modal */}
             {showAddModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl animate-in fade-in duration-300">
-                    <div className="bg-[#161b22] border border-white/10 w-full max-w-md rounded-[3rem] p-10 shadow-4xl animate-in zoom-in-95 duration-300 relative overflow-hidden">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl animate-in fade-in duration-300">
+                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-md rounded-[3rem] p-10 shadow-4xl animate-in zoom-in-95 duration-300 relative overflow-hidden">
                         <div className="absolute top-0 right-0 p-4">
                             <button onClick={() => setShowAddModal(false)} className="text-gray-600 hover:text-white transition-colors">
                                 <X size={24} />
                             </button>
                         </div>
-                        <h3 className="text-2xl font-black text-white text-center mb-8 tracking-tight">Yangi Xodim Qo'shish</h3>
+                        <h3 className="text-2xl font-black text-[var(--text-primary)] text-center mb-8 tracking-tight">Yangi Xodim Qo'shish</h3>
                         <form onSubmit={handleAdd} className="space-y-6">
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Foydalanuvchi Ismi</label>
                                 <input
                                     required
-                                    className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-indigo-500 transition-all font-bold uppercase"
+                                    className="w-full bg-[var(--bg-header)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-indigo-500 transition-all font-bold uppercase"
                                     value={newUserData.username}
                                     onChange={(e) => setNewUserData({ ...newUserData, username: e.target.value })}
                                 />
@@ -383,7 +383,7 @@ const Xodimlar = () => {
                                 <div className="relative">
                                     <input
                                         required
-                                        className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-indigo-500 transition-all font-mono"
+                                        className="w-full bg-[var(--bg-header)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-indigo-500 transition-all font-mono"
                                         value={newUserData.unique_code}
                                         onChange={(e) => setNewUserData({ ...newUserData, unique_code: e.target.value })}
                                     />
@@ -399,7 +399,7 @@ const Xodimlar = () => {
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Foydalanuvchi To'liq Ismi</label>
                                 <input
-                                    className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-indigo-500 transition-all font-bold"
+                                    className="w-full bg-[var(--bg-header)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-indigo-500 transition-all font-bold"
                                     value={newUserData.full_name}
                                     onChange={(e) => setNewUserData({ ...newUserData, full_name: e.target.value })}
                                 />
@@ -407,7 +407,7 @@ const Xodimlar = () => {
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Bo'limi (Lavozimi)</label>
                                 <input
-                                    className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-indigo-400 outline-none focus:border-indigo-500 transition-all font-bold uppercase"
+                                    className="w-full bg-[var(--bg-header)] border border-[var(--border-color)] rounded-2xl p-4 text-indigo-400 outline-none focus:border-indigo-500 transition-all font-bold uppercase"
                                     placeholder="MASALAN: KESIM USTA"
                                     value={newUserData.department}
                                     onChange={(e) => setNewUserData({ ...newUserData, department: e.target.value })}

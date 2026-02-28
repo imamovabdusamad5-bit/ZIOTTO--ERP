@@ -800,7 +800,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                         />
                                     </th>
                                     <th className="px-6 py-5">Sana</th>
-                                    <th className="px-6 py-5 font-black text-white">Nomi</th>
+                                    <th className="px-6 py-5">Nomi</th>
                                     <th className="px-6 py-5">ID</th>
                                     <th className="px-6 py-5 text-right">Soni</th>
                                     <th className="px-6 py-5 text-center">Birligi</th>
@@ -829,7 +829,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                             <td className="px-6 py-5 text-sm text-[var(--text-primary)] font-bold">
                                                 {group.date}
                                             </td>
-                                            <td className="px-6 py-5 font-black text-white text-base tracking-wide flex items-center gap-2">
+                                            <td className="px-6 py-5 font-black text-[var(--text-primary)] text-base tracking-wide flex items-center gap-2">
                                                 {group.name}
                                                 <span className="text-[10px] font-bold text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded-full border border-purple-500/30 shadow-[0_0_10px_rgba(168,85,247,0.2)]">{group.items.length} xil</span>
                                             </td>

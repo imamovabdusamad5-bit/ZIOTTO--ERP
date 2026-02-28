@@ -700,7 +700,7 @@ const Rejalashtirish = () => {
                                                 {/* TOP LEVEL GROUP HEADERS */}
                                                 <tr className="text-[var(--text-primary)] text-[11px] uppercase font-black tracking-widest text-center shadow-lg">
                                                     {/* Fixed Left Groups */}
-                                                    <th colSpan={3} className="py-4 sticky left-0 z-30 bg-[#1e2329] border-b border-indigo-500/30 text-indigo-100 ring-1 ring-white/5">
+                                                    <th colSpan={3} className="py-4 sticky left-0 z-30 bg-[var(--bg-card)] border-b border-indigo-500/30 text-indigo-500 ring-1 ring-[var(--border-color)]">
                                                         ASOSIY
                                                     </th>
 
@@ -1109,9 +1109,9 @@ const Rejalashtirish = () => {
                                     </h5>
                                 </div>
 
-                                <div className="bg-black/20 rounded-2xl overflow-hidden border border-white/5">
+                                <div className="bg-[var(--bg-header)] rounded-2xl overflow-hidden border border-[var(--border-color)]">
                                     <table className="w-full text-left text-[10px]">
-                                        <thead className="bg-white/5 text-gray-500 font-bold uppercase tracking-widest">
+                                        <thead className="bg-[var(--bg-header)] text-[var(--text-secondary)] font-bold uppercase tracking-widest">
                                             <tr>
                                                 <th className="px-4 py-2">Material</th>
                                                 <th className="px-4 py-2 text-right">Plan</th>
@@ -1119,7 +1119,7 @@ const Rejalashtirish = () => {
                                                 <th className="px-4 py-2 text-right">Farq</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-white/5">
+                                        <tbody className="divide-y divide-[var(--border-color)]">
                                             {/* Flatten summary items to compare with facts */}
                                             {(() => {
                                                 const planItems = [];
@@ -1140,8 +1140,8 @@ const Rejalashtirish = () => {
                                                     const perc = p.val > 0 ? (delta / p.val) * 100 : 0;
 
                                                     return (
-                                                        <tr key={idx} className="hover:bg-white/5">
-                                                            <td className="px-4 py-2 font-bold text-gray-400">{p.name}</td>
+                                                        <tr key={idx} className="hover:bg-[var(--bg-hover)]">
+                                                            <td className="px-4 py-2 font-bold text-[var(--text-secondary)]">{p.name}</td>
                                                             <td className="px-4 py-2 text-right font-mono">{p.val.toFixed(1)}</td>
                                                             <td className="px-4 py-2 text-right font-mono text-indigo-400">{factQty.toFixed(1)}</td>
                                                             <td className={`px-4 py-2 text-right font-mono font-black ${delta > 0 ? 'text-rose-500' : 'text-emerald-500'}`}>

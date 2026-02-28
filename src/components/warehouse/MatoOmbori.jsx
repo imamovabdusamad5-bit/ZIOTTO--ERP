@@ -1631,7 +1631,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                             <div className="flex justify-center flex-col items-center">
                                                                 <button onClick={() => toggleRow(item)} className="text-indigo-400 hover:text-indigo-300 font-bold text-xs flex flex-col items-center gap-1">
                                                                     <span className="text-sm font-black text-[var(--text-primary)]">{rollCounts[item.id] || 0} ta</span>
-                                                                    <span className="flex items-center gap-1"><ScrollText size={14} /> RO'YXAT</span>
+                                                                    <span className="flex items-center gap-1"><ScrollText size={14} /> RULON SONI</span>
                                                                 </button>
                                                             </div>
                                                         </td>

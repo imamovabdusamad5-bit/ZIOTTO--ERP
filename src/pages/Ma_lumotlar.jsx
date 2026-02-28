@@ -357,13 +357,13 @@ const Ma_lumotlar = () => {
                         <input
                             type="text"
                             placeholder="Qidirish (Nomi yoki Artikul)..."
-                            className="w-full pl-12 pr-6 py-4 bg-[#161b22] border border-white/5 rounded-2xl text-white focus:border-indigo-500 outline-none transition-all font-bold"
+                            className="w-full pl-12 pr-6 py-4 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl text-[var(--text-primary)] focus:border-indigo-500 outline-none transition-all font-bold"
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
                         />
                     </div>
                     <div className="flex flex-wrap items-center gap-4">
-                        <div className="flex gap-1 bg-[#161b22] p-1.5 rounded-2xl border border-white/5 shadow-inner">
+                        <div className="flex gap-1 bg-[var(--bg-card)] p-1.5 rounded-2xl border border-[var(--border-color)] shadow-inner">
                             <button
                                 onClick={() => setViewMode('grid')}
                                 className={`p-3 rounded-xl transition-all flex items-center gap-2 font-bold text-xs uppercase ${viewMode === 'grid' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
@@ -384,7 +384,7 @@ const Ma_lumotlar = () => {
                                 <button
                                     key={type}
                                     onClick={() => setFilterType(type)}
-                                    className={`flex-1 sm:flex-none px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all whitespace-nowrap ${filterType === type ? 'bg-indigo-600 text-white shadow-2xl shadow-indigo-600/20' : 'bg-[#161b22] text-gray-500 border border-white/5 hover:text-white'}`}
+                                    className={`flex-1 sm:flex-none px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all whitespace-nowrap ${filterType === type ? 'bg-indigo-600 text-white shadow-2xl shadow-indigo-600/20' : 'bg-[var(--bg-card)] text-[var(--text-secondary)] border border-[var(--border-color)] hover:text-[var(--text-primary)]'}`}
                                 >
                                     {type === 'All' ? 'Hammasi' : type}
                                 </button>
@@ -400,10 +400,10 @@ const Ma_lumotlar = () => {
                 ) : viewMode === 'grid' ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-in fade-in zoom-in-95 duration-300 relative z-0">
                         {filteredItems.map(item => (
-                            <div key={item.id} className="bg-[#161b22] p-6 rounded-[2rem] shadow-xl border border-white/5 hover:border-indigo-500/30 transition-all group relative overflow-hidden">
+                            <div key={item.id} className="bg-[var(--bg-card)] backdrop-blur-xl p-6 rounded-[2rem] shadow-xl border border-[var(--border-color)] hover:border-indigo-500/30 transition-all group relative overflow-hidden">
                                 <div className="flex items-start justify-between relative z-10">
                                     <div className="flex items-center gap-4">
-                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center overflow-hidden border border-white/5 shadow-inner shrink-0 ${item.type === 'Mato' ? 'bg-blue-500/10 text-blue-500' : 'bg-amber-500/10 text-amber-500'}`}>
+                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center overflow-hidden border border-[var(--border-color)] shadow-inner shrink-0 ${item.type === 'Mato' ? 'bg-blue-500/10 text-blue-500' : 'bg-amber-500/10 text-amber-500'}`}>
                                             {item.image_url ? (
                                                 <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
                                             ) : (
@@ -411,7 +411,7 @@ const Ma_lumotlar = () => {
                                             )}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <h4 className="font-black text-white text-lg tracking-tight truncate">{item.name}</h4>
+                                            <h4 className="font-black text-[var(--text-primary)] text-lg tracking-tight truncate">{item.name}</h4>
                                             <div className="flex items-center gap-2 mt-1 flex-wrap">
                                                 <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest truncate max-w-[100px]">{item.code || 'Kod yo\'q'}</span>
                                                 <span className="w-1 h-1 bg-white/10 rounded-full shrink-0"></span>
@@ -430,9 +430,9 @@ const Ma_lumotlar = () => {
                         ))}
                     </div>
                 ) : (
-                    <div className="overflow-x-auto bg-[#161b22] rounded-[2rem] border border-white/5 shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-300">
+                    <div className="overflow-x-auto bg-[var(--bg-card)] backdrop-blur-xl rounded-[2rem] border border-[var(--border-color)] shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-300">
                         <table className="w-full text-left border-collapse min-w-[800px]">
-                            <thead className="bg-black/40 text-gray-500 text-[10px] font-black uppercase tracking-widest border-b border-white/10">
+                            <thead className="bg-[var(--border-color)] text-[var(--text-secondary)] text-[10px] font-black uppercase tracking-widest border-b border-[var(--border-color)]">
                                 <tr>
                                     <th className="px-6 py-5 w-16 text-center">Rasm</th>
                                     <th className="px-6 py-5">Nomi</th>
@@ -455,18 +455,18 @@ const Ma_lumotlar = () => {
                                                 )}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 font-black text-white text-sm">{item.name}</td>
+                                        <td className="px-6 py-4 font-black text-[var(--text-primary)] text-sm">{item.name}</td>
                                         <td className="px-6 py-4 text-xs font-mono font-black text-indigo-400 bg-indigo-500/5 rounded-lg w-max px-2 py-1 my-2 border border-indigo-500/10 shadow-sm inline-block">{item.code || '-'}</td>
-                                        <td className="px-6 py-4 text-xs font-bold text-gray-300 uppercase tracking-wider">{item.type}</td>
+                                        <td className="px-6 py-4 text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">{item.type}</td>
                                         <td className="px-6 py-4 text-xs font-mono text-gray-400">
                                             {item.type === 'Mato' ? (
                                                 <div className="flex items-center gap-2">
-                                                    <span className="font-bold text-white">{item.thread_type || '-'}</span>
+                                                    <span className="font-bold text-[var(--text-primary)]">{item.thread_type || '-'}</span>
                                                     {item.grammage && <span className="text-[10px] font-black bg-white/5 px-2 py-1 rounded-lg text-gray-400 border border-white/5">{item.grammage} gr/m²</span>}
                                                 </div>
                                             ) : (
                                                 <div className="flex items-center gap-2">
-                                                    <span className="font-bold text-white max-w-[150px] truncate" title={item.thread_type}>{item.thread_type || '-'}</span>
+                                                    <span className="font-bold text-[var(--text-primary)] max-w-[150px] truncate" title={item.thread_type}>{item.thread_type || '-'}</span>
                                                     {item.grammage && <span className="text-[10px] font-black bg-white/5 px-2 py-1 rounded-lg text-gray-400 border border-white/5 shrink-0">{item.grammage} gr</span>}
                                                 </div>
                                             )}

@@ -141,11 +141,11 @@ const Hujjatlar = () => {
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500 text-white">
+        <div className="space-y-8 animate-in fade-in duration-500 text-[var(--text-primary)]">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-3xl font-black tracking-tight">Hujjatlar (Nakladnoylar)</h2>
-                    <p className="text-gray-500 font-bold uppercase tracking-widest text-[10px] mt-1">Materiallar harakati va faktlarni kiritish</p>
+                    <h2 className="text-3xl font-black tracking-tight text-[var(--text-primary)]">Hujjatlar (Nakladnoylar)</h2>
+                    <p className="text-[var(--text-secondary)] font-bold uppercase tracking-widest text-[10px] mt-1">Materiallar harakati va faktlarni kiritish</p>
                 </div>
                 {!showForm && (
                     <button
@@ -162,15 +162,15 @@ const Hujjatlar = () => {
             </div>
 
             {showForm && (
-                <div className="bg-[#161b22] rounded-[3rem] shadow-4xl border border-white/5 overflow-hidden animate-in slide-in-from-top-10 duration-500">
-                    <div className="p-10 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+                <div className="bg-[var(--bg-card)] rounded-[3rem] shadow-4xl border border-[var(--border-color)] overflow-hidden animate-in slide-in-from-top-10 duration-500">
+                    <div className="p-10 border-b border-[var(--border-color)] flex items-center justify-between bg-white/[0.02]">
                         <div className="flex items-center gap-4">
                             <div className="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-indigo-500">
                                 <FileText size={24} />
                             </div>
                             <div>
-                                <h3 className="text-xl font-black">Yangi Nakladnoy Formasi</h3>
-                                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">Materiallar harakatini rasmiylashtiring</p>
+                                <h3 className="text-xl font-black text-[var(--text-primary)]">Yangi Nakladnoy Formasi</h3>
+                                <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest mt-1">Materiallar harakatini rasmiylashtiring</p>
                             </div>
                         </div>
                         <button onClick={() => setShowForm(false)} className="p-4 bg-white/5 hover:bg-white/10 rounded-2xl transition-all">
@@ -182,19 +182,19 @@ const Hujjatlar = () => {
                         {/* Header Info */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
-                                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3 px-1">Nakladnoy №</label>
+                                <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-3 px-1">Nakladnoy №</label>
                                 <input
                                     required
-                                    className="w-full px-6 py-4 bg-black/40 border border-white/10 rounded-2xl font-black text-white focus:border-indigo-500 outline-none transition-all font-mono"
+                                    className="w-full px-6 py-4 bg-[var(--bg-header)] border border-[var(--border-color)] rounded-2xl font-black text-[var(--text-primary)] focus:border-indigo-500 outline-none transition-all font-mono"
                                     value={formData.doc_no}
                                     onChange={e => setFormData({ ...formData, doc_no: e.target.value })}
                                 />
                             </div>
                             <div>
-                                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3 px-1">Hujjat Turi</label>
+                                <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-3 px-1">Hujjat Turi</label>
                                 <select
                                     required
-                                    className="w-full px-6 py-4 bg-black/40 border border-white/10 rounded-2xl font-bold text-white focus:border-indigo-500 outline-none transition-all"
+                                    className="w-full px-6 py-4 bg-[var(--bg-header)] border border-[var(--border-color)] rounded-2xl font-bold text-[var(--text-primary)] focus:border-indigo-500 outline-none transition-all"
                                     value={formData.doc_type}
                                     onChange={e => {
                                         let from = formData.department_from;
@@ -257,7 +257,7 @@ const Hujjatlar = () => {
                         {/* Items Table */}
                         <div className="space-y-6">
                             <div className="flex items-center justify-between">
-                                <h4 className="text-xs font-black text-white uppercase tracking-widest flex items-center gap-3">
+                                <h4 className="text-xs font-black text-[var(--text-primary)] uppercase tracking-widest flex items-center gap-3">
                                     <Package size={18} className="text-indigo-500" />
                                     Materiallar Ro'yxati
                                 </h4>
@@ -270,7 +270,7 @@ const Hujjatlar = () => {
                                 </button>
                             </div>
 
-                            <div className="border border-white/5 rounded-[2.5rem] overflow-hidden bg-black/20 shadow-inner">
+                            <div className="border border-[var(--border-color)] rounded-[2.5rem] overflow-hidden bg-[var(--bg-body)]/[0.03] shadow-inner">
                                 <table className="w-full text-left">
                                     <thead className="bg-white/[0.02] text-[10px] font-black text-gray-500 uppercase tracking-widest font-mono">
                                         <tr>
@@ -358,7 +358,7 @@ const Hujjatlar = () => {
             )}
 
             {/* Documents List */}
-            <div className="bg-[#161b22] rounded-[3rem] border border-white/5 shadow-2xl overflow-hidden">
+            <div className="bg-[var(--bg-card)] rounded-[3rem] border border-[var(--border-color)] shadow-2xl overflow-hidden">
                 <div className="p-8 border-b border-white/5 flex items-center justify-between">
                     <h3 className="text-lg font-black uppercase tracking-widest flex items-center gap-3">
                         <clipboardList className="text-indigo-500" size={20} />
