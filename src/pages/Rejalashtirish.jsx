@@ -31,6 +31,7 @@ const Rejalashtirish = () => {
     const [selectedOrders, setSelectedOrders] = useState([]);
     const [showSummaryModal, setShowSummaryModal] = useState(false);
     const [grandTotal, setGrandTotal] = useState({});
+    const [matrixView, setMatrixView] = useState('full'); // full, colors, technical, totals
 
     // Toggle Order Selection
     const toggleOrderSelection = (orderId) => {
@@ -630,14 +631,14 @@ const Rejalashtirish = () => {
                         </button>
                     </div>
 
-                    <form onSubmit={handleSave} className="p-10 space-y-10">
+                    <form onSubmit={handleSave} className="p-6 space-y-8">
                         {/* 1. Model Selection */}
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 px-4 py-6 bg-[var(--bg-body)]/40 rounded-3xl border border-[var(--border-color)] shadow-inner">
                             <div>
-                                <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-3">Model Tanlash</label>
+                                <label className="block text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-2 ml-1">Model Tanlash</label>
                                 <select
                                     required
-                                    className="w-full px-6 py-4 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl font-bold text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all appearance-none"
+                                    className="w-full px-4 py-2.5 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl font-bold text-sm text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all appearance-none"
                                     value={selectedModel?.id || ''}
                                     onChange={e => handleModelChange(e.target.value)}
                                 >
@@ -646,15 +647,15 @@ const Rejalashtirish = () => {
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-3">Artikul (Kod)</label>
-                                <div className="w-full px-6 py-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-500 font-black font-mono shadow-inner">
+                                <label className="block text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-2 ml-1">Artikul (Kod)</label>
+                                <div className="w-full px-4 py-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-500 font-black font-mono shadow-inner text-sm">
                                     {selectedModel?.code || '---'}
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-3">Buyurtma №</label>
+                                <label className="block text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-2 ml-1">Buyurtma №</label>
                                 <input
-                                    className="w-full px-6 py-4 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl font-bold text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all placeholder:text-[var(--text-secondary)]"
+                                    className="w-full px-4 py-2.5 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl font-bold text-sm text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all placeholder:text-[var(--text-secondary)]"
                                     placeholder="ORD-001"
                                     value={orderInfo.order_number}
                                     onChange={(e) => setOrderInfo({ ...orderInfo, order_number: e.target.value.toUpperCase() })}
@@ -662,9 +663,9 @@ const Rejalashtirish = () => {
                                 />
                             </div>
                             <div>
-                                <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-3">Topshirish Muddat</label>
+                                <label className="block text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-2 ml-1">Topshirish Muddat</label>
                                 <input
-                                    className="w-full px-6 py-4 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl font-bold text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all"
+                                    className="w-full px-4 py-2.5 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl font-bold text-sm text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all"
                                     type="date"
                                     value={orderInfo.deadline}
                                     onChange={e => setOrderInfo({ ...orderInfo, deadline: e.target.value })}
@@ -679,11 +680,32 @@ const Rejalashtirish = () => {
 
                                 {/* 3. Breakdown Matrix Table */}
                                 <div className="space-y-4">
-                                    <div className="flex justify-between items-center mb-4">
-                                        <h4 className="text-xl font-black text-[var(--text-primary)] flex items-center gap-3">
-                                            <Layers className="text-emerald-500" size={24} />
-                                            Razmer & Rang Matritsasi
-                                        </h4>
+                                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4">
+                                        <div className="flex items-center gap-6">
+                                            <h4 className="text-xl font-black text-[var(--text-primary)] flex items-center gap-3">
+                                                <Layers className="text-emerald-500" size={24} />
+                                                Razmer & Rang Matritsasi
+                                            </h4>
+
+                                            {/* View Mode Switching Tabs */}
+                                            <div className="flex items-center bg-[var(--bg-body)]/60 rounded-xl p-1 border border-[var(--border-color)] shadow-inner">
+                                                {[
+                                                    { id: 'full', label: 'HAMMASI' },
+                                                    { id: 'colors', label: 'RANGLAR' },
+                                                    { id: 'technical', label: 'TEXNIK (GRAM)' },
+                                                    { id: 'totals', label: 'HISOB (KG)' },
+                                                ].map((v) => (
+                                                    <button
+                                                        key={v.id}
+                                                        type="button"
+                                                        onClick={() => setMatrixView(v.id)}
+                                                        className={`px-3 py-1.5 rounded-lg text-[9px] font-black tracking-widest transition-all ${matrixView === v.id ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'}`}
+                                                    >
+                                                        {v.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
                                         <button
                                             type="button"
                                             onClick={() => exportComplexTable('planning-table', orderInfo.order_number || 'Reja')}
@@ -700,53 +722,66 @@ const Rejalashtirish = () => {
                                                 {/* TOP LEVEL GROUP HEADERS */}
                                                 <tr className="text-[var(--text-primary)] text-[11px] uppercase font-black tracking-widest text-center shadow-lg">
                                                     {/* Fixed Left Groups */}
-                                                    <th colSpan={3} className="py-4 sticky left-0 z-30 bg-[var(--bg-card)] border-b border-indigo-500/30 text-indigo-500 ring-1 ring-[var(--border-color)]">
+                                                    <th colSpan={3} className="py-2 sticky left-0 z-30 bg-[var(--bg-card)] border-b border-indigo-500/30 text-indigo-500 ring-1 ring-[var(--border-color)]">
                                                         ASOSIY
                                                     </th>
 
                                                     {/* 1. DETAL VA RANGLAR (Pink/Purple) */}
-                                                    <th colSpan={uniqueParts.length + 1} className="py-4 bg-pink-900/40 text-pink-100 border-b border-pink-500/30 backdrop-blur-sm">
-                                                        DETAL VA RANGLAR
-                                                    </th>
+                                                    {(matrixView === 'all' || matrixView === 'full' || matrixView === 'colors') && (
+                                                        <th colSpan={uniqueParts.length + 1} className="py-2 bg-pink-900/40 text-pink-100 border-b border-pink-500/30 backdrop-blur-sm">
+                                                            DETAL VA RANGLAR
+                                                        </th>
+                                                    )}
 
                                                     {/* 2. GRAMAJ (Blue/Gray) */}
-                                                    <th colSpan={uniqueParts.length} className="py-4 bg-slate-800/60 text-slate-100 border-b border-slate-500/30 backdrop-blur-sm">
-                                                        GRAMAJ
-                                                    </th>
+                                                    {(matrixView === 'all' || matrixView === 'full' || matrixView === 'technical') && (
+                                                        <th colSpan={uniqueParts.length} className="py-2 bg-slate-800/60 text-slate-100 border-b border-slate-500/30 backdrop-blur-sm">
+                                                            GRAMAJ
+                                                        </th>
+                                                    )}
 
                                                     {/* 3. UMUMIY KG (Amber/Yellow) */}
-                                                    <th colSpan={uniqueParts.length} className="py-4 bg-amber-900/40 text-amber-100 border-b border-amber-500/30 backdrop-blur-sm">
-                                                        UMUMIY KG
-                                                    </th>
+                                                    {(matrixView === 'all' || matrixView === 'full' || matrixView === 'totals') && (
+                                                        <th colSpan={uniqueParts.length} className="py-2 bg-amber-900/40 text-amber-100 border-b border-amber-500/30 backdrop-blur-sm">
+                                                            UMUMIY KG
+                                                        </th>
+                                                    )}
 
-                                                    <th className="py-4 border-b border-[var(--border-color)] bg-[var(--bg-card)]"></th>
+                                                    <th className="py-2 border-b border-[var(--border-color)] bg-[var(--bg-card)]"></th>
                                                 </tr>
 
                                                 {/* COLUMN HEADERS */}
                                                 <tr className="bg-[var(--bg-body)] text-[var(--text-secondary)] text-[10px] uppercase font-bold tracking-wider text-center">
                                                     {/* Fixed Left Columns */}
-                                                    <th className="sticky left-0 bg-[var(--bg-body)] px-2 py-4 border-b border-r border-[var(--border-color)] w-20 z-20 text-[var(--text-primary)] shadow-[2px_0_5px_rgba(0,0,0,0.5)]">YOSHI/ RAZMER</th>
-                                                    <th className="sticky left-[80px] bg-[var(--bg-body)] px-2 py-4 border-b border-r border-[var(--border-color)] w-16 z-20 text-[var(--text-primary)] shadow-[2px_0_5px_rgba(0,0,0,0.5)]">ASSORT</th>
-                                                    <th className="sticky left-[144px] bg-[var(--bg-body)] px-2 py-4 border-b border-r border-[var(--border-color)] w-20 z-20 text-[var(--text-primary)] shadow-[2px_0_5px_rgba(0,0,0,0.5)]">SONI</th>
+                                                    <th className="sticky left-0 bg-[var(--bg-body)] px-1 py-3 border-b border-r border-[var(--border-color)] w-16 z-20 text-[var(--text-primary)] shadow-[2px_0_5px_rgba(0,0,0,0.5)]">RAZMER</th>
+                                                    <th className="sticky left-[64px] bg-[var(--bg-body)] px-1 py-3 border-b border-r border-[var(--border-color)] w-12 z-20 text-[var(--text-primary)] shadow-[2px_0_5px_rgba(0,0,0,0.5)] text-center">ASRT</th>
+                                                    <th className="sticky left-[112px] bg-[var(--bg-body)] px-1 py-3 border-b border-r border-[var(--border-color)] w-16 z-20 text-[var(--text-primary)] shadow-[2px_0_5px_rgba(0,0,0,0.5)] text-center">SONI</th>
 
                                                     {/* 1. Colors Group */}
-                                                    {/* Main Color is always first */}
-                                                    <th className="px-2 py-4 border-b border-r border-[var(--border-color)] text-pink-200 min-w-[120px] bg-pink-900/20">ASOSIY RANG</th>
-                                                    {uniqueParts.map(part => (
-                                                        <th key={`col-${part}`} className="px-2 py-4 border-b border-r border-[var(--border-color)] text-pink-200 bg-pink-900/20 min-w-[120px]">{part.toUpperCase()} RANGI</th>
-                                                    ))}
+                                                    {(matrixView === 'full' || matrixView === 'colors') && (
+                                                        <>
+                                                            <th className="px-1 py-3 border-b border-r border-[var(--border-color)] text-pink-200 min-w-[90px] bg-pink-900/20 text-center">ASOSIY</th>
+                                                            {uniqueParts.map(part => (
+                                                                <th key={`col-${part}`} className="px-1 py-3 border-b border-r border-[var(--border-color)] text-pink-200 bg-pink-900/20 min-w-[90px] text-center">{part.toUpperCase()}</th>
+                                                            ))}
+                                                        </>
+                                                    )}
 
                                                     {/* 2. Gramaj Group */}
-                                                    {uniqueParts.map(part => (
-                                                        <th key={`gram-${part}`} className="px-2 py-4 border-b border-r border-[var(--border-color)] text-slate-200 bg-slate-800/40 w-28">GRAMAJ {part.toUpperCase()}</th>
-                                                    ))}
+                                                    {(matrixView === 'full' || matrixView === 'technical') && (
+                                                        uniqueParts.map(part => (
+                                                            <th key={`gram-${part}`} className="px-1 py-3 border-b border-r border-[var(--border-color)] text-slate-200 bg-slate-800/40 w-20 text-center">GRM {part.toUpperCase().substring(0, 3)}</th>
+                                                        ))
+                                                    )}
 
                                                     {/* 3. Total Group */}
-                                                    {uniqueParts.map(part => (
-                                                        <th key={`tot-${part}`} className="px-2 py-4 border-b border-r border-[var(--border-color)] text-amber-200 bg-amber-900/20 w-28">KG {part.toUpperCase()}</th>
-                                                    ))}
+                                                    {(matrixView === 'full' || matrixView === 'totals') && (
+                                                        uniqueParts.map(part => (
+                                                            <th key={`tot-${part}`} className="px-1 py-3 border-b border-r border-[var(--border-color)] text-amber-200 bg-amber-900/20 w-20 text-center">KG {part.toUpperCase().substring(0, 3)}</th>
+                                                        ))
+                                                    )}
 
-                                                    <th className="px-2 py-4 border-b border-[var(--border-color)] w-10"></th>
+                                                    <th className="px-1 py-3 border-b border-[var(--border-color)] w-8"></th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-[var(--border-color)]">
@@ -767,10 +802,10 @@ const Rejalashtirish = () => {
                                                             </td>
 
                                                             {/* 2. ASSORT */}
-                                                            <td className="sticky left-[80px] bg-[var(--bg-body)] group-hover:bg-[var(--bg-card)] px-2 py-1 border-r border-[var(--border-color)] z-10">
+                                                            <td className="sticky left-[64px] bg-[var(--bg-body)] group-hover:bg-[var(--bg-card)] px-1 py-0.5 border-r border-[var(--border-color)] z-10">
                                                                 <input
                                                                     type="number"
-                                                                    className="w-full px-1 py-2 bg-transparent text-[var(--text-primary)] rounded-lg text-xs font-bold text-center outline-none focus:bg-[var(--bg-input)] placeholder:text-[var(--text-secondary)]"
+                                                                    className="w-full px-1 py-1.5 bg-transparent text-[var(--text-primary)] rounded-lg text-[10px] font-bold text-center outline-none focus:bg-[var(--bg-input)] placeholder:text-[var(--text-secondary)]"
                                                                     value={row.assort || ''}
                                                                     onChange={e => updateBreakdown(idx, 'assort', e.target.value)}
                                                                     placeholder="-"
@@ -778,10 +813,10 @@ const Rejalashtirish = () => {
                                                             </td>
 
                                                             {/* 3. SONI */}
-                                                            <td className="sticky left-[144px] bg-[var(--bg-body)] group-hover:bg-[var(--bg-card)] px-2 py-1 border-r border-[var(--border-color)] z-10">
+                                                            <td className="sticky left-[112px] bg-[var(--bg-body)] group-hover:bg-[var(--bg-card)] px-1 py-0.5 border-r border-[var(--border-color)] z-10">
                                                                 <input
                                                                     type="number"
-                                                                    className="w-full px-1 py-2 bg-emerald-500/20 text-emerald-300 rounded-lg text-xs font-black text-center outline-none border border-emerald-500/30"
+                                                                    className="w-full px-1 py-1.5 bg-emerald-500/20 text-emerald-300 rounded-lg text-[10px] font-black text-center outline-none border border-emerald-500/30"
                                                                     value={row.quantity}
                                                                     onChange={e => updateBreakdown(idx, 'quantity', e.target.value)}
                                                                     placeholder="0"
@@ -789,55 +824,63 @@ const Rejalashtirish = () => {
                                                             </td>
 
                                                             {/* --- GROUP 1: COLORS --- */}
-                                                            {/* Main Color */}
-                                                            <td className="px-2 py-1 border-r border-[var(--border-color)] bg-pink-900/10">
-                                                                <input
-                                                                    className="w-full px-2 py-2 bg-pink-500/20 text-pink-100 rounded-lg text-[11px] font-bold text-center outline-none border border-pink-500/30 placeholder:text-pink-500/40"
-                                                                    value={row.main_color}
-                                                                    onChange={e => updateBreakdown(idx, 'main_color', e.target.value.toUpperCase())}
-                                                                    placeholder="ASOSIY..."
-                                                                />
-                                                            </td>
-                                                            {/* Dynamic Parts Colors */}
-                                                            {uniqueParts.map(part => (
-                                                                <td key={`c-${part}`} className="px-2 py-1 border-r border-[var(--border-color)] bg-pink-900/10">
-                                                                    <input
-                                                                        className={`w-full px-2 py-2 rounded-lg text-[11px] font-bold outline-none transition-all ${row.colors && row.colors[part] ? 'bg-white/10 text-white border border-white/20' : 'bg-transparent text-gray-400 hover:bg-white/5 placeholder:text-gray-700'}`}
-                                                                        value={(row.colors && row.colors[part]) || ''}
-                                                                        onChange={e => updateRowDetail(idx, part, 'color', e.target.value.toUpperCase())}
-                                                                        placeholder={row.main_color || '-'}
-                                                                    />
-                                                                </td>
-                                                            ))}
+                                                            {(matrixView === 'full' || matrixView === 'colors') && (
+                                                                <>
+                                                                    {/* Main Color */}
+                                                                    <td className="px-1 py-0.5 border-r border-[var(--border-color)] bg-pink-900/10">
+                                                                        <input
+                                                                            className="w-full px-1 py-1.5 bg-pink-500/20 text-pink-100 rounded-lg text-[10px] font-bold text-center outline-none border border-pink-500/30 placeholder:text-pink-500/40"
+                                                                            value={row.main_color}
+                                                                            onChange={e => updateBreakdown(idx, 'main_color', e.target.value.toUpperCase())}
+                                                                            placeholder="..."
+                                                                        />
+                                                                    </td>
+                                                                    {/* Dynamic Parts Colors */}
+                                                                    {uniqueParts.map(part => (
+                                                                        <td key={`c-${part}`} className="px-1 py-0.5 border-r border-[var(--border-color)] bg-pink-900/10">
+                                                                            <input
+                                                                                className={`w-full px-1 py-1.5 rounded-lg text-[10px] font-bold outline-none transition-all ${row.colors && row.colors[part] ? 'bg-white/10 text-white border border-white/20' : 'bg-transparent text-gray-400 hover:bg-white/5 placeholder:text-gray-700'}`}
+                                                                                value={(row.colors && row.colors[part]) || ''}
+                                                                                onChange={e => updateRowDetail(idx, part, 'color', e.target.value.toUpperCase())}
+                                                                                placeholder={row.main_color || '-'}
+                                                                            />
+                                                                        </td>
+                                                                    ))}
+                                                                </>
+                                                            )}
 
                                                             {/* --- GROUP 2: GRAMAJ --- */}
-                                                            {uniqueParts.map(part => (
-                                                                <td key={`g-${part}`} className="px-2 py-1 border-r border-[var(--border-color)] bg-slate-800/20">
-                                                                    <input
-                                                                        type="number"
-                                                                        step="0.001"
-                                                                        className="w-full px-1 py-2 bg-transparent text-slate-200 text-center font-mono text-[11px] outline-none hover:bg-white/5 rounded-lg focus:bg-slate-500/30 transition-all placeholder:text-[var(--text-secondary)] border border-transparent focus:border-slate-500/30"
-                                                                        value={row.weights?.[part] || ''}
-                                                                        onChange={e => updateRowDetail(idx, part, 'weight', e.target.value)}
-                                                                        placeholder={partSettings[part]?.weight || '0'}
-                                                                    />
-                                                                </td>
-                                                            ))}
+                                                            {(matrixView === 'full' || matrixView === 'technical') && (
+                                                                uniqueParts.map(part => (
+                                                                    <td key={`g-${part}`} className="px-1 py-0.5 border-r border-[var(--border-color)] bg-slate-800/20">
+                                                                        <input
+                                                                            type="number"
+                                                                            step="0.001"
+                                                                            className="w-full px-1 py-1.5 bg-transparent text-slate-200 text-center font-mono text-[10px] outline-none hover:bg-white/5 rounded-lg focus:bg-slate-500/30 transition-all placeholder:text-[var(--text-secondary)] border border-transparent focus:border-slate-500/30"
+                                                                            value={row.weights?.[part] || ''}
+                                                                            onChange={e => updateRowDetail(idx, part, 'weight', e.target.value)}
+                                                                            placeholder={partSettings[part]?.weight || '0'}
+                                                                        />
+                                                                    </td>
+                                                                ))
+                                                            )}
 
                                                             {/* --- GROUP 3: TOTALS --- */}
-                                                            {uniqueParts.map(part => {
-                                                                const qty = parseFloat(row.quantity) || 0;
-                                                                const weight = getPartWeight(idx, part);
-                                                                const waste = 5;
-                                                                const total = (qty * weight * (1 + waste / 100)).toFixed(2);
-                                                                return (
-                                                                    <td key={`t-${part}`} className="px-2 py-1 border-r border-[var(--border-color)] bg-amber-900/10 text-center">
-                                                                        <span className={`font-mono text-[11px] font-black ${parseFloat(total) > 0 ? 'text-amber-200' : 'text-[var(--text-secondary)]'}`}>
-                                                                            {parseFloat(total) > 0 ? total : '-'}
-                                                                        </span>
-                                                                    </td>
-                                                                );
-                                                            })}
+                                                            {(matrixView === 'full' || matrixView === 'totals') && (
+                                                                uniqueParts.map(part => {
+                                                                    const qty = parseFloat(row.quantity) || 0;
+                                                                    const weight = getPartWeight(idx, part);
+                                                                    const waste = 5;
+                                                                    const total = (qty * weight * (1 + waste / 100)).toFixed(2);
+                                                                    return (
+                                                                        <td key={`t-${part}`} className="px-1 py-0.5 border-r border-[var(--border-color)] bg-amber-900/10 text-center">
+                                                                            <span className={`font-mono text-[10px] font-black ${parseFloat(total) > 0 ? 'text-amber-200' : 'text-[var(--text-secondary)]'}`}>
+                                                                                {parseFloat(total) > 0 ? total : '-'}
+                                                                            </span>
+                                                                        </td>
+                                                                    );
+                                                                })
+                                                            )}
 
                                                             {/* Actions */}
                                                             <td className="px-2 text-center">

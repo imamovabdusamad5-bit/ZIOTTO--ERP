@@ -618,28 +618,37 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
 
             {/* Header */}
             {selectedIds.length > 0 ? (
-                <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-rose-500/10 backdrop-blur-3xl p-6 rounded-[2.5rem] border border-rose-500/20 shadow-2xl animate-in slide-in-from-top-2">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-purple-500/10 backdrop-blur-3xl p-6 rounded-[2.5rem] border border-purple-500/20 shadow-2xl animate-in slide-in-from-top-2">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-rose-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-rose-500/30">
-                            <Trash2 size={24} />
+                        <div className="w-12 h-12 bg-purple-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-purple-500/30">
+                            <Package size={24} />
                         </div>
                         <div>
-                            <h3 className="text-xl font-black text-rose-500">{selectedIds.length} ta Tanlandi</h3>
-                            <p className="text-xs font-bold text-rose-400/70 uppercase tracking-widest">O'chirish uchun tayyor</p>
+                            <h3 className="text-xl font-black text-purple-400">{selectedIds.length} ta Tanlandi</h3>
+                            <p className="text-xs font-bold text-purple-400/70 uppercase tracking-widest">Amallar uchun tayyor</p>
                         </div>
                     </div>
-                    <div className="flex gap-3 w-full md:w-auto">
+                    <div className="flex flex-wrap gap-3 w-full md:w-auto">
                         <button
-                            onClick={() => setSelectedIds([])}
-                            className="flex-1 md:flex-none px-6 py-4 rounded-2xl border border-rose-500/20 text-rose-500 font-bold hover:bg-rose-500/10 transition-all flex items-center justify-center gap-2"
+                            onClick={() => {
+                                const selectedItems = inventory.filter(i => selectedIds.includes(i.id));
+                                handlePrintAllQRs(selectedItems);
+                            }}
+                            className="flex-1 md:flex-none bg-indigo-500 text-white px-6 py-4 rounded-2xl hover:bg-indigo-600 transition-all shadow-xl shadow-indigo-500/20 font-black uppercase text-xs tracking-widest flex items-center justify-center gap-2"
                         >
-                            <X size={18} /> Bekor qilish
+                            <Printer size={18} /> QR Chop etish
                         </button>
                         <button
                             onClick={handleBulkDelete}
-                            className="flex-1 md:flex-none bg-rose-500 text-white px-8 py-4 rounded-2xl hover:bg-rose-600 transition-all shadow-xl shadow-rose-500/20 font-black uppercase text-xs tracking-widest flex items-center justify-center gap-2"
+                            className="flex-1 md:flex-none bg-rose-500/10 border border-rose-500/20 text-rose-500 px-6 py-4 rounded-2xl hover:bg-rose-500 hover:text-white transition-all shadow-xl shadow-rose-500/10 font-black uppercase text-xs tracking-widest flex items-center justify-center gap-2"
                         >
                             <Trash2 size={18} /> O'chirish
+                        </button>
+                        <button
+                            onClick={() => setSelectedIds([])}
+                            className="flex-1 md:flex-none px-6 py-4 rounded-2xl border border-[var(--border-color)] text-[var(--text-secondary)] font-bold hover:bg-[var(--bg-card-hover)] transition-all flex items-center justify-center gap-2"
+                        >
+                            <X size={18} /> Bekor qilish
                         </button>
                     </div>
                 </div>
@@ -820,128 +829,146 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                     acc[key].items.push(item);
                                     acc[key].total += Number(item.quantity) || 0;
                                     return acc;
-                                }, {})).map(group => (
-                                    <React.Fragment key={group.groupKey}>
-                                        <tr onClick={() => toggleGroup(group.groupKey)} className="cursor-pointer hover:bg-[var(--bg-card-hover)] transition-colors group bg-[var(--bg-body)] border-b-2 border-[var(--border-color)]">
-                                            <td className="px-6 py-5 text-center">
-                                                {expandedGroups[group.groupKey] ? <ChevronUp size={20} className="text-purple-400 mx-auto" /> : <ChevronDown size={20} className="text-[var(--text-secondary)] mx-auto group-hover:text-purple-400 transition-colors" />}
-                                            </td>
-                                            <td className="px-6 py-5 text-sm text-[var(--text-primary)] font-bold">
-                                                {group.date}
-                                            </td>
-                                            <td className="px-6 py-5 font-black text-[var(--text-primary)] text-base tracking-wide flex items-center gap-2">
-                                                {group.name}
-                                                <span className="text-[10px] font-bold text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded-full border border-purple-500/30 shadow-[0_0_10px_rgba(168,85,247,0.2)]">{group.items.length} xil</span>
-                                            </td>
-                                            <td className="px-6 py-5 text-sm text-[var(--text-secondary)] font-mono uppercase">-</td>
-                                            <td className="px-6 py-5 text-right font-black text-purple-400 text-lg">{group.total.toFixed(2)}</td>
-                                            <td className="px-6 py-5 text-center text-xs text-[var(--text-secondary)] font-bold uppercase tracking-widest">{group.unit}</td>
-                                            <td className="px-6 py-5 text-xs text-[var(--text-secondary)] italic opacity-50">Jamlangan ko'rinish</td>
-                                            <td className="px-6 py-5 text-center text-xs text-[var(--text-secondary)] font-bold">UMUMIY JAMI</td>
-                                        </tr>
-                                        {expandedGroups[group.groupKey] && (
-                                            <tr className="bg-[var(--bg-body)]/50 transition-all">
-                                                <td colSpan="8" className="p-6 border-b border-[var(--border-color)]">
-                                                    <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] overflow-hidden">
-                                                        <div className="px-6 py-4 border-b border-[var(--border-color)] flex justify-between items-center bg-[var(--bg-body)]">
-                                                            <div className="flex items-center gap-3">
-                                                                <Package size={18} className="text-purple-400" />
-                                                                <h4 className="font-bold text-sm text-[var(--text-primary)]">Aksessuarlar Ro'yxati</h4>
-                                                            </div>
-                                                            <div className="flex items-center gap-3">
-                                                                <span className="text-xs text-[var(--text-secondary)] font-bold">Jami: {group.items.length} xil</span>
-                                                                <button onClick={(e) => { e.stopPropagation(); handlePrintAllQRs(group.items); }} className="p-2 bg-indigo-500/10 text-indigo-400 hover:text-white hover:bg-indigo-500 rounded-xl transition-all border border-indigo-500/20 shadow-sm flex items-center gap-2 text-xs font-bold" title="Barcha QR kodelarni Chop etish"><Printer size={16} /> Barchasini chop etish</button>
-                                                            </div>
-                                                        </div>
+                                }, {})).map(group => {
+                                    const groupCodes = [...new Set(group.items.map(item => {
+                                        const refItem = references?.find(r => r.id === item.reference_id) || {};
+                                        return refItem.code || `AKS-${item.id}`;
+                                    }))];
 
-                                                        <table className="w-full text-left text-sm">
-                                                            <thead className="text-[10px] uppercase text-[var(--text-secondary)] font-bold border-b border-[var(--border-color)] bg-[var(--bg-card)]">
-                                                                <tr>
-                                                                    <th className="px-6 py-3 w-10 text-center">
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            className="w-4 h-4 rounded border-[var(--border-color)] bg-[var(--input-bg)] text-purple-600 focus:ring-purple-500 cursor-pointer"
-                                                                            checked={group.items.length > 0 && group.items.every(i => selectedIds.includes(i.id))}
-                                                                            onChange={(e) => {
-                                                                                if (e.target.checked) {
-                                                                                    const ids = group.items.map(i => i.id);
-                                                                                    setSelectedIds(prev => [...new Set([...prev, ...ids])]);
-                                                                                } else {
-                                                                                    const ids = group.items.map(i => i.id);
-                                                                                    setSelectedIds(prev => prev.filter(id => !ids.includes(id)));
-                                                                                }
-                                                                            }}
-                                                                        />
-                                                                    </th>
-                                                                    <th className="px-6 py-3">Sana</th>
-                                                                    <th className="px-6 py-3">Nomi</th>
-                                                                    <th className="px-6 py-3">ID / KOD</th>
-                                                                    <th className="px-6 py-3 text-right">Soni</th>
-                                                                    <th className="px-6 py-3 text-center">Birligi</th>
-                                                                    <th className="px-6 py-3">Qo'shimcha</th>
-                                                                    <th className="px-6 py-3 text-center">Amallar</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody className="divide-y divide-[var(--border-color)]">
-                                                                {group.items.map(item => {
-                                                                    const isSelected = selectedIds.includes(item.id);
-                                                                    const dateDisplay = item.created_at
-                                                                        ? new Date(item.created_at).toLocaleDateString('ru-RU')
-                                                                        : (item.last_updated ? new Date(item.last_updated).toLocaleDateString('ru-RU') : '-');
-                                                                    const refItem = references?.find(r => r.id === item.reference_id) || {};
-                                                                    const codeToDisplay = refItem.code || `AKS-${item.id}`;
-
-                                                                    return (
-                                                                        <tr key={item.id} className={`hover:bg-[var(--bg-card-hover)] transition-colors ${isSelected ? 'bg-purple-500/5' : ''}`}>
-                                                                            <td className="px-6 py-3 text-center">
-                                                                                <input
-                                                                                    type="checkbox"
-                                                                                    className="w-4 h-4 rounded border-[var(--border-color)] bg-[var(--input-bg)] text-purple-600 focus:ring-purple-500 cursor-pointer transition-all"
-                                                                                    checked={isSelected}
-                                                                                    onChange={(e) => { e.stopPropagation(); setSelectedIds(prev => prev.includes(item.id) ? prev.filter(id => id !== item.id) : [...prev, item.id]); }}
-                                                                                />
-                                                                            </td>
-                                                                            <td className="px-6 py-3 text-xs text-[var(--text-primary)] font-bold">{dateDisplay}</td>
-                                                                            <td className="px-6 py-3 font-medium text-[var(--text-secondary)] text-sm">{item.item_name}</td>
-                                                                            <td className="px-6 py-3 font-mono font-black text-xl text-purple-400 uppercase bg-purple-500/10 rounded-lg inline-block my-1 px-3 border border-purple-500/20 shadow-sm" title={`Asl ID: AKS-${item.id}`}>{codeToDisplay}</td>
-                                                                            <td className="px-6 py-3 text-right font-black text-[var(--text-primary)] text-sm">{Number(item.quantity).toFixed(2)}</td>
-                                                                            <td className="px-6 py-3 text-center text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest">{item.unit}</td>
-                                                                            <td className="px-6 py-3">
-                                                                                <div className="text-[10px] text-[var(--text-secondary)] flex flex-col gap-0.5">
-                                                                                    {(item.color || item.batch_number) ? (
-                                                                                        <>
-                                                                                            {item.color && <span><span className="font-bold opacity-70">Rangi:</span> {item.color}</span>}
-                                                                                            {item.batch_number && <span><span className="font-bold opacity-70">Partiya:</span> {item.batch_number}</span>}
-                                                                                        </>
-                                                                                    ) : (
-                                                                                        <span className="opacity-50 italic">-</span>
-                                                                                    )}
-                                                                                </div>
-                                                                            </td>
-                                                                            <td className="px-6 py-3">
-                                                                                <div className="flex items-center justify-center gap-1.5 transition-opacity">
-                                                                                    <button onClick={(e) => {
-                                                                                        e.stopPropagation();
-                                                                                        setOutboundData({ inventory_id: item.id, quantity: '', reason: 'Ishlab chiqarishga' });
-                                                                                        setShowOutboundModal(true);
-                                                                                    }} className="p-1.5 text-[var(--text-secondary)] hover:text-green-400 hover:bg-green-500/10 rounded-lg transition-all border border-transparent hover:border-green-500/30" title="Chiqim"><ArrowUpRight size={14} /></button>
-                                                                                    <button onClick={(e) => { e.stopPropagation(); handlePrintQR(item, codeToDisplay); }} className="p-1.5 text-[var(--text-secondary)] hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all border border-transparent hover:border-indigo-500/30" title="QR Chop etish"><Printer size={14} /></button>
-                                                                                    <button onClick={(e) => { e.stopPropagation(); setSelectedItem(item); fetchHistory(item.id); setShowHistoryModal(true); }} className="p-1.5 text-[var(--text-secondary)] hover:text-sky-400 hover:bg-sky-500/10 rounded-lg transition-all border border-transparent hover:border-sky-500/30" title="Tarix"><History size={14} /></button>
-                                                                                    <button onClick={(e) => { e.stopPropagation(); handleEdit(item); }} className="p-1.5 text-[var(--text-secondary)] hover:text-amber-400 hover:bg-amber-500/10 rounded-lg transition-all border border-transparent hover:border-amber-500/30" title="Tahrir"><Edit size={14} /></button>
-                                                                                    <button onClick={(e) => { e.stopPropagation(); handleDelete(item); }} className="p-1.5 text-[var(--text-secondary)] hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all border border-transparent hover:border-rose-500/30" title="O'chirish"><Trash2 size={14} /></button>
-                                                                                </div>
-                                                                            </td>
-                                                                        </tr>
-                                                                    );
-                                                                })}
-                                                            </tbody>
-                                                        </table>
+                                    return (
+                                        <React.Fragment key={group.groupKey}>
+                                            <tr onClick={() => toggleGroup(group.groupKey)} className="cursor-pointer hover:bg-[var(--bg-card-hover)] transition-colors group bg-[var(--bg-body)] border-b-2 border-[var(--border-color)]">
+                                                <td className="px-6 py-5 text-center">
+                                                    {expandedGroups[group.groupKey] ? <ChevronUp size={20} className="text-purple-400 mx-auto" /> : <ChevronDown size={20} className="text-[var(--text-secondary)] mx-auto group-hover:text-purple-400 transition-colors" />}
+                                                </td>
+                                                <td className="px-6 py-5 text-sm text-[var(--text-primary)] font-bold">
+                                                    {group.date}
+                                                </td>
+                                                <td className="px-6 py-5 font-black text-[var(--text-primary)] text-base tracking-wide flex items-center gap-2">
+                                                    {group.name}
+                                                    <span className="text-[10px] font-bold text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded-full border border-purple-500/30 shadow-[0_0_10px_rgba(168,85,247,0.2)]">{group.items.length} xil</span>
+                                                </td>
+                                                <td className="px-6 py-5 text-sm text-[var(--text-secondary)] font-mono uppercase" title={groupCodes.join(', ')}>
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {groupCodes.slice(0, 2).map((code, idx) => (
+                                                            <span key={idx} className="bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded-md border border-purple-500/20 text-[11px] font-black">{code}</span>
+                                                        ))}
+                                                        {groupCodes.length > 2 && (
+                                                            <span className="bg-[var(--bg-card)] text-[var(--text-secondary)] px-2 py-0.5 rounded-md border border-[var(--border-color)] text-[11px] font-bold shadow-sm">
+                                                                +{groupCodes.length - 2}
+                                                            </span>
+                                                        )}
                                                     </div>
                                                 </td>
+                                                <td className="px-6 py-5 text-right font-black text-purple-400 text-lg">{group.total.toFixed(2)}</td>
+                                                <td className="px-6 py-5 text-center text-xs text-[var(--text-secondary)] font-bold uppercase tracking-widest">{group.unit}</td>
+                                                <td className="px-6 py-5 text-xs text-[var(--text-secondary)] italic opacity-50">Jamlangan ko'rinish</td>
+                                                <td className="px-6 py-5 text-center text-xs text-[var(--text-secondary)] font-bold">UMUMIY JAMI</td>
                                             </tr>
-                                        )}
-                                    </React.Fragment>
-                                ))}
+                                            {expandedGroups[group.groupKey] && (
+                                                <tr className="bg-[var(--bg-body)]/50 transition-all">
+                                                    <td colSpan="8" className="p-6 border-b border-[var(--border-color)]">
+                                                        <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] overflow-hidden">
+                                                            <div className="px-6 py-4 border-b border-[var(--border-color)] flex justify-between items-center bg-[var(--bg-body)]">
+                                                                <div className="flex items-center gap-3">
+                                                                    <Package size={18} className="text-purple-400" />
+                                                                    <h4 className="font-bold text-sm text-[var(--text-primary)]">Aksessuarlar Ro'yxati</h4>
+                                                                </div>
+                                                                <div className="flex items-center gap-3">
+                                                                    <span className="text-xs text-[var(--text-secondary)] font-bold">Jami: {group.items.length} xil</span>
+                                                                    <button onClick={(e) => { e.stopPropagation(); handlePrintAllQRs(group.items); }} className="p-2 bg-indigo-500/10 text-indigo-400 hover:text-white hover:bg-indigo-500 rounded-xl transition-all border border-indigo-500/20 shadow-sm flex items-center gap-2 text-xs font-bold" title="Barcha QR kodelarni Chop etish"><Printer size={16} /> Barchasini chop etish</button>
+                                                                </div>
+                                                            </div>
+
+                                                            <table className="w-full text-left text-sm">
+                                                                <thead className="text-[10px] uppercase text-[var(--text-secondary)] font-bold border-b border-[var(--border-color)] bg-[var(--bg-card)]">
+                                                                    <tr>
+                                                                        <th className="px-6 py-3 w-10 text-center">
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                className="w-4 h-4 rounded border-[var(--border-color)] bg-[var(--input-bg)] text-purple-600 focus:ring-purple-500 cursor-pointer"
+                                                                                checked={group.items.length > 0 && group.items.every(i => selectedIds.includes(i.id))}
+                                                                                onChange={(e) => {
+                                                                                    if (e.target.checked) {
+                                                                                        const ids = group.items.map(i => i.id);
+                                                                                        setSelectedIds(prev => [...new Set([...prev, ...ids])]);
+                                                                                    } else {
+                                                                                        const ids = group.items.map(i => i.id);
+                                                                                        setSelectedIds(prev => prev.filter(id => !ids.includes(id)));
+                                                                                    }
+                                                                                }}
+                                                                            />
+                                                                        </th>
+                                                                        <th className="px-6 py-3">Sana</th>
+                                                                        <th className="px-6 py-3">Nomi</th>
+                                                                        <th className="px-6 py-3">ID / KOD</th>
+                                                                        <th className="px-6 py-3 text-right">Soni</th>
+                                                                        <th className="px-6 py-3 text-center">Birligi</th>
+                                                                        <th className="px-6 py-3">Qo'shimcha</th>
+                                                                        <th className="px-6 py-3 text-center">Amallar</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody className="divide-y divide-[var(--border-color)]">
+                                                                    {group.items.map(item => {
+                                                                        const isSelected = selectedIds.includes(item.id);
+                                                                        const dateDisplay = item.created_at
+                                                                            ? new Date(item.created_at).toLocaleDateString('ru-RU')
+                                                                            : (item.last_updated ? new Date(item.last_updated).toLocaleDateString('ru-RU') : '-');
+                                                                        const refItem = references?.find(r => r.id === item.reference_id) || {};
+                                                                        const codeToDisplay = refItem.code || `AKS-${item.id}`;
+
+                                                                        return (
+                                                                            <tr key={item.id} className={`hover:bg-[var(--bg-card-hover)] transition-colors ${isSelected ? 'bg-purple-500/5' : ''}`}>
+                                                                                <td className="px-6 py-3 text-center">
+                                                                                    <input
+                                                                                        type="checkbox"
+                                                                                        className="w-4 h-4 rounded border-[var(--border-color)] bg-[var(--input-bg)] text-purple-600 focus:ring-purple-500 cursor-pointer transition-all"
+                                                                                        checked={isSelected}
+                                                                                        onChange={(e) => { e.stopPropagation(); setSelectedIds(prev => prev.includes(item.id) ? prev.filter(id => id !== item.id) : [...prev, item.id]); }}
+                                                                                    />
+                                                                                </td>
+                                                                                <td className="px-6 py-3 text-xs text-[var(--text-primary)] font-bold">{dateDisplay}</td>
+                                                                                <td className="px-6 py-3 font-medium text-[var(--text-secondary)] text-sm">{item.item_name}</td>
+                                                                                <td className="px-6 py-3 font-mono font-black text-xl text-purple-400 uppercase bg-purple-500/10 rounded-lg inline-block my-1 px-3 border border-purple-500/20 shadow-sm" title={`Asl ID: AKS-${item.id}`}>{codeToDisplay}</td>
+                                                                                <td className="px-6 py-3 text-right font-black text-[var(--text-primary)] text-sm">{Number(item.quantity).toFixed(2)}</td>
+                                                                                <td className="px-6 py-3 text-center text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest">{item.unit}</td>
+                                                                                <td className="px-6 py-3">
+                                                                                    <div className="text-[10px] text-[var(--text-secondary)] flex flex-col gap-0.5">
+                                                                                        {(item.color || item.batch_number) ? (
+                                                                                            <>
+                                                                                                {item.color && <span><span className="font-bold opacity-70">Rangi:</span> {item.color}</span>}
+                                                                                                {item.batch_number && <span><span className="font-bold opacity-70">Partiya:</span> {item.batch_number}</span>}
+                                                                                            </>
+                                                                                        ) : (
+                                                                                            <span className="opacity-50 italic">-</span>
+                                                                                        )}
+                                                                                    </div>
+                                                                                </td>
+                                                                                <td className="px-6 py-3">
+                                                                                    <div className="flex items-center justify-center gap-1.5 transition-opacity">
+                                                                                        <button onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            setOutboundData({ inventory_id: item.id, quantity: '', reason: 'Ishlab chiqarishga' });
+                                                                                            setShowOutboundModal(true);
+                                                                                        }} className="p-1.5 text-[var(--text-secondary)] hover:text-green-400 hover:bg-green-500/10 rounded-lg transition-all border border-transparent hover:border-green-500/30" title="Chiqim"><ArrowUpRight size={14} /></button>
+                                                                                        <button onClick={(e) => { e.stopPropagation(); handlePrintQR(item, codeToDisplay); }} className="p-1.5 text-[var(--text-secondary)] hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all border border-transparent hover:border-indigo-500/30" title="QR Chop etish"><Printer size={14} /></button>
+                                                                                        <button onClick={(e) => { e.stopPropagation(); setSelectedItem(item); fetchHistory(item.id); setShowHistoryModal(true); }} className="p-1.5 text-[var(--text-secondary)] hover:text-sky-400 hover:bg-sky-500/10 rounded-lg transition-all border border-transparent hover:border-sky-500/30" title="Tarix"><History size={14} /></button>
+                                                                                        <button onClick={(e) => { e.stopPropagation(); handleEdit(item); }} className="p-1.5 text-[var(--text-secondary)] hover:text-amber-400 hover:bg-amber-500/10 rounded-lg transition-all border border-transparent hover:border-amber-500/30" title="Tahrir"><Edit size={14} /></button>
+                                                                                        <button onClick={(e) => { e.stopPropagation(); handleDelete(item); }} className="p-1.5 text-[var(--text-secondary)] hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all border border-transparent hover:border-rose-500/30" title="O'chirish"><Trash2 size={14} /></button>
+                                                                                    </div>
+                                                                                </td>
+                                                                            </tr>
+                                                                        );
+                                                                    })}
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </React.Fragment>
+                                    );
+                                })}
                             </tbody>
                         </table>
 

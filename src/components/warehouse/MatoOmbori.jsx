@@ -448,9 +448,10 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
             setLoading(true);
 
             // 1. Calculate new total from rolls logic (Edit modal should enforce consistency)
-            // But user might edit quantity manually? In inbound quantity is sum of rolls.
-            // Let's recalculate quantity from rolls to be safe and consistent.
-            const newTotalWeight = editData.rolls.reduce((sum, r) => sum + Number(r.weight), 0);
+            // Fix: We must ONLY sum rolls that are NOT used (in_stock). 
+            // Summing used rolls would artificially inflate the remaining quantity back to the original grand total, causing severe desyncs later.
+            const inStockRolls = editData.rolls.filter(r => r.status !== 'used');
+            const newTotalWeight = inStockRolls.reduce((sum, r) => sum + Number(r.weight), 0);
 
             // 2. Validation
             if (editData.rolls.length === 0) {
@@ -1167,7 +1168,6 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                 if (!item) continue;
 
                 // Calculate quantity for this group
-                // If rolls exist, sum them. If not (manual), use outboundData.quantity (only if single item)
                 let qtyToDeduct = 0;
                 if (groupRolls.length > 0) {
                     qtyToDeduct = groupRolls.reduce((sum, r) => sum + Number(r.weight), 0);
@@ -1175,12 +1175,27 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                     qtyToDeduct = Number(outboundData.quantity);
                 }
 
-                // Check stock
-                if (qtyToDeduct > Number(item.quantity)) {
-                    throw new Error(`"${item.item_name}" (Partiya: ${item.batch_number}) uchun yetarli qoldiq yo'q! So'raldi: ${qtyToDeduct}, Bor: ${item.quantity}`);
+                // Self Healing: Ensure currentItemQty reflects real in-stock before making checks.
+                let currentItemQty = Number(item.quantity) || 0;
+
+                const { data: realStockRolls, error: stockCheckErr } = await supabase
+                    .from('inventory_rolls')
+                    .select('weight, status')
+                    .eq('inventory_id', item.id)
+                    .neq('status', 'used');
+
+                if (!stockCheckErr && realStockRolls) {
+                    const realQty = realStockRolls.reduce((sum, r) => sum + Number(r.weight), 0);
+                    // If there is a massive desync (e.g., negative quantity), self-heal using the truth from rolls.
+                    if (Math.abs(currentItemQty - realQty) > 0.05) currentItemQty = realQty;
                 }
 
-                // 2. Rolls Update
+                // Check stock
+                if (qtyToDeduct > currentItemQty) {
+                    throw new Error(`"${item.item_name}" (Partiya: ${item.batch_number}) uchun yetarli qoldiq yo'q! So'raldi: ${qtyToDeduct}, Bor: ${currentItemQty}`);
+                }
+
+                // 2. Rolls Update FIRST
                 if (groupRolls.length > 0) {
                     const rollIds = groupRolls.map(r => r.id);
                     const { error } = await supabase.from('inventory_rolls')
@@ -1189,8 +1204,24 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                     if (error) throw error;
                 }
 
-                // 3. Inventory Update
-                const newQty = Number(item.quantity) - qtyToDeduct;
+                // 3. Inventory Update WITH SELF-HEALING Logic
+                // Always get truth from remaining in_stock rolls to absolutely prevent desyncs / negative values
+                const { data: remainingStockRolls } = await supabase
+                    .from('inventory_rolls')
+                    .select('weight')
+                    .eq('inventory_id', item.id)
+                    .neq('status', 'used');
+
+                let newQty = 0;
+                if (remainingStockRolls && remainingStockRolls.length > 0) {
+                    newQty = remainingStockRolls.reduce((sum, r) => sum + Number(r.weight), 0);
+                } else if (remainingStockRolls && remainingStockRolls.length === 0) {
+                    newQty = 0; // True zero if rolls exist but none are in stock
+                } else {
+                    // Fallback to strict subtraction (never going negative) only if rolls tables are offline/missing
+                    newQty = Math.max(0, currentItemQty - qtyToDeduct);
+                }
+
                 await supabase.from('inventory').update({ quantity: newQty, last_updated: new Date() }).eq('id', item.id);
 
                 // 4. Log
