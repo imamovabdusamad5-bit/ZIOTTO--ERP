@@ -926,11 +926,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                 const { error: updErr } = await supabase.from('inventory').update({
                     quantity: newQty,
                     last_updated: new Date(),
-                    color_code: cleanColorCode || existing.color_code,
-                    source: inboundData.source || existing.source,
-                    type_specs: inboundData.type_specs || existing.type_specs,
-                    grammage: inboundData.grammage ? Number(inboundData.grammage) : existing.grammage,
-                    width: inboundData.width ? Number(inboundData.width) : existing.width
+                    color_code: cleanColorCode || existing.color_code
                 }).eq('id', existing.id);
                 if (updErr) throw updErr;
                 newInventoryId = existing.id;
@@ -946,10 +942,10 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                         color_code: cleanColorCode,
                         batch_number: cleanBatch,
                         reference_id: inboundData.reference_id || null, // Optional if just name used
-                        source: inboundData.source,
-                        type_specs: inboundData.type_specs,
-                        grammage: inboundData.grammage ? Number(inboundData.grammage) : null,
-                        width: inboundData.width ? Number(inboundData.width) : null,
+                        // source: inboundData.source, 
+                        // type_specs: inboundData.type_specs,
+                        // grammage: inboundData.grammage ? Number(inboundData.grammage) : null,
+                        // width: inboundData.width ? Number(inboundData.width) : null,
                         last_updated: new Date()
                     }])
                     .select()
