@@ -61,7 +61,7 @@ const Ombor = () => {
         // First try with the relation
         const { data, error } = await supabase
             .from('inventory')
-            .select(`*, material_types(thread_type, grammage, code)`);
+            .select(`*, material_types!inventory_reference_id_fkey(thread_type, grammage, code)`);
 
         if (error) {
             console.error("Inventory Fetch Error (Relation):", error);
@@ -84,7 +84,7 @@ const Ombor = () => {
     const fetchLogs = async () => {
         const { data, error } = await supabase
             .from('inventory_logs')
-            .select(`*, inventory(item_name, color, category, material_types(thread_type, grammage))`)
+            .select(`*, inventory(item_name, color, category, material_types!inventory_reference_id_fkey(thread_type, grammage))`)
             .order('created_at', { ascending: false })
             .limit(50);
         if (!error) setLogs(data || []);
