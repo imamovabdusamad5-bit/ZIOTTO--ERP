@@ -113,7 +113,7 @@ const Layout = () => {
 
             <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
-            <div className="flex-1 transition-all duration-300 md:pl-64 flex flex-col min-h-screen">
+            <div className="flex-1 transition-all duration-300 md:pl-64 flex flex-col min-h-screen min-w-0 w-full overflow-x-hidden">
                 <header className="bg-[var(--bg-card)] backdrop-blur-xl border-b border-[var(--border-color)] h-16 flex items-center justify-between px-4 md:px-8 sticky top-0 z-30 shrink-0 transition-colors duration-300 shadow-sm">
                     <div className="flex items-center gap-3">
                         <button
@@ -238,7 +238,7 @@ const Layout = () => {
                     </div>
                 )}
 
-                <main className="flex-1 p-4 md:p-8 overflow-y-auto">
+                <main className="flex-1 w-full min-w-0 p-4 md:p-8 overflow-x-hidden overflow-y-auto">
                     <Outlet />
                 </main>
             </div>

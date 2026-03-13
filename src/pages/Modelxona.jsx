@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Save, FileText, Trash2, Layers, Scissors, Ruler, Activity, ChevronRight, ChevronDown, Shirt, X, Calculator, RefreshCw, CircleAlert, Pencil, Search, Image, Package } from 'lucide-react';
+import { Plus, Save, FileText, Trash2, Layers, Scissors, Ruler, Activity, ChevronRight, ChevronDown, Shirt, X, Calculator, RefreshCw, CircleAlert, Pencil, Search, Image, Package, Clock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import ImageCropper from '../components/ImageCropper';
 
@@ -26,6 +26,12 @@ const Modelxona = () => {
     const [draftLoaded, setDraftLoaded] = useState(false);
     const [calcState, setCalcState] = useState({ open: false, rowIndex: null, grammage: 0, itemName: '' });
     const [calcValues, setCalcValues] = useState({ count: '', length: '' });
+
+    // --- OPERATIONS / SMV STATE ---
+    const [opModal, setOpModal] = useState({ open: false, model: null });
+    const [operations, setOperations] = useState([]);
+    const [opLoading, setOpLoading] = useState(false);
+    const [opSaving, setOpSaving] = useState(false);
 
     // Auto-save Draft
     useEffect(() => {
@@ -90,6 +96,137 @@ const Modelxona = () => {
             console.error('Error fetching models:', error.message);
         } finally {
             setLoading(false);
+        }
+    };
+
+    // --- OPERATIONS HELPERS ---
+    const openOperationsModal = async (model) => {
+        setOpModal({ open: true, model });
+        setOperations([]);
+        setOpLoading(true);
+        try {
+            const { data, error } = await supabase
+                .from('operations')
+                .select('*')
+                .eq('model_id', model.id)
+                .order('seq', { ascending: true });
+
+            if (error) throw error;
+
+            if (data && data.length > 0) {
+                setOperations(
+                    data.map(op => ({
+                        id: op.id,
+                        section: op.section || 'Tikuv',
+                        name: op.name || '',
+                        machine_type: op.machine_type || '',
+                        smv: op.smv ? Number(op.smv) : ''
+                    }))
+                );
+            } else {
+                setOperations([
+                    { id: null, section: 'Tikuv', name: '', machine_type: '', smv: '' }
+                ]);
+            }
+        } catch (error) {
+            alert("Operatsiyalarni yuklashda xatolik: " + error.message);
+        } finally {
+            setOpLoading(false);
+        }
+    };
+
+    const closeOperationsModal = () => {
+        setOpModal({ open: false, model: null });
+        setOperations([]);
+        setOpLoading(false);
+        setOpSaving(false);
+    };
+
+    const addOperationRow = () => {
+        setOperations(prev => [
+            ...prev,
+            { id: null, section: 'Tikuv', name: '', machine_type: '', smv: '' }
+        ]);
+    };
+
+    const removeOperationRow = (index) => {
+        setOperations(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const updateOperationField = (index, field, value) => {
+        setOperations(prev => {
+            const copy = [...prev];
+            copy[index] = { ...copy[index], [field]: value };
+            return copy;
+        });
+    };
+
+    const saveOperations = async (e) => {
+        e.preventDefault();
+        if (!opModal.model) return;
+
+        // Basic validation
+        for (const op of operations) {
+            if (!op.name?.trim()) {
+                alert("Har bir operatsiya uchun nom kiritilishi shart.");
+                return;
+            }
+            if (!op.section?.trim()) {
+                alert("Har bir operatsiya uchun bo'lim (section) tanlang.");
+                return;
+            }
+            if (op.smv === '' || isNaN(Number(op.smv)) || Number(op.smv) <= 0) {
+                alert(`"${op.name}" operatsiyasi uchun SMV (daqiqada) to'g'ri kiriting.`);
+                return;
+            }
+        }
+
+        try {
+            setOpSaving(true);
+
+            // 1. Eski operatsiyalarni o'chirish
+            const { error: delError } = await supabase
+                .from('operations')
+                .delete()
+                .eq('model_id', opModal.model.id);
+
+            if (delError) throw delError;
+
+            // 2. Yangi operatsiyalarni kiritish
+            const toInsert = operations.map((op, idx) => ({
+                model_id: opModal.model.id,
+                seq: idx + 1,
+                section: op.section || 'Tikuv',
+                name: op.name,
+                machine_type: op.machine_type || null,
+                smv: Number(op.smv)
+            }));
+
+            if (toInsert.length > 0) {
+                const { error: insError } = await supabase
+                    .from('operations')
+                    .insert(toInsert);
+
+                if (insError) throw insError;
+            }
+
+            // 3. Umumiy SMV ni hisoblab, models jadvaliga yozish
+            const totalSmv = toInsert.reduce((sum, op) => sum + Number(op.smv || 0), 0);
+
+            const { error: updError } = await supabase
+                .from('models')
+                .update({ total_smv: totalSmv })
+                .eq('id', opModal.model.id);
+
+            if (updError) throw updError;
+
+            await fetchModels();
+            alert("Operatsiyalar va umumiy SMV muvaffaqiyatli saqlandi.");
+            closeOperationsModal();
+        } catch (error) {
+            alert("Operatsiyalarni saqlashda xatolik: " + error.message);
+        } finally {
+            setOpSaving(false);
         }
     };
 
@@ -1009,7 +1146,15 @@ const Modelxona = () => {
                                 <div className="flex items-center gap-8">
                                     <div className="text-right hidden sm:block">
                                         <p className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-1">BOM Tarkibi</p>
-                                        <p className="text-lg font-black text-[var(--text-primary)] flex items-center justify-end gap-1">{model.bom_items?.length || 0} <span className="text-[10px] text-[var(--text-secondary)] uppercase">Qism</span></p>
+                                        <p className="text-lg font-black text-[var(--text-primary)] flex items-center justify-end gap-1">
+                                            {model.bom_items?.length || 0}
+                                            <span className="text-[10px] text-[var(--text-secondary)] uppercase">Qism</span>
+                                        </p>
+                                        {typeof model.total_smv === 'number' && model.total_smv > 0 && (
+                                            <p className="mt-1 text-[10px] font-black text-emerald-500 uppercase tracking-widest">
+                                                SMV: {Number(model.total_smv).toFixed(2)} min
+                                            </p>
+                                        )}
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <button
@@ -1020,6 +1165,16 @@ const Modelxona = () => {
                                             className="p-4 bg-[var(--bg-body)] text-[var(--text-secondary)] rounded-2xl hover:bg-indigo-600 hover:text-white transition-all border border-[var(--border-color)] shadow-lg group-hover:border-indigo-500/30"
                                         >
                                             <Pencil size={20} />
+                                        </button>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                openOperationsModal(model);
+                                            }}
+                                            className="p-4 bg-emerald-500/10 text-emerald-500 rounded-2xl hover:bg-emerald-500 hover:text-white transition-all border border-emerald-500/40 shadow-lg"
+                                            title="Operatsiyalar va SMV"
+                                        >
+                                            <Activity size={20} />
                                         </button>
                                         <button
                                             onClick={(e) => {
@@ -1118,6 +1273,170 @@ const Modelxona = () => {
                     onCropComplete={handleCropComplete}
                     onCancel={() => { setShowCropper(false); setTempImage(null); }}
                 />
+            )}
+
+            {/* OPERATIONS / SMV MODAL */}
+            {opModal.open && (
+                <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-xl p-4 animate-in fade-in duration-300">
+                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-[3rem] p-8 w-full max-w-4xl shadow-4xl relative overflow-hidden">
+                        <div className="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 className="text-lg md:text-xl font-black text-[var(--text-primary)] tracking-tight uppercase flex items-center gap-3">
+                                    <div className="p-3 rounded-2xl bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 shadow-lg shadow-emerald-500/20">
+                                        <Scissors size={20} />
+                                    </div>
+                                    {opModal.model?.name} – Operatsiyalar &amp; SMV
+                                </h3>
+                                <p className="text-[10px] md:text-[11px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mt-1">
+                                    Har bir qadam uchun texkartani kiriting (SMV daqiqada)
+                                </p>
+                            </div>
+                            <button
+                                onClick={closeOperationsModal}
+                                className="p-2 rounded-full hover:bg-[var(--bg-body)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+                            >
+                                <X size={22} />
+                            </button>
+                        </div>
+
+                        {opLoading ? (
+                            <div className="py-16 flex flex-col items-center justify-center gap-3">
+                                <Activity className="animate-spin text-emerald-500" size={28} />
+                                <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-widest">Operatsiyalar yuklanmoqda...</p>
+                            </div>
+                        ) : (
+                            <form onSubmit={saveOperations} className="space-y-6">
+                                <div className="flex items-center justify-between">
+                                    <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-[0.25em]">
+                                        Umumiy operatsiyalar: {operations.length}
+                                    </p>
+                                    <button
+                                        type="button"
+                                        onClick={addOperationRow}
+                                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest border border-emerald-500/30 hover:bg-emerald-500 hover:text-white transition-all"
+                                    >
+                                        <Plus size={14} /> Qator Qo'shish
+                                    </button>
+                                </div>
+
+                                <div className="border border-[var(--border-color)] rounded-[2rem] overflow-hidden">
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-left">
+                                            <thead className="bg-[var(--bg-body)] text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">
+                                                <tr>
+                                                    <th className="px-4 md:px-6 py-3">#</th>
+                                                    <th className="px-4 md:px-6 py-3">Bo'lim</th>
+                                                    <th className="px-4 md:px-6 py-3">Operatsiya Nomi</th>
+                                                    <th className="px-4 md:px-6 py-3">Mashina Turi</th>
+                                                    <th className="px-4 md:px-6 py-3 text-right">SMV (daq)</th>
+                                                    <th className="px-4 md:px-6 py-3 text-center"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-[var(--border-color)] bg-[var(--bg-card)]">
+                                                {operations.map((op, idx) => (
+                                                    <tr key={idx} className="hover:bg-[var(--bg-hover)] transition-colors">
+                                                        <td className="px-4 md:px-6 py-3 text-[11px] font-mono text-[var(--text-secondary)]">
+                                                            {idx + 1}
+                                                        </td>
+                                                        <td className="px-4 md:px-6 py-3">
+                                                            <select
+                                                                className="w-full px-3 py-2 rounded-xl bg-[var(--input-bg)] border border-[var(--border-color)] text-[10px] font-black text-[var(--text-primary)] uppercase tracking-widest outline-none focus:border-emerald-500 transition-all"
+                                                                value={op.section}
+                                                                onChange={e => updateOperationField(idx, 'section', e.target.value)}
+                                                            >
+                                                                <option value="Kesim">Kesim</option>
+                                                                <option value="Tikuv">Tikuv</option>
+                                                                <option value="OTK">OTK</option>
+                                                                <option value="Dazmol">Dazmol</option>
+                                                                <option value="Qadoq">Qadoq</option>
+                                                            </select>
+                                                        </td>
+                                                        <td className="px-4 md:px-6 py-3">
+                                                            <input
+                                                                className="w-full px-3 py-2 rounded-xl bg-[var(--input-bg)] border border-[var(--border-color)] text-xs font-bold text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all"
+                                                                placeholder="Yelkani tikish..."
+                                                                value={op.name}
+                                                                onChange={e => updateOperationField(idx, 'name', e.target.value)}
+                                                            />
+                                                        </td>
+                                                        <td className="px-4 md:px-6 py-3">
+                                                            <input
+                                                                className="w-full px-3 py-2 rounded-xl bg-[var(--input-bg)] border border-[var(--border-color)] text-xs font-bold text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all"
+                                                                placeholder="Juki Lockstitch..."
+                                                                value={op.machine_type}
+                                                                onChange={e => updateOperationField(idx, 'machine_type', e.target.value)}
+                                                            />
+                                                        </td>
+                                                        <td className="px-4 md:px-6 py-3 text-right">
+                                                            <input
+                                                                type="number"
+                                                                step="0.01"
+                                                                min="0"
+                                                                className="w-24 md:w-28 px-3 py-2 rounded-xl bg-[var(--input-bg)] border border-[var(--border-color)] text-xs font-mono font-black text-emerald-500 text-right outline-none focus:border-emerald-500 transition-all"
+                                                                value={op.smv}
+                                                                onChange={e => updateOperationField(idx, 'smv', e.target.value)}
+                                                            />
+                                                        </td>
+                                                        <td className="px-4 md:px-6 py-3 text-center">
+                                                            {operations.length > 1 && (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => removeOperationRow(idx)}
+                                                                    className="p-2 rounded-xl text-rose-500 hover:bg-rose-500/10 transition-colors"
+                                                                >
+                                                                    <Trash2 size={18} />
+                                                                </button>
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-4">
+                                    <div className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest flex items-center gap-2">
+                                        <Clock size={14} className="text-emerald-500" />
+                                        <span>
+                                            Umumiy SMV (taxminiy):{" "}
+                                            {operations.reduce((sum, op) => sum + (parseFloat(op.smv) || 0), 0).toFixed(2)} daqiqa
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-end gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={closeOperationsModal}
+                                            className="px-5 py-3 rounded-2xl bg-[var(--bg-body)] border border-[var(--border-color)] text-[10px] font-black text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] uppercase tracking-widest transition-all"
+                                        >
+                                            Bekor qilish
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            disabled={opSaving}
+                                            className={`px-7 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.25em] flex items-center gap-2 shadow-xl ${opSaving
+                                                    ? 'bg-gray-700 text-white'
+                                                    : 'bg-emerald-500 hover:bg-emerald-400 text-white'
+                                                } transition-all`}
+                                        >
+                                            {opSaving ? (
+                                                <>
+                                                    <Activity size={16} className="animate-spin" />
+                                                    Saqlanmoqda...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Save size={16} />
+                                                    Saqlash
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        )}
+                    </div>
+                </div>
             )}
         </div>
     );
