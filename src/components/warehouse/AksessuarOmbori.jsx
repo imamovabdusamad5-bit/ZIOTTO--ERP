@@ -604,13 +604,13 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
             <div className="flex gap-2 p-1 my-6 bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] w-max">
                 <button
                     onClick={() => { setSubTab('kirim'); setSearchTerm(''); }}
-                    className={`px-8 py-3 rounded-xl font-black uppercase text-xs tracking-widest transition-all ${subTab === 'kirim' ? 'bg-purple-600 text-white shadow-lg' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-card-hover)]'}`}
+                    className={`px-8 py-3 rounded-xl font-black uppercase text-[10px] md:text-xs tracking-widest transition-all ${subTab === 'kirim' ? 'bg-purple-600 text-white shadow-lg' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-card-hover)]'}`}
                 >
                     Kirim Bo'limi
                 </button>
                 <button
                     onClick={() => { setSubTab('chiqim'); setSearchTerm(''); }}
-                    className={`px-8 py-3 rounded-xl font-black uppercase text-xs tracking-widest transition-all ${subTab === 'chiqim' ? 'bg-purple-600 text-white shadow-lg' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-card-hover)]'}`}
+                    className={`px-8 py-3 rounded-xl font-black uppercase text-[10px] md:text-xs tracking-widest transition-all ${subTab === 'chiqim' ? 'bg-purple-600 text-white shadow-lg' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-card-hover)]'}`}
                 >
                     Chiqim Bo'limi
                 </button>
@@ -625,7 +625,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                         </div>
                         <div>
                             <h3 className="text-xl font-black text-purple-400">{selectedIds.length} ta Tanlandi</h3>
-                            <p className="text-xs font-bold text-purple-400/70 uppercase tracking-widest">Amallar uchun tayyor</p>
+                            <p className="text-[10px] md:text-xs font-bold text-purple-400/70 uppercase tracking-widest">Amallar uchun tayyor</p>
                         </div>
                     </div>
                     <div className="flex flex-wrap gap-3 w-full md:w-auto">
@@ -634,19 +634,19 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                 const selectedItems = inventory.filter(i => selectedIds.includes(i.id));
                                 handlePrintAllQRs(selectedItems);
                             }}
-                            className="flex-1 md:flex-none bg-indigo-500 text-white px-6 py-4 rounded-2xl hover:bg-indigo-600 transition-all shadow-xl shadow-indigo-500/20 font-black uppercase text-xs tracking-widest flex items-center justify-center gap-2"
+                            className="flex-1 md:flex-none bg-indigo-500 text-white px-3 py-3 md:px-6 md:py-4 rounded-2xl hover:bg-indigo-600 transition-all shadow-xl shadow-indigo-500/20 font-black uppercase text-[10px] md:text-xs tracking-widest flex items-center justify-center gap-2"
                         >
                             <Printer size={18} /> QR Chop etish
                         </button>
                         <button
                             onClick={handleBulkDelete}
-                            className="flex-1 md:flex-none bg-rose-500/10 border border-rose-500/20 text-rose-500 px-6 py-4 rounded-2xl hover:bg-rose-500 hover:text-white transition-all shadow-xl shadow-rose-500/10 font-black uppercase text-xs tracking-widest flex items-center justify-center gap-2"
+                            className="flex-1 md:flex-none bg-rose-500/10 border border-rose-500/20 text-rose-500 px-3 py-3 md:px-6 md:py-4 rounded-2xl hover:bg-rose-500 hover:text-white transition-all shadow-xl shadow-rose-500/10 font-black uppercase text-[10px] md:text-xs tracking-widest flex items-center justify-center gap-2"
                         >
                             <Trash2 size={18} /> O'chirish
                         </button>
                         <button
                             onClick={() => setSelectedIds([])}
-                            className="flex-1 md:flex-none px-6 py-4 rounded-2xl border border-[var(--border-color)] text-[var(--text-secondary)] font-bold hover:bg-[var(--bg-card-hover)] transition-all flex items-center justify-center gap-2"
+                            className="flex-1 md:flex-none px-3 py-3 md:px-6 md:py-4 rounded-2xl border border-[var(--border-color)] text-[var(--text-secondary)] font-bold hover:bg-[var(--bg-card-hover)] transition-all flex items-center justify-center gap-2"
                         >
                             <X size={18} /> Bekor qilish
                         </button>
@@ -681,18 +681,18 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                 <RotateCcw size={18} />
                             </button>
                         )}
-                        <button className="px-6 py-4 rounded-2xl border border-[var(--border-color)] text-[var(--text-secondary)] font-bold hover:bg-[var(--bg-card-hover)] transition-all">Filtrlar</button>
+                        <button className="px-3 py-3 md:px-6 md:py-4 rounded-2xl border border-[var(--border-color)] text-[var(--text-secondary)] font-bold hover:bg-[var(--bg-card-hover)] transition-all">Filtrlar</button>
                         {subTab === 'kirim' && (
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => setShowScanner(true)}
-                                    className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-[2rem] hover:shadow-[0_0_20px_rgba(79,70,229,0.5)] transition-all font-black uppercase text-xs tracking-widest border border-indigo-400/20 whitespace-nowrap"
+                                    className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-3 py-3 md:px-6 md:py-4 rounded-[2rem] hover:shadow-[0_0_20px_rgba(79,70,229,0.5)] transition-all font-black uppercase text-[10px] md:text-xs tracking-widest border border-indigo-400/20 whitespace-nowrap"
                                 >
                                     <QrCode size={18} /> QR Chiqim
                                 </button>
                                 <button
                                     onClick={() => setShowInboundModal(true)}
-                                    className="flex items-center gap-2 bg-purple-600 text-white px-8 py-4 rounded-[2rem] hover:bg-purple-500 transition-all shadow-xl shadow-purple-600/20 font-black uppercase text-xs tracking-widest border border-purple-400/20 whitespace-nowrap"
+                                    className="flex items-center gap-2 bg-purple-600 text-white px-8 py-4 rounded-[2rem] hover:bg-purple-500 transition-all shadow-xl shadow-purple-600/20 font-black uppercase text-[10px] md:text-xs tracking-widest border border-purple-400/20 whitespace-nowrap"
                                 >
                                     <Plus size={18} /> Yangi Kirim
                                 </button>
@@ -712,7 +712,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                             </button>
                         </div>
                         <div id="reader" className="w-full bg-[var(--input-bg)] rounded-2xl overflow-hidden border border-purple-500/20 shadow-inner"></div>
-                        <p className="text-center text-xs text-purple-400 font-bold mt-4 animate-pulse">Kamerani QR kodga qarating...</p>
+                        <p className="text-center text-[10px] md:text-xs text-purple-400 font-bold mt-4 animate-pulse">Kamerani QR kodga qarating...</p>
                     </div>
                 </div>
             )}
@@ -722,19 +722,19 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                 // Chiqim Logs Table
                 <div className="overflow-hidden bg-[var(--bg-card)] backdrop-blur-3xl rounded-3xl border border-[var(--border-color)] shadow-2xl min-h-[500px] animate-in fade-in">
                     <table className="w-full text-left border-collapse">
-                        <thead className="bg-[var(--bg-sidebar-footer)] text-[var(--text-secondary)] text-[11px] font-black uppercase tracking-wider border-b border-[var(--border-color)]">
+                        <thead className="bg-[var(--bg-sidebar-footer)] text-[var(--text-secondary)] text-[9px] md:text-[11px] font-black uppercase tracking-wider border-b border-[var(--border-color)]">
                             <tr>
-                                <th className="px-6 py-5">Sana</th>
-                                <th className="px-6 py-5">Nomi</th>
-                                <th className="px-6 py-5">ID</th>
-                                <th className="px-6 py-5 text-right">Soni</th>
-                                <th className="px-6 py-5 text-center">Birligi</th>
-                                <th className="px-6 py-5">Kimga</th>
-                                <th className="px-6 py-5">Model</th>
-                                <th className="px-6 py-5">Qism</th>
-                                <th className="px-6 py-5">Buyurtma ID</th>
-                                <th className="px-6 py-5">Buyurtma Soni</th>
-                                <th className="px-6 py-5 text-center">Amallar</th>
+                                <th className="px-3 py-3 md:px-6 md:py-5">Sana</th>
+                                <th className="px-3 py-3 md:px-6 md:py-5">Nomi</th>
+                                <th className="px-3 py-3 md:px-6 md:py-5">ID</th>
+                                <th className="px-3 py-3 md:px-6 md:py-5 text-right">Soni</th>
+                                <th className="px-3 py-3 md:px-6 md:py-5 text-center">Birligi</th>
+                                <th className="px-3 py-3 md:px-6 md:py-5">Kimga</th>
+                                <th className="px-3 py-3 md:px-6 md:py-5">Model</th>
+                                <th className="px-3 py-3 md:px-6 md:py-5">Qism</th>
+                                <th className="px-3 py-3 md:px-6 md:py-5">Buyurtma ID</th>
+                                <th className="px-3 py-3 md:px-6 md:py-5">Buyurtma Soni</th>
+                                <th className="px-3 py-3 md:px-6 md:py-5 text-center">Amallar</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-[var(--border-color)]">
@@ -761,19 +761,19 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
 
                                 return (
                                     <tr key={log.id} className="hover:bg-[var(--bg-card-hover)] transition-colors">
-                                        <td className="px-6 py-5 text-xs font-bold text-[var(--text-primary)]">
+                                        <td className="px-3 py-3 md:px-6 md:py-5 text-[10px] md:text-xs font-bold text-[var(--text-primary)]">
                                             {new Date(log.created_at).toLocaleDateString('ru-RU')}
                                         </td>
-                                        <td className="px-6 py-5 font-black text-xs text-[var(--text-primary)]">{item.item_name || '-'}</td>
-                                        <td className="px-6 py-5 text-[10px] text-[var(--text-secondary)] font-mono uppercase" title={`Asl ID: AKS-${item.id}`}>{codeToDisplay}</td>
-                                        <td className="px-6 py-5 text-right font-black text-rose-500 text-sm">{log.quantity}</td>
-                                        <td className="px-6 py-5 text-center text-[10px] font-bold text-[var(--text-secondary)] uppercase">{item.unit || 'dona'}</td>
-                                        <td className="px-6 py-5 text-xs font-bold text-[var(--text-primary)]">{extract('Bichuvchi')}</td>
-                                        <td className="px-6 py-5 text-xs font-bold text-purple-400">{model}</td>
-                                        <td className="px-6 py-5 text-xs text-[var(--text-primary)]">{extract('Qism')}</td>
-                                        <td className="px-6 py-5 text-[10px] text-[var(--text-secondary)] font-mono">#{orderId}</td>
-                                        <td className="px-6 py-5 text-xs font-bold text-[var(--text-primary)]">{orderQuantity}</td>
-                                        <td className="px-6 py-5 text-center">
+                                        <td className="px-3 py-3 md:px-6 md:py-5 font-black text-[10px] md:text-xs text-[var(--text-primary)]">{item.item_name || '-'}</td>
+                                        <td className="px-3 py-3 md:px-6 md:py-5 text-[10px] text-[var(--text-secondary)] font-mono uppercase" title={`Asl ID: AKS-${item.id}`}>{codeToDisplay}</td>
+                                        <td className="px-3 py-3 md:px-6 md:py-5 text-right font-black text-rose-500 text-xs md:text-sm">{log.quantity}</td>
+                                        <td className="px-3 py-3 md:px-6 md:py-5 text-center text-[10px] font-bold text-[var(--text-secondary)] uppercase">{item.unit || 'dona'}</td>
+                                        <td className="px-3 py-3 md:px-6 md:py-5 text-[10px] md:text-xs font-bold text-[var(--text-primary)]">{extract('Bichuvchi')}</td>
+                                        <td className="px-3 py-3 md:px-6 md:py-5 text-[10px] md:text-xs font-bold text-purple-400">{model}</td>
+                                        <td className="px-3 py-3 md:px-6 md:py-5 text-[10px] md:text-xs text-[var(--text-primary)]">{extract('Qism')}</td>
+                                        <td className="px-3 py-3 md:px-6 md:py-5 text-[10px] text-[var(--text-secondary)] font-mono">#{orderId}</td>
+                                        <td className="px-3 py-3 md:px-6 md:py-5 text-[10px] md:text-xs font-bold text-[var(--text-primary)]">{orderQuantity}</td>
+                                        <td className="px-3 py-3 md:px-6 md:py-5 text-center">
                                             <button onClick={() => handleDeleteLog(log)} className="p-2 text-[var(--text-secondary)] hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all" title="O'chirish">
                                                 <Trash2 size={16} />
                                             </button>
@@ -792,9 +792,9 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                 <div className="overflow-hidden bg-[var(--bg-card)] backdrop-blur-3xl rounded-3xl border border-[var(--border-color)] shadow-2xl min-h-[500px]">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
-                            <thead className="bg-[var(--bg-sidebar-footer)] text-[var(--text-secondary)] uppercase tracking-widest text-[11px] font-black border-b border-[var(--border-color)] sticky top-0 z-10">
+                            <thead className="bg-[var(--bg-sidebar-footer)] text-[var(--text-secondary)] uppercase tracking-widest text-[9px] md:text-[11px] font-black border-b border-[var(--border-color)] sticky top-0 z-10">
                                 <tr>
-                                    <th className="px-6 py-5 text-center w-12">
+                                    <th className="px-3 py-3 md:px-6 md:py-5 text-center w-12">
                                         <input
                                             type="checkbox"
                                             className="w-5 h-5 rounded-lg bg-[var(--input-bg)] border-[var(--border-color)] checked:bg-purple-600 focus:ring-purple-500 cursor-pointer transition-all"
@@ -808,13 +808,13 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                             }}
                                         />
                                     </th>
-                                    <th className="px-6 py-5">Sana</th>
-                                    <th className="px-6 py-5">Nomi</th>
-                                    <th className="px-6 py-5">ID</th>
-                                    <th className="px-6 py-5 text-right">Soni</th>
-                                    <th className="px-6 py-5 text-center">Birligi</th>
-                                    <th className="px-6 py-5">Qo'shimcha</th>
-                                    <th className="px-6 py-5 text-center">Amallar</th>
+                                    <th className="px-3 py-3 md:px-6 md:py-5">Sana</th>
+                                    <th className="px-3 py-3 md:px-6 md:py-5">Nomi</th>
+                                    <th className="px-3 py-3 md:px-6 md:py-5">ID</th>
+                                    <th className="px-3 py-3 md:px-6 md:py-5 text-right">Soni</th>
+                                    <th className="px-3 py-3 md:px-6 md:py-5 text-center">Birligi</th>
+                                    <th className="px-3 py-3 md:px-6 md:py-5">Qo'shimcha</th>
+                                    <th className="px-3 py-3 md:px-6 md:py-5 text-center">Amallar</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-[var(--border-color)]">
@@ -838,52 +838,52 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                     return (
                                         <React.Fragment key={group.groupKey}>
                                             <tr onClick={() => toggleGroup(group.groupKey)} className="cursor-pointer hover:bg-[var(--bg-card-hover)] transition-colors group bg-[var(--bg-body)] border-b-2 border-[var(--border-color)]">
-                                                <td className="px-6 py-5 text-center">
+                                                <td className="px-3 py-3 md:px-6 md:py-5 text-center">
                                                     {expandedGroups[group.groupKey] ? <ChevronUp size={20} className="text-purple-400 mx-auto" /> : <ChevronDown size={20} className="text-[var(--text-secondary)] mx-auto group-hover:text-purple-400 transition-colors" />}
                                                 </td>
-                                                <td className="px-6 py-5 text-sm text-[var(--text-primary)] font-bold">
+                                                <td className="px-3 py-3 md:px-6 md:py-5 text-xs md:text-sm text-[var(--text-primary)] font-bold">
                                                     {group.date}
                                                 </td>
-                                                <td className="px-6 py-5 font-black text-[var(--text-primary)] text-base tracking-wide flex items-center gap-2">
+                                                <td className="px-3 py-3 md:px-6 md:py-5 font-black text-[var(--text-primary)] text-base tracking-wide flex items-center gap-2">
                                                     {group.name}
                                                     <span className="text-[10px] font-bold text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded-full border border-purple-500/30 shadow-[0_0_10px_rgba(168,85,247,0.2)]">{group.items.length} xil</span>
                                                 </td>
-                                                <td className="px-6 py-5 text-sm text-[var(--text-secondary)] font-mono uppercase" title={groupCodes.join(', ')}>
+                                                <td className="px-3 py-3 md:px-6 md:py-5 text-xs md:text-sm text-[var(--text-secondary)] font-mono uppercase" title={groupCodes.join(', ')}>
                                                     <div className="flex flex-wrap gap-1">
                                                         {groupCodes.slice(0, 2).map((code, idx) => (
-                                                            <span key={idx} className="bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded-md border border-purple-500/20 text-[11px] font-black">{code}</span>
+                                                            <span key={idx} className="bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded-md border border-purple-500/20 text-[9px] md:text-[11px] font-black">{code}</span>
                                                         ))}
                                                         {groupCodes.length > 2 && (
-                                                            <span className="bg-[var(--bg-card)] text-[var(--text-secondary)] px-2 py-0.5 rounded-md border border-[var(--border-color)] text-[11px] font-bold shadow-sm">
+                                                            <span className="bg-[var(--bg-card)] text-[var(--text-secondary)] px-2 py-0.5 rounded-md border border-[var(--border-color)] text-[9px] md:text-[11px] font-bold shadow-sm">
                                                                 +{groupCodes.length - 2}
                                                             </span>
                                                         )}
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-5 text-right font-black text-purple-400 text-lg">{group.total.toFixed(2)}</td>
-                                                <td className="px-6 py-5 text-center text-xs text-[var(--text-secondary)] font-bold uppercase tracking-widest">{group.unit}</td>
-                                                <td className="px-6 py-5 text-xs text-[var(--text-secondary)] italic opacity-50">Jamlangan ko'rinish</td>
-                                                <td className="px-6 py-5 text-center text-xs text-[var(--text-secondary)] font-bold">UMUMIY JAMI</td>
+                                                <td className="px-3 py-3 md:px-6 md:py-5 text-right font-black text-purple-400 text-base md:text-lg">{group.total.toFixed(2)}</td>
+                                                <td className="px-3 py-3 md:px-6 md:py-5 text-center text-[10px] md:text-xs text-[var(--text-secondary)] font-bold uppercase tracking-widest">{group.unit}</td>
+                                                <td className="px-3 py-3 md:px-6 md:py-5 text-[10px] md:text-xs text-[var(--text-secondary)] italic opacity-50">Jamlangan ko'rinish</td>
+                                                <td className="px-3 py-3 md:px-6 md:py-5 text-center text-[10px] md:text-xs text-[var(--text-secondary)] font-bold">UMUMIY JAMI</td>
                                             </tr>
                                             {expandedGroups[group.groupKey] && (
                                                 <tr className="bg-[var(--bg-body)]/50 transition-all">
                                                     <td colSpan="8" className="p-6 border-b border-[var(--border-color)]">
                                                         <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] overflow-hidden">
-                                                            <div className="px-6 py-4 border-b border-[var(--border-color)] flex justify-between items-center bg-[var(--bg-body)]">
+                                                            <div className="px-3 py-3 md:px-6 md:py-4 border-b border-[var(--border-color)] flex justify-between items-center bg-[var(--bg-body)]">
                                                                 <div className="flex items-center gap-3">
                                                                     <Package size={18} className="text-purple-400" />
-                                                                    <h4 className="font-bold text-sm text-[var(--text-primary)]">Aksessuarlar Ro'yxati</h4>
+                                                                    <h4 className="font-bold text-xs md:text-sm text-[var(--text-primary)]">Aksessuarlar Ro'yxati</h4>
                                                                 </div>
                                                                 <div className="flex items-center gap-3">
-                                                                    <span className="text-xs text-[var(--text-secondary)] font-bold">Jami: {group.items.length} xil</span>
-                                                                    <button onClick={(e) => { e.stopPropagation(); handlePrintAllQRs(group.items); }} className="p-2 bg-indigo-500/10 text-indigo-400 hover:text-white hover:bg-indigo-500 rounded-xl transition-all border border-indigo-500/20 shadow-sm flex items-center gap-2 text-xs font-bold" title="Barcha QR kodelarni Chop etish"><Printer size={16} /> Barchasini chop etish</button>
+                                                                    <span className="text-[10px] md:text-xs text-[var(--text-secondary)] font-bold">Jami: {group.items.length} xil</span>
+                                                                    <button onClick={(e) => { e.stopPropagation(); handlePrintAllQRs(group.items); }} className="p-2 bg-indigo-500/10 text-indigo-400 hover:text-white hover:bg-indigo-500 rounded-xl transition-all border border-indigo-500/20 shadow-sm flex items-center gap-2 text-[10px] md:text-xs font-bold" title="Barcha QR kodelarni Chop etish"><Printer size={16} /> Barchasini chop etish</button>
                                                                 </div>
                                                             </div>
 
-                                                            <table className="w-full text-left text-sm">
+                                                            <table className="w-full text-left text-xs md:text-sm">
                                                                 <thead className="text-[10px] uppercase text-[var(--text-secondary)] font-bold border-b border-[var(--border-color)] bg-[var(--bg-card)]">
                                                                     <tr>
-                                                                        <th className="px-6 py-3 w-10 text-center">
+                                                                        <th className="px-3 py-2 md:px-6 md:py-3 w-10 text-center">
                                                                             <input
                                                                                 type="checkbox"
                                                                                 className="w-4 h-4 rounded border-[var(--border-color)] bg-[var(--input-bg)] text-purple-600 focus:ring-purple-500 cursor-pointer"
@@ -899,13 +899,13 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                                                                 }}
                                                                             />
                                                                         </th>
-                                                                        <th className="px-6 py-3">Sana</th>
-                                                                        <th className="px-6 py-3">Nomi</th>
-                                                                        <th className="px-6 py-3">ID / KOD</th>
-                                                                        <th className="px-6 py-3 text-right">Soni</th>
-                                                                        <th className="px-6 py-3 text-center">Birligi</th>
-                                                                        <th className="px-6 py-3">Qo'shimcha</th>
-                                                                        <th className="px-6 py-3 text-center">Amallar</th>
+                                                                        <th className="px-3 py-2 md:px-6 md:py-3">Sana</th>
+                                                                        <th className="px-3 py-2 md:px-6 md:py-3">Nomi</th>
+                                                                        <th className="px-3 py-2 md:px-6 md:py-3">ID / KOD</th>
+                                                                        <th className="px-3 py-2 md:px-6 md:py-3 text-right">Soni</th>
+                                                                        <th className="px-3 py-2 md:px-6 md:py-3 text-center">Birligi</th>
+                                                                        <th className="px-3 py-2 md:px-6 md:py-3">Qo'shimcha</th>
+                                                                        <th className="px-3 py-2 md:px-6 md:py-3 text-center">Amallar</th>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody className="divide-y divide-[var(--border-color)]">
@@ -919,7 +919,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
 
                                                                         return (
                                                                             <tr key={item.id} className={`hover:bg-[var(--bg-card-hover)] transition-colors ${isSelected ? 'bg-purple-500/5' : ''}`}>
-                                                                                <td className="px-6 py-3 text-center">
+                                                                                <td className="px-3 py-2 md:px-6 md:py-3 text-center">
                                                                                     <input
                                                                                         type="checkbox"
                                                                                         className="w-4 h-4 rounded border-[var(--border-color)] bg-[var(--input-bg)] text-purple-600 focus:ring-purple-500 cursor-pointer transition-all"
@@ -927,12 +927,12 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                                                                         onChange={(e) => { e.stopPropagation(); setSelectedIds(prev => prev.includes(item.id) ? prev.filter(id => id !== item.id) : [...prev, item.id]); }}
                                                                                     />
                                                                                 </td>
-                                                                                <td className="px-6 py-3 text-xs text-[var(--text-primary)] font-bold">{dateDisplay}</td>
-                                                                                <td className="px-6 py-3 font-medium text-[var(--text-secondary)] text-sm">{item.item_name}</td>
-                                                                                <td className="px-6 py-3 font-mono font-black text-xl text-purple-400 uppercase bg-purple-500/10 rounded-lg inline-block my-1 px-3 border border-purple-500/20 shadow-sm" title={`Asl ID: AKS-${item.id}`}>{codeToDisplay}</td>
-                                                                                <td className="px-6 py-3 text-right font-black text-[var(--text-primary)] text-sm">{Number(item.quantity).toFixed(2)}</td>
-                                                                                <td className="px-6 py-3 text-center text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest">{item.unit}</td>
-                                                                                <td className="px-6 py-3">
+                                                                                <td className="px-3 py-2 md:px-6 md:py-3 text-[10px] md:text-xs text-[var(--text-primary)] font-bold">{dateDisplay}</td>
+                                                                                <td className="px-3 py-2 md:px-6 md:py-3 font-medium text-[var(--text-secondary)] text-xs md:text-sm">{item.item_name}</td>
+                                                                                <td className="px-3 py-2 md:px-6 md:py-3 font-mono font-black text-xl text-purple-400 uppercase bg-purple-500/10 rounded-lg inline-block my-1 px-3 border border-purple-500/20 shadow-sm" title={`Asl ID: AKS-${item.id}`}>{codeToDisplay}</td>
+                                                                                <td className="px-3 py-2 md:px-6 md:py-3 text-right font-black text-[var(--text-primary)] text-xs md:text-sm">{Number(item.quantity).toFixed(2)}</td>
+                                                                                <td className="px-3 py-2 md:px-6 md:py-3 text-center text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest">{item.unit}</td>
+                                                                                <td className="px-3 py-2 md:px-6 md:py-3">
                                                                                     <div className="text-[10px] text-[var(--text-secondary)] flex flex-col gap-0.5">
                                                                                         {(item.color || item.batch_number) ? (
                                                                                             <>
@@ -944,7 +944,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                                                                         )}
                                                                                     </div>
                                                                                 </td>
-                                                                                <td className="px-6 py-3">
+                                                                                <td className="px-3 py-2 md:px-6 md:py-3">
                                                                                     <div className="flex items-center justify-center gap-1.5 transition-opacity">
                                                                                         <button onClick={(e) => {
                                                                                             e.stopPropagation();
@@ -975,7 +975,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                         {filteredInventory.length === 0 && (
                             <div className="py-20 flex flex-col items-center justify-center text-[var(--text-secondary)]">
                                 <Package size={48} className="mb-4 opacity-20" />
-                                <span className="font-bold uppercase tracking-widest text-xs">Aksessuarlar topilmadi</span>
+                                <span className="font-bold uppercase tracking-widest text-[10px] md:text-xs">Aksessuarlar topilmadi</span>
                             </div>
                         )}
                     </div>
@@ -993,23 +993,23 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
 
                         <form onSubmit={handleKirim}>
                             <div className="p-8 space-y-6">
-                                <h4 className="text-sm font-bold text-[var(--text-primary)] mb-4 uppercase tracking-widest">Aksessuar Ma'lumotlari</h4>
+                                <h4 className="text-xs md:text-sm font-bold text-[var(--text-primary)] mb-4 uppercase tracking-widest">Aksessuar Ma'lumotlari</h4>
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Sana</label>
+                                        <label className="text-[10px] md:text-xs text-[var(--text-secondary)] mb-1 block font-bold">Sana</label>
                                         <input
                                             type="date"
-                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 font-bold shadow-inner"
+                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 font-bold shadow-inner"
                                             value={inboundData.date}
                                             onChange={e => setInboundData({ ...inboundData, date: e.target.value })}
                                             required
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Nomi</label>
+                                        <label className="text-[10px] md:text-xs text-[var(--text-secondary)] mb-1 block font-bold">Nomi</label>
                                         <select
-                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 transition-all font-bold appearance-none cursor-pointer placeholder-[var(--text-secondary)] shadow-inner"
+                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 transition-all font-bold appearance-none cursor-pointer placeholder-[var(--text-secondary)] shadow-inner"
                                             value={inboundData.selected_material_name}
                                             onChange={(e) => {
                                                 const val = e.target.value;
@@ -1025,19 +1025,19 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">ID</label>
+                                        <label className="text-[10px] md:text-xs text-[var(--text-secondary)] mb-1 block font-bold">ID</label>
                                         <input
                                             type="text"
-                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-secondary)] font-mono font-bold cursor-not-allowed opacity-70"
+                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-secondary)] font-mono font-bold cursor-not-allowed opacity-70"
                                             value="Saqlanganda beriladi"
                                             disabled
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs font-bold text-[var(--text-secondary)] mb-1 block">Kimdan (Manba)</label>
+                                        <label className="text-[10px] md:text-xs font-bold text-[var(--text-secondary)] mb-1 block">Kimdan (Manba)</label>
                                         <input
                                             list="in-source-suggestions"
-                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 font-bold shadow-inner"
+                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 font-bold shadow-inner"
                                             value={inboundData.source || ''}
                                             onChange={e => setInboundData({ ...inboundData, source: e.target.value })}
                                             placeholder="Sotuvchi o'rnini yozing..."
@@ -1054,7 +1054,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                         if (selectedRefs.length > 0) {
                                             return (
                                                 <div className="col-span-2 mt-2">
-                                                    <label className="text-xs text-[var(--text-secondary)] mb-2 block font-bold">Miqdorlar (O'lcham/ID bo'yicha)</label>
+                                                    <label className="text-[10px] md:text-xs text-[var(--text-secondary)] mb-2 block font-bold">Miqdorlar (O'lcham/ID bo'yicha)</label>
                                                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 bg-[var(--bg-body)] p-4 rounded-2xl border border-[var(--border-color)]">
                                                         {selectedRefs.map(ref => (
                                                             <div key={ref.id} className="bg-[var(--bg-card)] p-3 rounded-xl shadow-sm border border-[var(--border-color)]">
@@ -1062,7 +1062,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                                                 <div className="relative">
                                                                     <input
                                                                         type="number"
-                                                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-lg p-2 text-sm font-black text-[var(--text-primary)] outline-none focus:border-purple-500 shadow-inner pr-10"
+                                                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-lg p-2 text-xs md:text-sm font-black text-[var(--text-primary)] outline-none focus:border-purple-500 shadow-inner pr-10"
                                                                         value={inboundData.quantities?.[ref.id] || ''}
                                                                         onChange={e => setInboundData({
                                                                             ...inboundData,
@@ -1081,18 +1081,18 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
 
                                         return (
                                             <div className="col-span-2">
-                                                <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Miqdor va Birlik</label>
+                                                <label className="text-[10px] md:text-xs text-[var(--text-secondary)] mb-1 block font-bold">Miqdor va Birlik</label>
                                                 <div className="relative">
                                                     <input
                                                         type="number"
-                                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 font-bold pr-20 shadow-inner"
+                                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 font-bold pr-20 shadow-inner"
                                                         value={inboundData.quantity}
                                                         onChange={e => setInboundData({ ...inboundData, quantity: e.target.value })}
                                                         placeholder="0.00"
                                                         required={!inboundData.selected_material_name}
                                                     />
                                                     <select
-                                                        className="absolute right-1 top-1 bottom-1 bg-[var(--bg-card)] text-xs text-[var(--text-secondary)] font-bold outline-none border-l border-[var(--border-color)] pl-2 rounded-r-xl"
+                                                        className="absolute right-1 top-1 bottom-1 bg-[var(--bg-card)] text-[10px] md:text-xs text-[var(--text-secondary)] font-bold outline-none border-l border-[var(--border-color)] pl-2 rounded-r-xl"
                                                         value={inboundData.unit}
                                                         onChange={e => setInboundData({ ...inboundData, unit: e.target.value })}
                                                     >
@@ -1110,18 +1110,18 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                 </div>
 
                                 <div>
-                                    <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Izoh</label>
+                                    <label className="text-[10px] md:text-xs text-[var(--text-secondary)] mb-1 block font-bold">Izoh</label>
                                     <textarea
                                         placeholder="Qo'shimcha ma'lumotlar..."
-                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 h-20 resize-none font-bold"
+                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 h-20 resize-none font-bold"
                                         value={inboundData.note}
                                         onChange={e => setInboundData({ ...inboundData, note: e.target.value })}
                                     />
                                 </div>
                             </div>
                             <div className="p-6 border-t border-[var(--border-color)] flex justify-end gap-3 bg-[var(--bg-card)] sticky bottom-0 z-10">
-                                <button type="button" onClick={() => setShowInboundModal(false)} className="px-6 py-3 rounded-xl border border-[var(--border-color)] text-[var(--text-secondary)] font-bold text-sm hover:bg-[var(--bg-card-hover)]">Bekor qilish</button>
-                                <button type="submit" disabled={loading} className="px-8 py-3 rounded-xl bg-purple-600 text-white font-bold text-sm hover:bg-purple-500 shadow-lg shadow-purple-600/20 active:scale-95 transition-all flex items-center gap-2">
+                                <button type="button" onClick={() => setShowInboundModal(false)} className="px-3 py-2 md:px-6 md:py-3 rounded-xl border border-[var(--border-color)] text-[var(--text-secondary)] font-bold text-xs md:text-sm hover:bg-[var(--bg-card-hover)]">Bekor qilish</button>
+                                <button type="submit" disabled={loading} className="px-8 py-3 rounded-xl bg-purple-600 text-white font-bold text-xs md:text-sm hover:bg-purple-500 shadow-lg shadow-purple-600/20 active:scale-95 transition-all flex items-center gap-2">
                                     <Plus size={16} /> Kiritish
                                 </button>
                             </div>
@@ -1136,14 +1136,14 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                     <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-2xl rounded-[3rem] p-8 relative shadow-2xl">
                         <button onClick={() => setShowOutboundModal(false)} className="absolute top-8 right-8 p-2 bg-[var(--bg-body)] rounded-full text-[var(--text-secondary)] hover:text-rose-500 transition-colors"><X size={20} /></button>
                         <h3 className="text-2xl font-black mb-1 text-[var(--text-primary)]">Chiqim Qilish</h3>
-                        <p className="text-[var(--text-secondary)] text-xs font-bold uppercase tracking-widest mb-6">Ishlab chiqarish uchun tayyorlash</p>
+                        <p className="text-[var(--text-secondary)] text-[10px] md:text-xs font-bold uppercase tracking-widest mb-6">Ishlab chiqarish uchun tayyorlash</p>
 
                         <form onSubmit={handleChiqim} className="space-y-6">
                             <div className="bg-[var(--bg-body)] p-6 rounded-2xl border border-[var(--border-color)] flex justify-between items-center">
                                 <div>
                                     <div className="text-[10px] uppercase font-black text-[var(--text-secondary)] mb-1">Aksessuar:</div>
                                     <div className="font-bold text-[var(--text-primary)]">{(inventory.find(i => i.id === outboundData.inventory_id) || {}).item_name || 'Hato'}</div>
-                                    <div className="text-xs font-mono text-[var(--text-secondary)] mt-1">Sklad Qoldiq: <span className="text-[var(--text-primary)] font-bold">{(inventory.find(i => i.id === outboundData.inventory_id) || {}).quantity || 0}</span></div>
+                                    <div className="text-[10px] md:text-xs font-mono text-[var(--text-secondary)] mt-1">Sklad Qoldiq: <span className="text-[var(--text-primary)] font-bold">{(inventory.find(i => i.id === outboundData.inventory_id) || {}).quantity || 0}</span></div>
                                 </div>
                                 <div className="text-right">
                                     <label className="text-[10px] uppercase font-black text-[var(--text-secondary)] mb-1 block">Chiqim Miqdori:</label>
@@ -1156,17 +1156,17 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                             placeholder="0.00"
                                             required
                                         />
-                                        <span className="text-xs font-bold text-[var(--text-secondary)]">{(inventory.find(i => i.id === outboundData.inventory_id) || {}).unit}</span>
+                                        <span className="text-[10px] md:text-xs font-bold text-[var(--text-secondary)]">{(inventory.find(i => i.id === outboundData.inventory_id) || {}).unit}</span>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-xs font-bold text-[var(--text-secondary)] mb-1 block">Model (Plan)</label>
+                                    <label className="text-[10px] md:text-xs font-bold text-[var(--text-secondary)] mb-1 block">Model (Plan)</label>
                                     <input
                                         list="out-model-suggestions"
-                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-rose-500 font-bold"
+                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-rose-500 font-bold"
                                         value={outboundExtra.model}
                                         onChange={e => setOutboundExtra({ ...outboundExtra, model: e.target.value })}
                                         placeholder="Modelni tanlang..."
@@ -1177,19 +1177,19 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                     </datalist>
                                 </div>
                                 <div>
-                                    <label className="text-xs font-bold text-[var(--text-secondary)] mb-1 block">Qism / Izoh</label>
+                                    <label className="text-[10px] md:text-xs font-bold text-[var(--text-secondary)] mb-1 block">Qism / Izoh</label>
                                     <input
                                         type="text"
-                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-rose-500 font-bold"
+                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-rose-500 font-bold"
                                         value={outboundExtra.part}
                                         onChange={e => setOutboundExtra({ ...outboundExtra, part: e.target.value })}
                                         placeholder="M: Zamok uchun"
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs font-bold text-[var(--text-secondary)] mb-1 block">Yosh / O'lcham</label>
+                                    <label className="text-[10px] md:text-xs font-bold text-[var(--text-secondary)] mb-1 block">Yosh / O'lcham</label>
                                     <select
-                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-rose-500 font-bold"
+                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-rose-500 font-bold"
                                         value={outboundExtra.age}
                                         onChange={e => setOutboundExtra({ ...outboundExtra, age: e.target.value })}
                                     >
@@ -1202,10 +1202,10 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="text-xs font-bold text-[var(--text-secondary)] mb-1 block">Qabul qildi / Bichuvchi</label>
+                                    <label className="text-[10px] md:text-xs font-bold text-[var(--text-secondary)] mb-1 block">Qabul qildi / Bichuvchi</label>
                                     <input
                                         type="text"
-                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-rose-500 font-bold"
+                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-rose-500 font-bold"
                                         value={outboundExtra.cutter}
                                         onChange={e => setOutboundExtra({ ...outboundExtra, cutter: e.target.value })}
                                         placeholder="Ism..."
@@ -1214,7 +1214,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold uppercase mb-2 text-[var(--text-secondary)]">Qo'shimcha Izoh / Sabab</label>
+                                <label className="block text-[10px] md:text-xs font-bold uppercase mb-2 text-[var(--text-secondary)]">Qo'shimcha Izoh / Sabab</label>
                                 <textarea
                                     className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-4 font-bold text-[var(--text-primary)] outline-none focus:border-rose-500 min-h-[80px] resize-none"
                                     value={outboundData.reason}
@@ -1240,7 +1240,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                         <div className="p-6 border-b border-[var(--border-color)] flex justify-between items-center bg-[var(--bg-card)] shrink-0">
                             <h3 className="text-xl font-black text-[var(--text-primary)] flex items-center gap-2">
                                 <History size={24} className="text-purple-500" />
-                                Tarix: <span className="text-[var(--text-secondary)] font-medium text-lg ml-2">{selectedItem.item_name}</span>
+                                Tarix: <span className="text-[var(--text-secondary)] font-medium text-base md:text-lg ml-2">{selectedItem.item_name}</span>
                             </h3>
                             <button
                                 onClick={() => setShowHistoryModal(false)}
@@ -1287,14 +1287,14 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                             {h.type === 'In' ? <ArrowDownLeft size={20} /> : <ArrowUpRight size={20} />}
                                         </div>
                                         <div>
-                                            <div className="text-xs font-black text-[var(--text-secondary)] uppercase tracking-wide mb-0.5">
+                                            <div className="text-[10px] md:text-xs font-black text-[var(--text-secondary)] uppercase tracking-wide mb-0.5">
                                                 {new Date(h.created_at).toLocaleString('ru-RU')}
                                             </div>
-                                            <div className="text-sm font-bold text-[var(--text-primary)]">{h.reason || (h.type === 'In' ? 'Kirim' : 'Chiqim')}</div>
+                                            <div className="text-xs md:text-sm font-bold text-[var(--text-primary)]">{h.reason || (h.type === 'In' ? 'Kirim' : 'Chiqim')}</div>
                                             {h.batch_number && <div className="text-[10px] text-[var(--text-secondary)] font-mono mt-1 bg-[var(--bg-card)] inline-block px-2 py-0.5 rounded border border-[var(--border-color)]">Partiya: {h.batch_number}</div>}
                                         </div>
                                     </div>
-                                    <div className={`text-lg font-black ${h.type === 'In' ? 'text-emerald-500' : 'text-rose-500'}`}>
+                                    <div className={`text-base md:text-lg font-black ${h.type === 'In' ? 'text-emerald-500' : 'text-rose-500'}`}>
                                         {h.type === 'In' ? '+' : '-'}{Number(h.quantity).toFixed(2)}
                                     </div>
                                 </div>
@@ -1315,10 +1315,10 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                         <form onSubmit={handleSaveEdit}>
                             <div className="p-8 space-y-4">
                                 <div>
-                                    <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Aksessuar Nomi</label>
+                                    <label className="text-[10px] md:text-xs text-[var(--text-secondary)] mb-1 block font-bold">Aksessuar Nomi</label>
                                     <input
                                         type="text"
-                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 font-bold"
+                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 font-bold"
                                         value={editData.item_name}
                                         onChange={e => setEditData({ ...editData, item_name: e.target.value })}
                                         required
@@ -1326,35 +1326,35 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Rangi</label>
+                                        <label className="text-[10px] md:text-xs text-[var(--text-secondary)] mb-1 block font-bold">Rangi</label>
                                         <input
                                             type="text"
-                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 font-bold"
+                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 font-bold"
                                             value={editData.color}
                                             onChange={e => setEditData({ ...editData, color: e.target.value })}
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Partiya</label>
+                                        <label className="text-[10px] md:text-xs text-[var(--text-secondary)] mb-1 block font-bold">Partiya</label>
                                         <input
                                             type="text"
-                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 font-bold"
+                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 font-bold"
                                             value={editData.batch_number}
                                             onChange={e => setEditData({ ...editData, batch_number: e.target.value })}
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Miqdor</label>
+                                        <label className="text-[10px] md:text-xs text-[var(--text-secondary)] mb-1 block font-bold">Miqdor</label>
                                         <div className="relative">
                                             <input
                                                 type="number"
-                                                className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 font-bold pr-16"
+                                                className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 font-bold pr-16"
                                                 value={editData.quantity}
                                                 onChange={e => setEditData({ ...editData, quantity: e.target.value })}
                                                 required
                                             />
                                             <select
-                                                className="absolute right-1 top-1 bottom-1 bg-transparent text-xs text-[var(--text-secondary)] font-bold outline-none border-l border-[var(--border-color)] pl-2"
+                                                className="absolute right-1 top-1 bottom-1 bg-transparent text-[10px] md:text-xs text-[var(--text-secondary)] font-bold outline-none border-l border-[var(--border-color)] pl-2"
                                                 value={editData.unit}
                                                 onChange={e => setEditData({ ...editData, unit: e.target.value })}
                                             >
@@ -1367,7 +1367,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Kod (Pantone)</label>
+                                        <label className="text-[10px] md:text-xs text-[var(--text-secondary)] mb-1 block font-bold">Kod (Pantone)</label>
                                         <div className="flex gap-2">
                                             <input
                                                 type="color"
@@ -1377,7 +1377,7 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                             />
                                             <input
                                                 type="text"
-                                                className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 font-mono font-bold"
+                                                className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-purple-500 font-mono font-bold"
                                                 value={editData.color_code}
                                                 onChange={e => setEditData({ ...editData, color_code: e.target.value })}
                                             />
@@ -1385,17 +1385,17 @@ const AksessuarOmbori = ({ inventory, references, orders, onRefresh, viewMode })
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Asl Izoh (O'zgartirib bo'lmaydi)</label>
+                                    <label className="text-[10px] md:text-xs text-[var(--text-secondary)] mb-1 block font-bold">Asl Izoh (O'zgartirib bo'lmaydi)</label>
                                     <textarea
                                         disabled
-                                        className="w-full bg-[var(--bg-body)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-secondary)] outline-none h-20 resize-none font-bold opacity-70"
+                                        className="w-full bg-[var(--bg-body)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-secondary)] outline-none h-20 resize-none font-bold opacity-70"
                                         value={editData.note}
                                     />
                                 </div>
                             </div>
                             <div className="p-6 border-t border-[var(--border-color)] flex justify-end gap-3 bg-[var(--bg-card)] sticky bottom-0 z-10">
-                                <button type="button" onClick={() => setShowEditModal(false)} className="px-6 py-3 rounded-xl border border-[var(--border-color)] text-[var(--text-secondary)] font-bold text-sm hover:bg-[var(--bg-card-hover)]">Bekor qilish</button>
-                                <button type="submit" disabled={loading} className="px-8 py-3 rounded-xl bg-purple-600 text-white font-bold text-sm hover:bg-purple-500 shadow-lg shadow-purple-600/20 active:scale-95 transition-all flex items-center gap-2">
+                                <button type="button" onClick={() => setShowEditModal(false)} className="px-3 py-2 md:px-6 md:py-3 rounded-xl border border-[var(--border-color)] text-[var(--text-secondary)] font-bold text-xs md:text-sm hover:bg-[var(--bg-card-hover)]">Bekor qilish</button>
+                                <button type="submit" disabled={loading} className="px-8 py-3 rounded-xl bg-purple-600 text-white font-bold text-xs md:text-sm hover:bg-purple-500 shadow-lg shadow-purple-600/20 active:scale-95 transition-all flex items-center gap-2">
                                     Saqlash
                                 </button>
                             </div>

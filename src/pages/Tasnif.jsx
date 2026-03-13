@@ -89,7 +89,7 @@ const Tasnif = () => {
                     <input
                         type="text"
                         placeholder="Partiya qidirish..."
-                        className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl pl-12 pr-6 py-4 text-sm text-[var(--text-primary)] focus:border-blue-500 outline-none w-64 transition-all"
+                        className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl pl-12 pr-6 py-4 text-xs md:text-sm text-[var(--text-primary)] focus:border-blue-500 outline-none w-64 transition-all"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -112,18 +112,18 @@ const Tasnif = () => {
                                 <h3 className="text-xl font-black text-[var(--text-primary)] mt-3 tracking-tight group-hover:text-blue-400 transition-colors uppercase">
                                     {batch.production_orders?.models?.name || 'Noma\'lum xil'}
                                 </h3>
-                                <p className="text-xs font-mono font-bold text-[var(--text-secondary)] mt-1"># {batch.bundle_number}</p>
+                                <p className="text-[10px] md:text-xs font-mono font-bold text-[var(--text-secondary)] mt-1"># {batch.bundle_number}</p>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4 mb-8">
                             <div className="bg-[var(--bg-header)] p-4 rounded-2xl border border-[var(--border-color)]">
                                 <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-1">Miqdor</p>
-                                <p className="text-lg font-black text-[var(--text-primary)]">{batch.quantity} <span className="text-[10px] text-[var(--text-secondary)]">dona</span></p>
+                                <p className="text-base md:text-lg font-black text-[var(--text-primary)]">{batch.quantity} <span className="text-[10px] text-[var(--text-secondary)]">dona</span></p>
                             </div>
                             <div className="bg-[var(--bg-header)] p-4 rounded-2xl border border-[var(--border-color)]">
                                 <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-1">Rangi & Olcham</p>
-                                <p className="text-sm font-black text-blue-500">{batch.color} | {batch.size}</p>
+                                <p className="text-xs md:text-sm font-black text-blue-500">{batch.color} | {batch.size}</p>
                             </div>
                         </div>
 
@@ -141,7 +141,7 @@ const Tasnif = () => {
 
                 {!loading && filteredBundles.length === 0 && (
                     <div className="col-span-full py-20 text-center bg-[var(--bg-card)] rounded-[3rem] border-2 border-dashed border-[var(--border-color)]">
-                        <p className="text-[var(--text-secondary)] font-bold uppercase tracking-widest text-xs">Hozircha saralash uchun partiyalar yo'q</p>
+                        <p className="text-[var(--text-secondary)] font-bold uppercase tracking-widest text-[10px] md:text-xs">Hozircha saralash uchun partiyalar yo'q</p>
                     </div>
                 )}
             </div>
@@ -155,7 +155,7 @@ const Tasnif = () => {
                                 <ArrowRight size={40} />
                             </div>
                             <h3 className="text-2xl font-black text-white text-center tracking-tight mb-2 uppercase">Navbatdagi Bo'limni Tanlang</h3>
-                            <p className="text-gray-500 text-xs font-bold uppercase tracking-widest">{selectedBundle?.bundle_number} partiyasi uchun</p>
+                            <p className="text-gray-500 text-[10px] md:text-xs font-bold uppercase tracking-widest">{selectedBundle?.bundle_number} partiyasi uchun</p>
                         </div>
 
                         <div className="p-10 grid grid-cols-1 gap-4">
@@ -167,7 +167,7 @@ const Tasnif = () => {
                                     <Printer size={24} />
                                 </div>
                                 <div>
-                                    <p className="text-lg font-black text-white group-hover:text-white">Pechatga Yuborish</p>
+                                    <p className="text-base md:text-lg font-black text-white group-hover:text-white">Pechatga Yuborish</p>
                                     <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest group-hover:text-purple-200">Naqsh va bosma ishlari uchun</p>
                                 </div>
                             </button>
@@ -180,7 +180,7 @@ const Tasnif = () => {
                                     <Activity size={24} />
                                 </div>
                                 <div>
-                                    <p className="text-lg font-black text-white group-hover:text-white">Vishefkaga Yuborish</p>
+                                    <p className="text-base md:text-lg font-black text-white group-hover:text-white">Vishefkaga Yuborish</p>
                                     <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest group-hover:text-pink-200">Kashta va tikma ishlari uchun</p>
                                 </div>
                             </button>
@@ -193,7 +193,7 @@ const Tasnif = () => {
                                     <Shirt size={24} />
                                 </div>
                                 <div>
-                                    <p className="text-lg font-black text-white group-hover:text-white">Tikuvga To'g'ridan-to'g'ri</p>
+                                    <p className="text-base md:text-lg font-black text-white group-hover:text-white">Tikuvga To'g'ridan-to'g'ri</p>
                                     <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest group-hover:text-emerald-200">Boshqa ishlov talab etilmasa</p>
                                 </div>
                             </button>

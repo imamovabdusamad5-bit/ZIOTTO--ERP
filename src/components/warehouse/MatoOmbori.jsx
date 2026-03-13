@@ -1298,13 +1298,13 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
             <div className="flex gap-2 p-1 my-6 bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] w-max">
                 <button
                     onClick={() => { setSubTab('kirim'); setSearchTerm(''); }}
-                    className={`px-8 py-3 rounded-xl font-black uppercase text-xs tracking-widest transition-all ${subTab === 'kirim' ? 'bg-indigo-600 text-white shadow-lg' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-card-hover)]'}`}
+                    className={`px-8 py-3 rounded-xl font-black uppercase text-[10px] md:text-xs tracking-widest transition-all ${subTab === 'kirim' ? 'bg-indigo-600 text-white shadow-lg' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-card-hover)]'}`}
                 >
                     Kirim Bo'limi
                 </button>
                 <button
                     onClick={() => { setSubTab('chiqim'); setSearchTerm(''); }}
-                    className={`px-8 py-3 rounded-xl font-black uppercase text-xs tracking-widest transition-all ${subTab === 'chiqim' ? 'bg-indigo-600 text-white shadow-lg' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-card-hover)]'}`}
+                    className={`px-8 py-3 rounded-xl font-black uppercase text-[10px] md:text-xs tracking-widest transition-all ${subTab === 'chiqim' ? 'bg-indigo-600 text-white shadow-lg' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-card-hover)]'}`}
                 >
                     Chiqim Bo'limi
                 </button>
@@ -1319,19 +1319,19 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                         </div>
                         <div>
                             <h3 className="text-xl font-black text-rose-500">{selectedIds.length} ta Tanlandi</h3>
-                            <p className="text-xs font-bold text-rose-400/70 uppercase tracking-widest">O'chirish uchun tayyor</p>
+                            <p className="text-[10px] md:text-xs font-bold text-rose-400/70 uppercase tracking-widest">O'chirish uchun tayyor</p>
                         </div>
                     </div>
                     <div className="flex gap-3 w-full md:w-auto">
                         <button
                             onClick={() => setSelectedIds([])}
-                            className="flex-1 md:flex-none px-6 py-4 rounded-2xl border border-rose-500/20 text-rose-500 font-bold hover:bg-rose-500/10 transition-all flex items-center justify-center gap-2"
+                            className="flex-1 md:flex-none px-3 py-3 md:px-6 md:py-4 rounded-2xl border border-rose-500/20 text-rose-500 font-bold hover:bg-rose-500/10 transition-all flex items-center justify-center gap-2"
                         >
                             <X size={18} /> Bekor qilish
                         </button>
                         <button
                             onClick={handleBulkDelete}
-                            className="flex-1 md:flex-none bg-rose-500 text-white px-8 py-4 rounded-2xl hover:bg-rose-600 transition-all shadow-xl shadow-rose-500/20 font-black uppercase text-xs tracking-widest flex items-center justify-center gap-2"
+                            className="flex-1 md:flex-none bg-rose-500 text-white px-8 py-4 rounded-2xl hover:bg-rose-600 transition-all shadow-xl shadow-rose-500/20 font-black uppercase text-[10px] md:text-xs tracking-widest flex items-center justify-center gap-2"
                         >
                             <Trash2 size={18} /> O'chirish
                         </button>
@@ -1377,11 +1377,11 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                         >
                             <QrCode size={20} /> <span className="hidden sm:inline">Scan</span>
                         </button>
-                        <button className="px-6 py-4 rounded-2xl border border-[var(--border-color)] text-[var(--text-secondary)] font-bold hover:bg-[var(--bg-card-hover)] transition-all">Filtrlar</button>
+                        <button className="px-3 py-3 md:px-6 md:py-4 rounded-2xl border border-[var(--border-color)] text-[var(--text-secondary)] font-bold hover:bg-[var(--bg-card-hover)] transition-all">Filtrlar</button>
                         {subTab === 'kirim' && (
                             <button
                                 onClick={() => setShowInboundModal(true)}
-                                className="bg-indigo-600 text-white px-8 py-4 rounded-2xl hover:bg-indigo-500 transition-all shadow-xl shadow-indigo-600/20 font-black uppercase text-xs tracking-widest border border-indigo-400/20 flex items-center gap-2"
+                                className="bg-indigo-600 text-white px-8 py-4 rounded-2xl hover:bg-indigo-500 transition-all shadow-xl shadow-indigo-600/20 font-black uppercase text-[10px] md:text-xs tracking-widest border border-indigo-400/20 flex items-center gap-2"
                             >
                                 <Plus size={18} /> Mato Kirimi
                             </button>
@@ -1394,18 +1394,18 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
             {subTab === 'chiqim' ? (
                 <div className="overflow-hidden bg-[var(--bg-card)] backdrop-blur-3xl rounded-3xl border border-[var(--border-color)] shadow-2xl min-h-[500px] animate-in fade-in">
                     <table className="w-full text-left border-collapse">
-                        <thead className="bg-[var(--bg-sidebar-footer)] text-[var(--text-secondary)] text-[11px] font-black uppercase tracking-wider border-b border-[var(--border-color)]">
+                        <thead className="bg-[var(--bg-sidebar-footer)] text-[var(--text-secondary)] text-[9px] md:text-[11px] font-black uppercase tracking-wider border-b border-[var(--border-color)]">
                             <tr>
-                                <th className="px-6 py-5">Sana</th>
-                                <th className="px-6 py-5">Mato Turi</th>
-                                <th className="px-6 py-5">Rang</th>
-                                <th className="px-6 py-5">Turi</th>
-                                <th className="px-6 py-5">Partiya</th>
-                                <th className="px-6 py-5 text-right">Jami Chiqim</th>
-                                <th className="px-6 py-5">Model</th>
-                                <th className="px-6 py-5">Qism</th>
-                                <th className="px-6 py-5">Yosh</th>
-                                <th className="px-6 py-5">Bichuvchi</th>
+                                <th className="px-3 py-3 md:px-6 md:py-5">Sana</th>
+                                <th className="px-3 py-3 md:px-6 md:py-5">Mato Turi</th>
+                                <th className="px-3 py-3 md:px-6 md:py-5">Rang</th>
+                                <th className="px-3 py-3 md:px-6 md:py-5">Turi</th>
+                                <th className="px-3 py-3 md:px-6 md:py-5">Partiya</th>
+                                <th className="px-3 py-3 md:px-6 md:py-5 text-right">Jami Chiqim</th>
+                                <th className="px-3 py-3 md:px-6 md:py-5">Model</th>
+                                <th className="px-3 py-3 md:px-6 md:py-5">Qism</th>
+                                <th className="px-3 py-3 md:px-6 md:py-5">Yosh</th>
+                                <th className="px-3 py-3 md:px-6 md:py-5">Bichuvchi</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-[var(--border-color)]">
@@ -1434,18 +1434,18 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
 
                                 return (
                                     <tr key={log.id} className="hover:bg-[var(--bg-card-hover)] transition-colors">
-                                        <td className="px-6 py-5 text-sm font-bold text-[var(--text-primary)]">
+                                        <td className="px-3 py-3 md:px-6 md:py-5 text-xs md:text-sm font-bold text-[var(--text-primary)]">
                                             {new Date(log.created_at).toLocaleDateString('ru-RU')}
                                         </td>
-                                        <td className="px-6 py-5 font-black text-sm">{item.item_name || '-'}</td>
-                                        <td className="px-6 py-5 text-xs font-bold">{item.color || '-'}</td>
-                                        <td className="px-6 py-5 text-xs text-[var(--text-secondary)]">{typeStr}</td>
-                                        <td className="px-6 py-5 text-xs font-mono">{log.batch_number || item.batch_number || '-'}</td>
-                                        <td className="px-6 py-5 text-right font-black text-rose-500 text-lg">{log.quantity} kg</td>
-                                        <td className="px-6 py-5 text-xs font-bold text-indigo-400">{model}</td>
-                                        <td className="px-6 py-5 text-xs">{part}</td>
-                                        <td className="px-6 py-5 text-xs text-[var(--text-secondary)]">{age}</td>
-                                        <td className="px-6 py-5 text-xs font-bold">{cutter}</td>
+                                        <td className="px-3 py-3 md:px-6 md:py-5 font-black text-xs md:text-sm">{item.item_name || '-'}</td>
+                                        <td className="px-3 py-3 md:px-6 md:py-5 text-[10px] md:text-xs font-bold">{item.color || '-'}</td>
+                                        <td className="px-3 py-3 md:px-6 md:py-5 text-[10px] md:text-xs text-[var(--text-secondary)]">{typeStr}</td>
+                                        <td className="px-3 py-3 md:px-6 md:py-5 text-[10px] md:text-xs font-mono">{log.batch_number || item.batch_number || '-'}</td>
+                                        <td className="px-3 py-3 md:px-6 md:py-5 text-right font-black text-rose-500 text-base md:text-lg">{log.quantity} kg</td>
+                                        <td className="px-3 py-3 md:px-6 md:py-5 text-[10px] md:text-xs font-bold text-indigo-400">{model}</td>
+                                        <td className="px-3 py-3 md:px-6 md:py-5 text-[10px] md:text-xs">{part}</td>
+                                        <td className="px-3 py-3 md:px-6 md:py-5 text-[10px] md:text-xs text-[var(--text-secondary)]">{age}</td>
+                                        <td className="px-3 py-3 md:px-6 md:py-5 text-[10px] md:text-xs font-bold">{cutter}</td>
                                     </tr>
                                 );
                             })}
@@ -1469,26 +1469,26 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                             onChange={() => setSelectedIds(prev => prev.includes(item.id) ? prev.filter(x => x !== item.id) : [...prev, item.id])}
                                             className="w-5 h-5 rounded border-[var(--border-color)] bg-[var(--input-bg)]"
                                         />
-                                        <span className="font-bold text-[var(--text-primary)] text-sm">#{item.id}</span>
+                                        <span className="font-bold text-[var(--text-primary)] text-xs md:text-sm">#{item.id}</span>
                                     </div>
-                                    <span className="font-black text-indigo-400 text-lg">{Number(item.quantity).toFixed(2)} kg</span>
+                                    <span className="font-black text-indigo-400 text-base md:text-lg">{Number(item.quantity).toFixed(2)} kg</span>
                                 </div>
 
                                 <div className="mb-3 pl-8">
                                     <div className="font-bold text-[var(--text-primary)] leading-tight">{item.item_name}</div>
-                                    <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)] mt-1">
+                                    <div className="flex items-center gap-2 text-[10px] md:text-xs text-[var(--text-secondary)] mt-1">
                                         <div className="w-3 h-3 rounded-full border border-[var(--border-color)]" style={{ backgroundColor: item.color_code || '#ccc' }}></div>
                                         {item.color} | {item.material_types?.thread_type || '-'}
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-2 text-xs mb-3 pl-8">
+                                <div className="grid grid-cols-2 gap-2 text-[10px] md:text-xs mb-3 pl-8">
                                     <div className="bg-[var(--bg-body)] p-2 rounded text-[var(--text-secondary)]">Pr: <span className="font-bold text-[var(--text-primary)]">{item.batch_number || '-'}</span></div>
                                     <div className="bg-[var(--bg-body)] p-2 rounded text-[var(--text-secondary)]">Mn: <span className="font-bold text-[var(--text-primary)]">{item.source || '-'}</span></div>
                                 </div>
 
                                 <div className="flex gap-2 pl-8">
-                                    <button onClick={() => toggleRow(item)} className={`flex-1 py-2 rounded-lg text-xs font-bold border transition-colors ${expandedRowId === item.id ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-[var(--bg-body)] text-[var(--text-secondary)] border-[var(--border-color)]'}`}>
+                                    <button onClick={() => toggleRow(item)} className={`flex-1 py-2 rounded-lg text-[10px] md:text-xs font-bold border transition-colors ${expandedRowId === item.id ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-[var(--bg-body)] text-[var(--text-secondary)] border-[var(--border-color)]'}`}>
                                         {expandedRowId === item.id ? 'Yopish' : "Ro'yxat"}
                                     </button>
                                     <button onClick={() => { setSelectedItem(item); toggleRow(item); }} className="p-2 text-[var(--text-secondary)] bg-[var(--bg-body)] border border-[var(--border-color)] rounded-lg">
@@ -1504,7 +1504,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                         {itemRolls.length > 0 ? (
                                             <div className="space-y-2">
                                                 {itemRolls.map(r => (
-                                                    <div key={r.id} className="flex justify-between items-center text-xs bg-[var(--bg-body)] p-2 rounded border border-[var(--border-color)]">
+                                                    <div key={r.id} className="flex justify-between items-center text-[10px] md:text-xs bg-[var(--bg-body)] p-2 rounded border border-[var(--border-color)]">
                                                         <div className="font-mono">{r.roll_number}</div>
                                                         <div className="font-bold text-emerald-500">{Number(r.weight).toFixed(2)} kg</div>
                                                     </div>
@@ -1513,10 +1513,10 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                     <button onClick={() => {
                                                         setSubTab('chiqim');
                                                         handleBulkChiqim(item, itemRolls.filter(r => r.status !== 'used'));
-                                                    }} className="text-xs text-indigo-400 font-bold underline">Barchasini Chiqim Qilish</button>
+                                                    }} className="text-[10px] md:text-xs text-indigo-400 font-bold underline">Barchasini Chiqim Qilish</button>
                                                 </div>
                                             </div>
-                                        ) : <div className="text-center text-xs opacity-50 py-2">Rulonlar topilmadi</div>}
+                                        ) : <div className="text-center text-[10px] md:text-xs opacity-50 py-2">Rulonlar topilmadi</div>}
                                     </div>
                                 )}
                             </div>
@@ -1525,9 +1525,9 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
 
                     <div className="hidden md:block overflow-hidden bg-[var(--bg-card)] backdrop-blur-3xl rounded-3xl border border-[var(--border-color)] shadow-2xl min-h-[500px]">
                         <table className="w-full text-left border-collapse">
-                            <thead className="bg-[var(--bg-sidebar-footer)] text-[var(--text-secondary)] text-[11px] font-black uppercase tracking-wider border-b border-[var(--border-color)]">
+                            <thead className="bg-[var(--bg-sidebar-footer)] text-[var(--text-secondary)] text-[9px] md:text-[11px] font-black uppercase tracking-wider border-b border-[var(--border-color)]">
                                 <tr>
-                                    <th className="px-6 py-5 text-center w-12">
+                                    <th className="px-3 py-3 md:px-6 md:py-5 text-center w-12">
                                         <input
                                             type="checkbox"
                                             className="w-5 h-5 rounded-lg bg-[var(--input-bg)] border-[var(--border-color)] checked:bg-indigo-600 focus:ring-indigo-500 cursor-pointer transition-all"
@@ -1538,15 +1538,15 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                             }}
                                         />
                                     </th>
-                                    <th className="px-6 py-5">Sana / ID</th>
-                                    <th className="px-6 py-5">Mato Turi</th>
-                                    <th className="px-6 py-5">Rang</th>
-                                    <th className="px-6 py-5">Turi</th>
-                                    <th className="px-6 py-5">Partiya</th>
-                                    <th className="px-6 py-5 text-center">Rulonlar</th>
-                                    <th className="px-6 py-5 text-right">Jami Og'irlik</th>
-                                    <th className="px-6 py-5">Kimdan</th>
-                                    <th className="px-6 py-5 text-center">Amallar</th>
+                                    <th className="px-3 py-3 md:px-6 md:py-5">Sana / ID</th>
+                                    <th className="px-3 py-3 md:px-6 md:py-5">Mato Turi</th>
+                                    <th className="px-3 py-3 md:px-6 md:py-5">Rang</th>
+                                    <th className="px-3 py-3 md:px-6 md:py-5">Turi</th>
+                                    <th className="px-3 py-3 md:px-6 md:py-5">Partiya</th>
+                                    <th className="px-3 py-3 md:px-6 md:py-5 text-center">Rulonlar</th>
+                                    <th className="px-3 py-3 md:px-6 md:py-5 text-right">Jami Og'irlik</th>
+                                    <th className="px-3 py-3 md:px-6 md:py-5">Kimdan</th>
+                                    <th className="px-3 py-3 md:px-6 md:py-5 text-center">Amallar</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-[var(--border-color)]">
@@ -1576,19 +1576,19 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                 }, {})).map(group => (
                                     <React.Fragment key={group.groupKey}>
                                         <tr onClick={() => toggleGroup(group.groupKey)} className="cursor-pointer hover:bg-[var(--bg-card-hover)] transition-colors group bg-[var(--bg-body)] border-b-2 border-[var(--border-color)]">
-                                            <td className="px-6 py-5 text-center">
+                                            <td className="px-3 py-3 md:px-6 md:py-5 text-center">
                                                 {expandedGroups[group.groupKey] ? <ChevronUp size={20} className="text-indigo-400 mx-auto" /> : <ChevronDown size={20} className="text-[var(--text-secondary)] mx-auto group-hover:text-indigo-400 transition-colors" />}
                                             </td>
-                                            <td className="px-6 py-5">
-                                                <div className="font-bold text-sm text-[var(--text-primary)]">
+                                            <td className="px-3 py-3 md:px-6 md:py-5">
+                                                <div className="font-bold text-xs md:text-sm text-[var(--text-primary)]">
                                                     {group.date}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-5 font-black text-[var(--text-primary)] text-base tracking-wide flex items-center gap-2">
+                                            <td className="px-3 py-3 md:px-6 md:py-5 font-black text-[var(--text-primary)] text-base tracking-wide flex items-center gap-2">
                                                 <span>{group.name}</span>
                                                 <span className="text-[10px] font-bold text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-full border border-indigo-500/30 shadow-[0_0_10px_rgba(99,102,241,0.2)]">{group.items.length} xil</span>
                                             </td>
-                                            <td className="px-6 py-5">
+                                            <td className="px-3 py-3 md:px-6 md:py-5">
                                                 <div className="flex flex-wrap gap-1 max-w-[150px]">
                                                     {Array.from(group.colors).slice(0, 3).map(c => (
                                                         <span key={c} className="text-[10px] bg-[var(--bg-card)] px-2 py-0.5 rounded border border-[var(--border-color)] text-[var(--text-secondary)] font-bold shadow-sm">{c}</span>
@@ -1596,16 +1596,16 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                     {group.colors.size > 3 && <span className="text-[10px] text-[var(--text-secondary)] bg-indigo-500/10 px-1 py-0.5 rounded">+{group.colors.size - 3}</span>}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-5 text-sm text-[var(--text-secondary)] font-mono uppercase text-center">-</td>
-                                            <td className="px-6 py-5 text-sm text-[var(--text-secondary)] font-mono uppercase text-center">-</td>
-                                            <td className="px-6 py-5 text-xs text-[var(--text-secondary)] font-bold italic opacity-50 text-center">
+                                            <td className="px-3 py-3 md:px-6 md:py-5 text-xs md:text-sm text-[var(--text-secondary)] font-mono uppercase text-center">-</td>
+                                            <td className="px-3 py-3 md:px-6 md:py-5 text-xs md:text-sm text-[var(--text-secondary)] font-mono uppercase text-center">-</td>
+                                            <td className="px-3 py-3 md:px-6 md:py-5 text-[10px] md:text-xs text-[var(--text-secondary)] font-bold italic opacity-50 text-center">
                                                 {group.rolls} ta rulon
                                             </td>
-                                            <td className="px-6 py-5 text-right">
-                                                <div className="font-black text-indigo-400 text-lg">{group.totalWeight.toFixed(2)} <span className="text-xs text-[var(--text-secondary)] font-bold">kg</span></div>
+                                            <td className="px-3 py-3 md:px-6 md:py-5 text-right">
+                                                <div className="font-black text-indigo-400 text-base md:text-lg">{group.totalWeight.toFixed(2)} <span className="text-[10px] md:text-xs text-[var(--text-secondary)] font-bold">kg</span></div>
                                             </td>
-                                            <td className="px-6 py-5 text-xs text-[var(--text-secondary)] italic opacity-50 uppercase text-center">-</td>
-                                            <td className="px-6 py-5 text-center">
+                                            <td className="px-3 py-3 md:px-6 md:py-5 text-[10px] md:text-xs text-[var(--text-secondary)] italic opacity-50 uppercase text-center">-</td>
+                                            <td className="px-3 py-3 md:px-6 md:py-5 text-center">
                                                 <button onClick={(e) => { e.stopPropagation(); handlePrintGroupRolls(group.items, `${group.name} (${group.date})`); }} className="bg-indigo-500/10 text-indigo-400 hover:text-white hover:bg-indigo-500 px-3 py-1.5 rounded-xl transition-all border border-indigo-500/20 shadow-sm flex items-center gap-2 text-[10px] font-bold mx-auto" title="Guruhdagi barcha rulonlarni chop etish">
                                                     <Printer size={14} /> BARCHA QR
                                                 </button>
@@ -1627,7 +1627,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                             return (
                                                 <React.Fragment key={item.id}>
                                                     <tr className={`transition-all group ${isSelected ? 'bg-indigo-500/5' : (isExpanded ? 'bg-[var(--bg-card-hover)]' : 'hover:bg-[var(--bg-card-hover)]')}`}>
-                                                        <td className="px-6 py-5 text-center">
+                                                        <td className="px-3 py-3 md:px-6 md:py-5 text-center">
                                                             <input
                                                                 type="checkbox"
                                                                 className="w-5 h-5 rounded-lg bg-[var(--input-bg)] border-[var(--border-color)] checked:bg-indigo-600 focus:ring-indigo-500 cursor-pointer transition-all"
@@ -1635,46 +1635,46 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                                 onChange={() => setSelectedIds(prev => prev.includes(item.id) ? prev.filter(id => id !== item.id) : [...prev, item.id])}
                                                             />
                                                         </td>
-                                                        <td className="px-6 py-5">
-                                                            <div className="font-bold text-[var(--text-primary)] text-sm mb-1">{dateDisplay}</div>
+                                                        <td className="px-3 py-3 md:px-6 md:py-5">
+                                                            <div className="font-bold text-[var(--text-primary)] text-xs md:text-sm mb-1">{dateDisplay}</div>
                                                             <div className="text-[10px] text-[var(--text-secondary)] font-mono uppercase">MAT-{item.id}</div>
                                                         </td>
-                                                        <td className="px-6 py-5 font-black text-[var(--text-primary)] text-sm">{item.item_name}</td>
+                                                        <td className="px-3 py-3 md:px-6 md:py-5 font-black text-[var(--text-primary)] text-xs md:text-sm">{item.item_name}</td>
 
-                                                        <td className="px-6 py-5">
+                                                        <td className="px-3 py-3 md:px-6 md:py-5">
                                                             <div className="flex items-center gap-3">
                                                                 <div
                                                                     className="w-8 h-8 rounded-full border border-[var(--border-color)] shadow-sm"
                                                                     style={{ backgroundColor: item.color_code || '#ccc' }}
                                                                 ></div>
                                                                 <div>
-                                                                    <div className="font-bold text-[var(--text-primary)] text-xs">{item.color}</div>
+                                                                    <div className="font-bold text-[var(--text-primary)] text-[10px] md:text-xs">{item.color}</div>
                                                                     <div className="text-[10px] text-[var(--text-secondary)] opacity-70">{item.color_code || '-'}</div>
                                                                 </div>
                                                             </div>
                                                         </td>
-                                                        <td className="px-6 py-5">
-                                                            <div className="font-bold text-[var(--text-primary)] text-xs">{typeStr}</div>
+                                                        <td className="px-3 py-3 md:px-6 md:py-5">
+                                                            <div className="font-bold text-[var(--text-primary)] text-[10px] md:text-xs">{typeStr}</div>
                                                             <div className="text-[10px] text-[var(--text-secondary)] opacity-70 mt-0.5">{specs}</div>
                                                         </td>
-                                                        <td className="px-6 py-5">
-                                                            <span className="bg-[var(--bg-body)] text-[var(--text-primary)] font-mono text-xs font-bold px-3 py-1.5 rounded-lg border border-[var(--border-color)]">
+                                                        <td className="px-3 py-3 md:px-6 md:py-5">
+                                                            <span className="bg-[var(--bg-body)] text-[var(--text-primary)] font-mono text-[10px] md:text-xs font-bold px-3 py-1.5 rounded-lg border border-[var(--border-color)]">
                                                                 {item.batch_number || 'N/A'}
                                                             </span>
                                                         </td>
-                                                        <td className="px-6 py-5 text-center">
+                                                        <td className="px-3 py-3 md:px-6 md:py-5 text-center">
                                                             <div className="flex justify-center flex-col items-center">
-                                                                <button onClick={() => toggleRow(item)} className="text-indigo-400 hover:text-indigo-300 font-bold text-xs flex flex-col items-center gap-1">
-                                                                    <span className="text-sm font-black text-[var(--text-primary)]">{rollCounts[item.id] || 0} ta</span>
+                                                                <button onClick={() => toggleRow(item)} className="text-indigo-400 hover:text-indigo-300 font-bold text-[10px] md:text-xs flex flex-col items-center gap-1">
+                                                                    <span className="text-xs md:text-sm font-black text-[var(--text-primary)]">{rollCounts[item.id] || 0} ta</span>
                                                                     <span className="flex items-center gap-1"><ScrollText size={14} /> RULON SONI</span>
                                                                 </button>
                                                             </div>
                                                         </td>
-                                                        <td className="px-6 py-5 text-right">
-                                                            <div className="font-black text-indigo-400 text-lg">{Number(item.quantity).toFixed(2)} <span className="text-xs text-[var(--text-secondary)] font-bold">kg</span></div>
+                                                        <td className="px-3 py-3 md:px-6 md:py-5 text-right">
+                                                            <div className="font-black text-indigo-400 text-base md:text-lg">{Number(item.quantity).toFixed(2)} <span className="text-[10px] md:text-xs text-[var(--text-secondary)] font-bold">kg</span></div>
                                                         </td>
-                                                        <td className="px-6 py-5 font-bold text-[var(--text-secondary)] text-xs uppercase">{item.source || '-'}</td>
-                                                        <td className="px-6 py-5">
+                                                        <td className="px-3 py-3 md:px-6 md:py-5 font-bold text-[var(--text-secondary)] text-[10px] md:text-xs uppercase">{item.source || '-'}</td>
+                                                        <td className="px-3 py-3 md:px-6 md:py-5">
                                                             <div className="flex items-center justify-center gap-2">
                                                                 <button onClick={() => {
                                                                     setSelectedItem(item);
@@ -1702,29 +1702,29 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                         <tr className="bg-[var(--bg-body)]/50 transition-all">
                                                             <td colSpan="9" className="p-6 border-b border-[var(--border-color)]">
                                                                 <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] overflow-hidden">
-                                                                    <div className="px-6 py-4 border-b border-[var(--border-color)] flex justify-between items-center bg-[var(--bg-body)]">
+                                                                    <div className="px-3 py-3 md:px-6 md:py-4 border-b border-[var(--border-color)] flex justify-between items-center bg-[var(--bg-body)]">
                                                                         <div className="flex items-center gap-3">
                                                                             <ScrollText size={18} className="text-indigo-400" />
-                                                                            <h4 className="font-bold text-sm text-[var(--text-primary)]">Rulonlar Ro'yxati</h4>
+                                                                            <h4 className="font-bold text-xs md:text-sm text-[var(--text-primary)]">Rulonlar Ro'yxati</h4>
                                                                             {selectedRollIds.length > 0 && (
                                                                                 <button
                                                                                     onClick={() => {
                                                                                         const selectedRolls = itemRolls.filter(r => selectedRollIds.includes(r.id));
                                                                                         handleBulkChiqim(item, selectedRolls);
                                                                                     }}
-                                                                                    className="ml-4 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-lg text-xs font-bold transition-colors animate-in fade-in zoom-in"
+                                                                                    className="ml-4 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-lg text-[10px] md:text-xs font-bold transition-colors animate-in fade-in zoom-in"
                                                                                 >
                                                                                     Tanlanganlarni Chiqim Qilish ({selectedRollIds.length})
                                                                                 </button>
                                                                             )}
                                                                         </div>
-                                                                        <span className="text-xs text-[var(--text-secondary)] font-bold">Jami: {itemRolls.length} ta rulon</span>
+                                                                        <span className="text-[10px] md:text-xs text-[var(--text-secondary)] font-bold">Jami: {itemRolls.length} ta rulon</span>
                                                                     </div>
 
-                                                                    <table className="w-full text-left text-sm">
+                                                                    <table className="w-full text-left text-xs md:text-sm">
                                                                         <thead className="text-[10px] uppercase text-[var(--text-secondary)] font-bold border-b border-[var(--border-color)] bg-[var(--bg-card)]">
                                                                             <tr>
-                                                                                <th className="px-6 py-3 w-10">
+                                                                                <th className="px-3 py-2 md:px-6 md:py-3 w-10">
                                                                                     <input
                                                                                         type="checkbox"
                                                                                         className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
@@ -1739,11 +1739,11 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                                                         }}
                                                                                     />
                                                                                 </th>
-                                                                                <th className="px-6 py-3">ID Raqam</th>
-                                                                                <th className="px-6 py-3 text-right">Og'irlik (Kg)</th>
-                                                                                <th className="px-6 py-3 text-center">Holati</th>
-                                                                                <th className="px-6 py-3 text-center">Kimdan</th>
-                                                                                <th className="px-6 py-3 text-right">QR Kod</th>
+                                                                                <th className="px-3 py-2 md:px-6 md:py-3">ID Raqam</th>
+                                                                                <th className="px-3 py-2 md:px-6 md:py-3 text-right">Og'irlik (Kg)</th>
+                                                                                <th className="px-3 py-2 md:px-6 md:py-3 text-center">Holati</th>
+                                                                                <th className="px-3 py-2 md:px-6 md:py-3 text-center">Kimdan</th>
+                                                                                <th className="px-3 py-2 md:px-6 md:py-3 text-right">QR Kod</th>
                                                                             </tr>
                                                                         </thead>
                                                                         <tbody className="divide-y divide-[var(--border-color)]">
@@ -1756,7 +1756,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                                                             <span className="font-bold opacity-50 uppercase tracking-widest text-[10px]">Rulonlar (poylar) mavjud emas</span>
                                                                                             <button
                                                                                                 onClick={() => handleAutoGenerateRolls(item)}
-                                                                                                className="px-6 py-3 bg-indigo-600/10 hover:bg-indigo-600 text-indigo-400 hover:text-white rounded-xl border border-indigo-500/20 text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-indigo-600/10 active:scale-95 flex items-center gap-2"
+                                                                                                className="px-3 py-2 md:px-6 md:py-3 bg-indigo-600/10 hover:bg-indigo-600 text-indigo-400 hover:text-white rounded-xl border border-indigo-500/20 text-[10px] md:text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-indigo-600/10 active:scale-95 flex items-center gap-2"
                                                                                             >
                                                                                                 <Plus size={16} /> Rulonlarni Avtomatik Yaratish
                                                                                             </button>
@@ -1766,7 +1766,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                                             ) : (
                                                                                 itemRolls.map(roll => (
                                                                                     <tr key={roll.id} className="hover:bg-[var(--bg-card-hover)]">
-                                                                                        <td className="px-6 py-3 w-10">
+                                                                                        <td className="px-3 py-2 md:px-6 md:py-3 w-10">
                                                                                             {roll.status !== 'used' && (
                                                                                                 <input
                                                                                                     type="checkbox"
@@ -1776,9 +1776,9 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                                                                 />
                                                                                             )}
                                                                                         </td>
-                                                                                        <td className="px-6 py-4 font-mono font-black text-xl text-indigo-400 bg-indigo-500/5 rounded-lg border border-indigo-500/10 shadow-sm text-center">{roll.roll_number}</td>
-                                                                                        <td className="px-6 py-3 text-right font-medium">{Number(roll.weight).toFixed(2)}</td>
-                                                                                        <td className="px-6 py-3 text-center">
+                                                                                        <td className="px-3 py-3 md:px-6 md:py-4 font-mono font-black text-xl text-indigo-400 bg-indigo-500/5 rounded-lg border border-indigo-500/10 shadow-sm text-center">{roll.roll_number}</td>
+                                                                                        <td className="px-3 py-2 md:px-6 md:py-3 text-right font-medium">{Number(roll.weight).toFixed(2)}</td>
+                                                                                        <td className="px-3 py-2 md:px-6 md:py-3 text-center">
                                                                                             <div className="flex items-center justify-center gap-3">
                                                                                                 <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${roll.status === 'used'
                                                                                                     ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
@@ -1805,10 +1805,10 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                                                                 )}
                                                                                             </div>
                                                                                         </td>
-                                                                                        <td className="px-6 py-3 text-center font-bold text-[10px] uppercase text-[var(--text-secondary)]">
+                                                                                        <td className="px-3 py-2 md:px-6 md:py-3 text-center font-bold text-[10px] uppercase text-[var(--text-secondary)]">
                                                                                             {rollSourceMap[roll.id] || item.source || "E'ZONUR"}
                                                                                         </td>
-                                                                                        <td className="px-6 py-3 text-right">
+                                                                                        <td className="px-3 py-2 md:px-6 md:py-3 text-right">
                                                                                             <button onClick={() => handlePrintQR(roll, item)} className="text-[var(--text-secondary)] hover:text-indigo-400 transition-colors"><QrCode size={16} /></button>
                                                                                         </td>
                                                                                     </tr>
@@ -1820,7 +1820,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                                     <div className="p-4 border-t border-[var(--border-color)] bg-[var(--bg-body)] flex justify-end">
                                                                         <button
                                                                             onClick={() => handlePrintAllRolls(item, itemRolls)}
-                                                                            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg shadow-indigo-600/20 transition-all"
+                                                                            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-black uppercase text-[10px] md:text-xs tracking-widest shadow-lg shadow-indigo-600/20 transition-all"
                                                                         >
                                                                             <Printer size={16} /> Barcha Rulonlarni Chop Etish
                                                                         </button>
@@ -1855,23 +1855,23 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                             {/* Left: Form */}
                             <div className="space-y-6">
                                 <div>
-                                    <h4 className="text-sm font-bold text-[var(--text-primary)] mb-4 uppercase tracking-widest">Partiya Ma'lumotlari</h4>
+                                    <h4 className="text-xs md:text-sm font-bold text-[var(--text-primary)] mb-4 uppercase tracking-widest">Partiya Ma'lumotlari</h4>
 
                                     <div className="space-y-4">
                                         <div>
-                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Sana (Avtomatik)</label>
+                                            <label className="text-[10px] md:text-xs text-[var(--text-secondary)] mb-1 block font-bold">Sana (Avtomatik)</label>
                                             <input
                                                 type="date"
-                                                className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
+                                                className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
                                                 value={inboundData.date}
                                                 onChange={e => setInboundData({ ...inboundData, date: e.target.value })}
                                             />
                                         </div>
                                         <div>
-                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Kimdan (Manba)</label>
+                                            <label className="text-[10px] md:text-xs text-[var(--text-secondary)] mb-1 block font-bold">Kimdan (Manba)</label>
                                             <input
                                                 list="source-suggestions"
-                                                className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
+                                                className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
                                                 value={inboundData.source}
                                                 onChange={e => setInboundData({ ...inboundData, source: e.target.value })}
                                                 placeholder="Tanlang yoki yozing..."
@@ -1888,22 +1888,22 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                             </datalist>
                                         </div>
                                         <div>
-                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Partiya Raqami</label>
+                                            <label className="text-[10px] md:text-xs text-[var(--text-secondary)] mb-1 block font-bold">Partiya Raqami</label>
                                             <input
                                                 type="text"
                                                 placeholder="Masalan: 10525"
-                                                className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
+                                                className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
                                                 value={inboundData.batch_number}
                                                 onChange={e => setInboundData({ ...inboundData, batch_number: e.target.value })}
                                             />
                                         </div>
                                         <div>
-                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Mato Turi</label>
+                                            <label className="text-[10px] md:text-xs text-[var(--text-secondary)] mb-1 block font-bold">Mato Turi</label>
                                             <div className="relative">
                                                 <input
                                                     list="mato-suggestions"
                                                     placeholder="Tanlang yoki yozing..."
-                                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
+                                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
                                                     value={inboundData.selected_material_name}
                                                     onChange={e => {
                                                         const val = e.target.value;
@@ -1921,11 +1921,11 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                             </div>
                                         </div>
                                         <div>
-                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Turi / Gramaj / Eni</label>
+                                            <label className="text-[10px] md:text-xs text-[var(--text-secondary)] mb-1 block font-bold">Turi / Gramaj / Eni</label>
                                             <input
                                                 type="text"
                                                 placeholder="Turi (30/1)"
-                                                className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 mb-2 font-bold"
+                                                className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 mb-2 font-bold"
                                                 value={inboundData.type_specs}
                                                 onChange={e => setInboundData({ ...inboundData, type_specs: e.target.value })}
                                             />
@@ -1933,31 +1933,31 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                 <div className="relative flex-1">
                                                     <input
                                                         type="number" placeholder="240"
-                                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 pr-8 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
+                                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 pr-8 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
                                                         value={inboundData.grammage}
                                                         onChange={e => setInboundData({ ...inboundData, grammage: e.target.value })}
                                                     />
-                                                    <span className="absolute right-3 top-3 text-xs text-[var(--text-secondary)] font-bold">gr</span>
+                                                    <span className="absolute right-3 top-3 text-[10px] md:text-xs text-[var(--text-secondary)] font-bold">gr</span>
                                                 </div>
                                                 <div className="relative flex-1">
                                                     <input
                                                         type="number" placeholder="185"
-                                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 pr-8 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
+                                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 pr-8 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
                                                         value={inboundData.width}
                                                         onChange={e => setInboundData({ ...inboundData, width: e.target.value })}
                                                     />
-                                                    <span className="absolute right-3 top-3 text-xs text-[var(--text-secondary)] font-bold">sm</span>
+                                                    <span className="absolute right-3 top-3 text-[10px] md:text-xs text-[var(--text-secondary)] font-bold">sm</span>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div>
-                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Rang va Kod</label>
+                                            <label className="text-[10px] md:text-xs text-[var(--text-secondary)] mb-1 block font-bold">Rang va Kod</label>
                                             <div className="flex gap-2">
                                                 <input
                                                     type="text"
                                                     placeholder="Rang nomi (Oq, Qora)"
-                                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
+                                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
                                                     value={inboundData.color}
                                                     onChange={e => setInboundData({ ...inboundData, color: e.target.value })}
                                                 />
@@ -1971,16 +1971,16 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                             <input
                                                 type="text"
                                                 placeholder="Panton / Kod (#1A2B3C)"
-                                                className="w-full mt-2 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-mono font-bold"
+                                                className="w-full mt-2 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-mono font-bold"
                                                 value={inboundData.color_code}
                                                 onChange={e => setInboundData({ ...inboundData, color_code: e.target.value })}
                                             />
                                         </div>
                                         <div>
-                                            <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Izoh</label>
+                                            <label className="text-[10px] md:text-xs text-[var(--text-secondary)] mb-1 block font-bold">Izoh</label>
                                             <textarea
                                                 placeholder="Kesimdan qayti, Tasnifdan qayti..."
-                                                className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 h-24 resize-none font-bold"
+                                                className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 h-24 resize-none font-bold"
                                                 value={inboundData.note}
                                                 onChange={e => setInboundData({ ...inboundData, note: e.target.value })}
                                             />
@@ -1992,10 +1992,10 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                             {/* Right: Rolls */}
                             <div className="flex flex-col h-full">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h4 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest">Rulonlar Hisobi</h4>
-                                    <div className="flex gap-4 text-xs font-mono text-[var(--text-secondary)]">
-                                        <span>Jami Rulon: <b className="text-[var(--text-primary)] text-sm">{inboundData.rolls.length}</b></span>
-                                        <span>Jami Kg: <b className="text-[var(--text-primary)] text-sm">{inboundData.quantity || 0}</b></span>
+                                    <h4 className="text-xs md:text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest">Rulonlar Hisobi</h4>
+                                    <div className="flex gap-4 text-[10px] md:text-xs font-mono text-[var(--text-secondary)]">
+                                        <span>Jami Rulon: <b className="text-[var(--text-primary)] text-xs md:text-sm">{inboundData.rolls.length}</b></span>
+                                        <span>Jami Kg: <b className="text-[var(--text-primary)] text-xs md:text-sm">{inboundData.quantity || 0}</b></span>
                                     </div>
                                 </div>
 
@@ -2004,7 +2004,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                     {inboundData.rolls.length === 0 ? (
                                         <div className="text-center p-8 bg-[var(--bg-card)] rounded-2xl border border-dashed border-[var(--border-color)]">
                                             <Warehouse size={48} className="mx-auto mb-4 opacity-20" />
-                                            <p className="text-sm font-bold text-[var(--text-secondary)] mb-6">Rulonlar qo'shilmagan</p>
+                                            <p className="text-xs md:text-sm font-bold text-[var(--text-secondary)] mb-6">Rulonlar qo'shilmagan</p>
 
                                             <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto">
                                                 <button
@@ -2069,7 +2069,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                 <div className="mt-4 flex gap-2 mb-24">
                                     <button
                                         onClick={() => setInboundData({ ...inboundData, rolls: [...inboundData.rolls, { weight: '' }] })}
-                                        className="flex-1 py-4 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[var(--bg-card-hover)] transition-all shadow-sm"
+                                        className="flex-1 py-4 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest hover:bg-[var(--bg-card-hover)] transition-all shadow-sm"
                                     >
                                         + Rulon qo'shish
                                     </button>
@@ -2080,7 +2080,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                     setInboundData({ ...inboundData, rolls: [], quantity: '0.00' });
                                                 }
                                             }}
-                                            className="px-6 py-4 bg-rose-500/10 text-rose-500 border border-rose-500/20 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-rose-500 hover:text-white transition-all shadow-sm"
+                                            className="px-3 py-3 md:px-6 md:py-4 bg-rose-500/10 text-rose-500 border border-rose-500/20 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest hover:bg-rose-500 hover:text-white transition-all shadow-sm"
                                         >
                                             Tozalash
                                         </button>
@@ -2090,8 +2090,8 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                         </div>
 
                         <div className="p-6 border-t border-[var(--border-color)] flex justify-end gap-3 bg-[var(--bg-card)] sticky bottom-0 z-10">
-                            <button onClick={() => setShowInboundModal(false)} className="px-6 py-3 rounded-xl border border-[var(--border-color)] text-[var(--text-secondary)] font-bold text-sm hover:bg-[var(--bg-card-hover)]">Bekor qilish</button>
-                            <button onClick={handleKirim} className="px-8 py-3 rounded-xl bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-500 shadow-lg shadow-indigo-600/20 active:scale-95 transition-all flex items-center gap-2">
+                            <button onClick={() => setShowInboundModal(false)} className="px-3 py-2 md:px-6 md:py-3 rounded-xl border border-[var(--border-color)] text-[var(--text-secondary)] font-bold text-xs md:text-sm hover:bg-[var(--bg-card-hover)]">Bekor qilish</button>
+                            <button onClick={handleKirim} className="px-8 py-3 rounded-xl bg-indigo-600 text-white font-bold text-xs md:text-sm hover:bg-indigo-500 shadow-lg shadow-indigo-600/20 active:scale-95 transition-all flex items-center gap-2">
                                 <Plus size={16} /> Kiritish
                             </button>
                         </div>
@@ -2107,28 +2107,28 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                         <div className="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-2xl rounded-[3rem] p-8 relative shadow-2xl">
                             <button onClick={() => setShowOutboundModal(false)} className="absolute top-8 right-8 p-2 bg-[var(--bg-body)] rounded-full text-[var(--text-secondary)] hover:text-rose-500 transition-colors"><Trash2 size={20} className="rotate-45" /></button>
                             <h3 className="text-2xl font-black mb-1 text-[var(--text-primary)]">Chiqim Qilish</h3>
-                            <p className="text-[var(--text-secondary)] text-xs font-bold uppercase tracking-widest mb-6">Tanlangan rulonlar asosida</p>
+                            <p className="text-[var(--text-secondary)] text-[10px] md:text-xs font-bold uppercase tracking-widest mb-6">Tanlangan rulonlar asosida</p>
 
                             <form onSubmit={handleChiqim} className="space-y-6">
                                 <div className="bg-[var(--bg-body)] p-6 rounded-2xl border border-[var(--border-color)]">
                                     <div className="text-[10px] uppercase font-black text-[var(--text-secondary)] mb-2">Tanlangan Rulonlar:</div>
                                     <div className="flex flex-wrap gap-2 mb-4">
                                         {outboundData.selected_rolls.map(r => (
-                                            <span key={r.id} className="bg-[var(--bg-card)] border border-[var(--border-color)] px-2 py-1 rounded text-xs font-bold">{r.roll_number} ({Number(r.weight).toFixed(2)}kg)</span>
+                                            <span key={r.id} className="bg-[var(--bg-card)] border border-[var(--border-color)] px-2 py-1 rounded text-[10px] md:text-xs font-bold">{r.roll_number} ({Number(r.weight).toFixed(2)}kg)</span>
                                         ))}
                                     </div>
                                     <div className="flex justify-between items-end border-t border-[var(--border-color)] pt-4">
-                                        <span className="font-bold text-sm">Jami Og'irlik:</span>
-                                        <span className="text-3xl font-black text-[var(--text-primary)]">{Number(outboundData.quantity).toFixed(2)} <span className="text-sm text-[var(--text-secondary)]">kg</span></span>
+                                        <span className="font-bold text-xs md:text-sm">Jami Og'irlik:</span>
+                                        <span className="text-3xl font-black text-[var(--text-primary)]">{Number(outboundData.quantity).toFixed(2)} <span className="text-xs md:text-sm text-[var(--text-secondary)]">kg</span></span>
                                     </div>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="text-xs font-bold text-[var(--text-secondary)] mb-1 block">Model (Plan)</label>
+                                        <label className="text-[10px] md:text-xs font-bold text-[var(--text-secondary)] mb-1 block">Model (Plan)</label>
                                         <input
                                             list="model-suggestions"
-                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-rose-500 font-bold"
+                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-rose-500 font-bold"
                                             value={outboundExtra.model}
                                             onChange={e => setOutboundExtra({ ...outboundExtra, model: e.target.value })}
                                             placeholder="Modelni tanlang..."
@@ -2139,9 +2139,9 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                         </datalist>
                                     </div>
                                     <div>
-                                        <label className="text-xs font-bold text-[var(--text-secondary)] mb-1 block">Qism</label>
+                                        <label className="text-[10px] md:text-xs font-bold text-[var(--text-secondary)] mb-1 block">Qism</label>
                                         <select
-                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-rose-500 font-bold"
+                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-rose-500 font-bold"
                                             value={outboundExtra.part}
                                             onChange={e => setOutboundExtra({ ...outboundExtra, part: e.target.value })}
                                         >
@@ -2154,9 +2154,9 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="text-xs font-bold text-[var(--text-secondary)] mb-1 block">Yosh / O'lcham</label>
+                                        <label className="text-[10px] md:text-xs font-bold text-[var(--text-secondary)] mb-1 block">Yosh / O'lcham</label>
                                         <select
-                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-rose-500 font-bold"
+                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-rose-500 font-bold"
                                             value={outboundExtra.age}
                                             onChange={e => setOutboundExtra({ ...outboundExtra, age: e.target.value })}
                                         >
@@ -2169,10 +2169,10 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="text-xs font-bold text-[var(--text-secondary)] mb-1 block">Bichuvchi</label>
+                                        <label className="text-[10px] md:text-xs font-bold text-[var(--text-secondary)] mb-1 block">Bichuvchi</label>
                                         <input
                                             type="text"
-                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-rose-500 font-bold"
+                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-rose-500 font-bold"
                                             value={outboundExtra.cutter}
                                             onChange={e => setOutboundExtra({ ...outboundExtra, cutter: e.target.value })}
                                             placeholder="Ism"
@@ -2181,7 +2181,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-bold uppercase mb-2 text-[var(--text-secondary)]">Qo'shimcha Izoh</label>
+                                    <label className="block text-[10px] md:text-xs font-bold uppercase mb-2 text-[var(--text-secondary)]">Qo'shimcha Izoh</label>
                                     <textarea
                                         className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-4 font-bold text-[var(--text-primary)] outline-none focus:border-rose-500 min-h-[80px]"
                                         value={outboundData.reason}
@@ -2199,7 +2199,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                         className="flex-1 py-4 bg-[var(--bg-body)] border border-[var(--border-color)] text-[var(--text-secondary)] rounded-xl font-bold uppercase transition-all hover:bg-[var(--bg-card)] flex items-center justify-center gap-2"
                                     >
                                         <QrCode size={20} />
-                                        <span className="text-xs">Qo'shish</span>
+                                        <span className="text-[10px] md:text-xs">Qo'shish</span>
                                     </button>
                                     <button className="flex-[3] py-4 bg-rose-600 hover:bg-rose-500 text-white rounded-xl font-black uppercase shadow-lg shadow-rose-600/30 transition-all active:scale-95">Tasdiqlash</button>
                                 </div>
@@ -2218,7 +2218,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                             <div className="p-6 border-b border-[var(--border-color)] flex justify-between items-center bg-[var(--bg-card)] shrink-0">
                                 <h3 className="text-xl font-black text-[var(--text-primary)] flex items-center gap-2">
                                     <History size={24} className="text-indigo-500" />
-                                    Tarix: <span className="text-[var(--text-secondary)] font-medium text-lg ml-2">{selectedItem.item_name}</span>
+                                    Tarix: <span className="text-[var(--text-secondary)] font-medium text-base md:text-lg ml-2">{selectedItem.item_name}</span>
                                 </h3>
                                 <button
                                     onClick={() => setShowHistoryModal(false)}
@@ -2239,16 +2239,16 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                         <>
                                             <div className="bg-[var(--bg-card)] p-4 rounded-2xl border border-[var(--border-color)] shadow-sm">
                                                 <div className="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-1">Jami Kirim</div>
-                                                <div className="text-2xl font-black text-[var(--text-primary)]">+{totalIn.toFixed(2)} <span className="text-xs text-[var(--text-secondary)]">kg</span></div>
+                                                <div className="text-2xl font-black text-[var(--text-primary)]">+{totalIn.toFixed(2)} <span className="text-[10px] md:text-xs text-[var(--text-secondary)]">kg</span></div>
                                             </div>
                                             <div className="bg-[var(--bg-card)] p-4 rounded-2xl border border-[var(--border-color)] shadow-sm">
                                                 <div className="text-[10px] font-black uppercase tracking-widest text-rose-500 mb-1">Jami Chiqim</div>
-                                                <div className="text-2xl font-black text-[var(--text-primary)]">-{totalOut.toFixed(2)} <span className="text-xs text-[var(--text-secondary)]">kg</span></div>
+                                                <div className="text-2xl font-black text-[var(--text-primary)]">-{totalOut.toFixed(2)} <span className="text-[10px] md:text-xs text-[var(--text-secondary)]">kg</span></div>
                                             </div>
                                             <div className="bg-[var(--bg-card)] p-4 rounded-2xl border border-[var(--border-color)] shadow-sm relative overflow-hidden">
                                                 <div className="absolute top-0 right-0 w-16 h-16 bg-indigo-500/10 rounded-bl-full -mr-4 -mt-4"></div>
                                                 <div className="text-[10px] font-black uppercase tracking-widest text-indigo-500 mb-1">Joriy Qoldiq</div>
-                                                <div className="text-2xl font-black text-[var(--text-primary)]">{currentBalance.toFixed(2)} <span className="text-xs text-[var(--text-secondary)]">kg</span></div>
+                                                <div className="text-2xl font-black text-[var(--text-primary)]">{currentBalance.toFixed(2)} <span className="text-[10px] md:text-xs text-[var(--text-secondary)]">kg</span></div>
                                             </div>
                                         </>
                                     );
@@ -2269,15 +2269,15 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                 {h.type === 'In' ? <ArrowDownLeft size={20} /> : <ArrowUpRight size={20} />}
                                             </div>
                                             <div>
-                                                <div className="text-xs font-black text-[var(--text-secondary)] uppercase tracking-wide mb-0.5">
+                                                <div className="text-[10px] md:text-xs font-black text-[var(--text-secondary)] uppercase tracking-wide mb-0.5">
                                                     {new Date(h.created_at).toLocaleString('ru-RU')}
                                                 </div>
-                                                <div className="text-sm font-bold text-[var(--text-primary)]">{h.reason || (h.type === 'In' ? 'Kirim' : 'Chiqim')}</div>
+                                                <div className="text-xs md:text-sm font-bold text-[var(--text-primary)]">{h.reason || (h.type === 'In' ? 'Kirim' : 'Chiqim')}</div>
                                                 {h.batch_number && <div className="text-[10px] text-[var(--text-secondary)] font-mono mt-1 bg-[var(--bg-card)] inline-block px-2 py-0.5 rounded border border-[var(--border-color)]">Partiya: {h.batch_number}</div>}
                                             </div>
                                         </div>
-                                        <div className={`text-lg font-black ${h.type === 'In' ? 'text-emerald-500' : 'text-rose-500'}`}>
-                                            {h.type === 'In' ? '+' : '-'}{Number(h.quantity).toFixed(2)} <span className="text-xs text-[var(--text-secondary)] font-bold">kg</span>
+                                        <div className={`text-base md:text-lg font-black ${h.type === 'In' ? 'text-emerald-500' : 'text-rose-500'}`}>
+                                            {h.type === 'In' ? '+' : '-'}{Number(h.quantity).toFixed(2)} <span className="text-[10px] md:text-xs text-[var(--text-secondary)] font-bold">kg</span>
                                         </div>
                                     </div>
                                 ))}
@@ -2301,34 +2301,34 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                 {/* Left: Form */}
                                 <div className="space-y-6">
                                     <div>
-                                        <h4 className="text-sm font-bold text-[var(--text-primary)] mb-4 uppercase tracking-widest">Partiya Ma'lumotlari</h4>
+                                        <h4 className="text-xs md:text-sm font-bold text-[var(--text-primary)] mb-4 uppercase tracking-widest">Partiya Ma'lumotlari</h4>
 
                                         <div className="space-y-4">
                                             <div>
-                                                <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Sana (Yaratilgan)</label>
+                                                <label className="text-[10px] md:text-xs text-[var(--text-secondary)] mb-1 block font-bold">Sana (Yaratilgan)</label>
                                                 <input
                                                     type="date"
                                                     disabled // Keep creation date immutable or allow edit? Usually immutable.
-                                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-secondary)] outline-none font-bold opacity-50 cursor-not-allowed"
+                                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-secondary)] outline-none font-bold opacity-50 cursor-not-allowed"
                                                     value={editData.date}
                                                 />
                                             </div>
                                             <div>
-                                                <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Partiya Raqami</label>
+                                                <label className="text-[10px] md:text-xs text-[var(--text-secondary)] mb-1 block font-bold">Partiya Raqami</label>
                                                 <input
                                                     type="text"
-                                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
+                                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
                                                     value={editData.batch_number}
                                                     onChange={e => setEditData({ ...editData, batch_number: e.target.value })}
                                                 />
                                             </div>
                                             <div>
-                                                <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Mato Turi</label>
+                                                <label className="text-[10px] md:text-xs text-[var(--text-secondary)] mb-1 block font-bold">Mato Turi</label>
                                                 <div className="relative">
                                                     <input
                                                         list="edit-mato-suggestions"
                                                         placeholder="Tanlang yoki yozing..."
-                                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
+                                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
                                                         value={editData.item_name}
                                                         onChange={e => {
                                                             const val = e.target.value;
@@ -2350,12 +2350,12 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                 </div>
                                             </div>
                                             <div>
-                                                <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Turi / Gramaj / Eni</label>
+                                                <label className="text-[10px] md:text-xs text-[var(--text-secondary)] mb-1 block font-bold">Turi / Gramaj / Eni</label>
                                                 <div className="flex gap-2">
                                                     <input
                                                         type="text"
                                                         placeholder="Turi (30/1)"
-                                                        className="flex-1 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm font-bold text-[var(--text-primary)] outline-none focus:border-indigo-500"
+                                                        className="flex-1 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm font-bold text-[var(--text-primary)] outline-none focus:border-indigo-500"
                                                         value={editData.type_specs || ''}
                                                         onChange={e => setEditData({ ...editData, type_specs: e.target.value })}
                                                     />
@@ -2363,7 +2363,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                         <input
                                                             type="number"
                                                             placeholder="Gr"
-                                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm font-bold text-[var(--text-primary)] outline-none focus:border-indigo-500"
+                                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm font-bold text-[var(--text-primary)] outline-none focus:border-indigo-500"
                                                             value={editData.grammage || ''}
                                                             onChange={e => setEditData({ ...editData, grammage: e.target.value })}
                                                         />
@@ -2373,7 +2373,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                         <input
                                                             type="number"
                                                             placeholder="Sm"
-                                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm font-bold text-[var(--text-primary)] outline-none focus:border-indigo-500"
+                                                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm font-bold text-[var(--text-primary)] outline-none focus:border-indigo-500"
                                                             value={editData.width || ''}
                                                             onChange={e => setEditData({ ...editData, width: e.target.value })}
                                                         />
@@ -2383,7 +2383,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                             </div>
 
                                             <div>
-                                                <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1 block">Kimdan (Manba)</label>
+                                                <label className="text-[10px] md:text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1 block">Kimdan (Manba)</label>
                                                 <div className="relative">
                                                     <input
                                                         list="source-suggestions"
@@ -2406,11 +2406,11 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                             </div>
 
                                             <div>
-                                                <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Rang va Kod</label>
+                                                <label className="text-[10px] md:text-xs text-[var(--text-secondary)] mb-1 block font-bold">Rang va Kod</label>
                                                 <div className="flex gap-2">
                                                     <input
                                                         type="text"
-                                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
+                                                        className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-bold"
                                                         value={editData.color}
                                                         onChange={e => setEditData({ ...editData, color: e.target.value })}
                                                     />
@@ -2423,16 +2423,16 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                 </div>
                                                 <input
                                                     type="text"
-                                                    className="w-full mt-2 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-mono font-bold"
+                                                    className="w-full mt-2 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500 font-mono font-bold"
                                                     value={editData.color_code}
                                                     onChange={e => setEditData({ ...editData, color_code: e.target.value })}
                                                 />
                                             </div>
                                             <div>
-                                                <label className="text-xs text-[var(--text-secondary)] mb-1 block font-bold">Asl Izoh (O'zgartirib bo'lmaydi)</label>
+                                                <label className="text-[10px] md:text-xs text-[var(--text-secondary)] mb-1 block font-bold">Asl Izoh (O'zgartirib bo'lmaydi)</label>
                                                 <textarea
                                                     disabled
-                                                    className="w-full bg-[var(--bg-body)] border border-[var(--border-color)] rounded-xl p-3 text-sm text-[var(--text-secondary)] outline-none h-24 resize-none font-bold opacity-70"
+                                                    className="w-full bg-[var(--bg-body)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm text-[var(--text-secondary)] outline-none h-24 resize-none font-bold opacity-70"
                                                     value={editData.note}
                                                 />
                                             </div>
@@ -2443,10 +2443,10 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                 {/* Right: Rolls */}
                                 <div className="flex flex-col h-full">
                                     <div className="flex justify-between items-center mb-4">
-                                        <h4 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest">Rulonlar Tahriri</h4>
-                                        <div className="flex gap-4 text-xs font-mono text-[var(--text-secondary)]">
-                                            <span>Jami Rulon: <b className="text-[var(--text-primary)] text-sm">{editData.rolls.length}</b></span>
-                                            <span>Jami Kg: <b className="text-[var(--text-primary)] text-sm">{editData.rolls.reduce((a, b) => a + Number(b.weight), 0).toFixed(2)}</b></span>
+                                        <h4 className="text-xs md:text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest">Rulonlar Tahriri</h4>
+                                        <div className="flex gap-4 text-[10px] md:text-xs font-mono text-[var(--text-secondary)]">
+                                            <span>Jami Rulon: <b className="text-[var(--text-primary)] text-xs md:text-sm">{editData.rolls.length}</b></span>
+                                            <span>Jami Kg: <b className="text-[var(--text-primary)] text-xs md:text-sm">{editData.rolls.reduce((a, b) => a + Number(b.weight), 0).toFixed(2)}</b></span>
                                         </div>
                                     </div>
 
@@ -2494,7 +2494,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                         {editData.rolls.length === 0 && (
                                             <div className="text-center text-[var(--text-secondary)] opacity-50 absolute inset-0 flex flex-col items-center justify-center">
                                                 <Warehouse size={48} className="mb-2" />
-                                                <p className="text-sm font-bold">Rulonlar yo'q</p>
+                                                <p className="text-xs md:text-sm font-bold">Rulonlar yo'q</p>
                                             </div>
                                         )}
                                     </div>
@@ -2510,7 +2510,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                                 };
                                                 setEditData({ ...editData, rolls: [...editData.rolls, newRoll] });
                                             }}
-                                            className="flex-1 py-4 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[var(--bg-card-hover)] transition-all shadow-sm"
+                                            className="flex-1 py-4 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest hover:bg-[var(--bg-card-hover)] transition-all shadow-sm"
                                         >
                                             + Rulon qo'shish
                                         </button>
@@ -2519,8 +2519,8 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                             </div>
 
                             <div className="p-6 border-t border-[var(--border-color)] flex justify-end gap-3 bg-[var(--bg-card)] sticky bottom-0 z-10">
-                                <button onClick={() => setShowEditModal(false)} className="px-6 py-3 rounded-xl border border-[var(--border-color)] text-[var(--text-secondary)] font-bold text-sm hover:bg-[var(--bg-card-hover)]">Bekor qilish</button>
-                                <button onClick={handleSaveEdit} className="px-8 py-3 rounded-xl bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-500 shadow-lg shadow-indigo-600/20 active:scale-95 transition-all flex items-center gap-2">
+                                <button onClick={() => setShowEditModal(false)} className="px-3 py-2 md:px-6 md:py-3 rounded-xl border border-[var(--border-color)] text-[var(--text-secondary)] font-bold text-xs md:text-sm hover:bg-[var(--bg-card-hover)]">Bekor qilish</button>
+                                <button onClick={handleSaveEdit} className="px-8 py-3 rounded-xl bg-indigo-600 text-white font-bold text-xs md:text-sm hover:bg-indigo-500 shadow-lg shadow-indigo-600/20 active:scale-95 transition-all flex items-center gap-2">
                                     Saqlash
                                 </button>
                             </div>
@@ -2547,11 +2547,11 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
 
                                     {/* MANUAL INPUT FALLBACK */}
                                     <div className="mt-4 pt-4 border-t border-[var(--border-color)]">
-                                        <p className="text-xs text-[var(--text-secondary)] mb-2 font-bold uppercase tracking-widest">Yoki ID raqam</p>
+                                        <p className="text-[10px] md:text-xs text-[var(--text-secondary)] mb-2 font-bold uppercase tracking-widest">Yoki ID raqam</p>
                                         <input
                                             type="text"
                                             placeholder="Scan ID..."
-                                            className="bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-sm w-full text-center font-mono font-bold outline-none focus:border-indigo-500 transition-colors"
+                                            className="bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl p-3 text-xs md:text-sm w-full text-center font-mono font-bold outline-none focus:border-indigo-500 transition-colors"
                                             onKeyDown={(e) => {
                                                 if (e.key === 'Enter') {
                                                     handleScanSuccess(e.target.value);
@@ -2563,19 +2563,19 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                 </div>
 
                                 <div className="mt-6">
-                                    <h4 className="font-bold text-sm text-[var(--text-primary)] mb-3 flex justify-between items-center">
+                                    <h4 className="font-bold text-xs md:text-sm text-[var(--text-primary)] mb-3 flex justify-between items-center">
                                         <span>Skan qilinganlar</span>
-                                        <span className="bg-indigo-500/10 text-indigo-500 px-2 py-0.5 rounded text-xs">{scannedRolls.length} ta</span>
+                                        <span className="bg-indigo-500/10 text-indigo-500 px-2 py-0.5 rounded text-[10px] md:text-xs">{scannedRolls.length} ta</span>
                                     </h4>
                                     <div className="space-y-2 max-h-40 overflow-y-auto custom-scrollbar bg-[var(--bg-body)] p-2 rounded-xl border border-[var(--border-color)]">
                                         {scannedRolls.map((r, i) => (
                                             <div key={i} className="flex justify-between items-center p-3 bg-[var(--bg-card)] rounded-lg border border-[var(--border-color)] hover:border-indigo-500/30 transition-colors">
                                                 <div>
-                                                    <div className="font-mono font-bold text-xs text-[var(--text-primary)]">{r.roll_number || r.roll_id?.substring(0, 8)}</div>
+                                                    <div className="font-mono font-bold text-[10px] md:text-xs text-[var(--text-primary)]">{r.roll_number || r.roll_id?.substring(0, 8)}</div>
                                                     <div className="text-[10px] text-[var(--text-secondary)] font-bold">{r.inventory?.item_name}</div>
                                                 </div>
                                                 <div className="flex items-center gap-3">
-                                                    <div className="font-black text-emerald-500 text-sm">{Number(r.weight).toFixed(2)} kg</div>
+                                                    <div className="font-black text-emerald-500 text-xs md:text-sm">{Number(r.weight).toFixed(2)} kg</div>
                                                     <button
                                                         onClick={() => setScannedRolls(scannedRolls.filter((_, idx) => idx !== i))}
                                                         className="text-[var(--text-secondary)] hover:text-rose-500 p-1"
@@ -2586,7 +2586,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
                                             </div>
                                         ))}
                                         {scannedRolls.length === 0 && (
-                                            <div className="text-center text-[var(--text-secondary)] text-xs py-8 opacity-50 font-bold">Kamerani rulon QR kodiga qarating</div>
+                                            <div className="text-center text-[var(--text-secondary)] text-[10px] md:text-xs py-8 opacity-50 font-bold">Kamerani rulon QR kodiga qarating</div>
                                         )}
                                     </div>
                                 </div>

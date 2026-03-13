@@ -177,11 +177,11 @@ const Ma_lumotlar = () => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h2 className="text-2xl font-extrabold text-white tracking-tight">Ma'lumotnomalar</h2>
-                    <p className="text-gray-500 text-sm font-bold uppercase tracking-widest text-[10px] mt-1">Mato va aksessuarlar bazasini boshqarish</p>
+                    <p className="text-gray-500 text-xs md:text-sm font-bold uppercase tracking-widest text-[10px] mt-1">Mato va aksessuarlar bazasini boshqarish</p>
                 </div>
                 <button
                     onClick={() => { setShowForm(true); setEditingId(null); setFormData({ type: 'Mato', name: '', code: '', thread_type: '', grammage: '', unit: 'kg', image_url: '' }); }}
-                    className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20 font-semibold text-sm"
+                    className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20 font-semibold text-xs md:text-sm"
                 >
                     <Plus size={18} />
                     Yangi Qo'shish
@@ -272,7 +272,7 @@ const Ma_lumotlar = () => {
                                         required
                                         type="text"
                                         placeholder={formData.type === 'Mato' ? "Masalan: 2IP, SUPREM, KASHKORSA" : "Masalan: IP, SHEVRON, ZAMOK"}
-                                        className="w-full px-4 py-4 bg-black/40 border border-white/10 rounded-2xl text-white focus:border-indigo-500 outline-none transition-all font-black text-lg"
+                                        className="w-full px-4 py-4 bg-black/40 border border-white/10 rounded-2xl text-white focus:border-indigo-500 outline-none transition-all font-black text-base md:text-lg"
                                         value={formData.name}
                                         onChange={e => setFormData({ ...formData, name: e.target.value })}
                                     />
@@ -285,7 +285,7 @@ const Ma_lumotlar = () => {
                                     <input
                                         type="text"
                                         placeholder={formData.type === 'Mato' ? "Masalan: 30/1, 20/1, 24/1" : "Qo'shimcha izoh..."}
-                                        className="w-full px-4 py-4 bg-black/40 border border-indigo-500/20 rounded-2xl text-indigo-400 focus:border-indigo-500 outline-none transition-all font-mono font-black text-lg"
+                                        className="w-full px-4 py-4 bg-black/40 border border-indigo-500/20 rounded-2xl text-indigo-400 focus:border-indigo-500 outline-none transition-all font-mono font-black text-base md:text-lg"
                                         value={formData.thread_type}
                                         onChange={e => setFormData({ ...formData, thread_type: e.target.value })}
                                     />
@@ -299,11 +299,11 @@ const Ma_lumotlar = () => {
                                         <input
                                             type="number"
                                             placeholder={formData.type === 'Mato' ? "180" : "5"}
-                                            className="w-full px-4 py-4 pr-12 bg-black/40 border border-indigo-500/20 rounded-2xl text-indigo-400 focus:border-indigo-500 outline-none transition-all font-mono font-black text-lg"
+                                            className="w-full px-4 py-4 pr-12 bg-black/40 border border-indigo-500/20 rounded-2xl text-indigo-400 focus:border-indigo-500 outline-none transition-all font-mono font-black text-base md:text-lg"
                                             value={formData.grammage}
                                             onChange={e => setFormData({ ...formData, grammage: e.target.value })}
                                         />
-                                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">
+                                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] md:text-xs font-bold text-gray-400">
                                             {formData.type === 'Mato' ? 'gr/m²' : 'gr'}
                                         </span>
                                     </div>
@@ -340,7 +340,7 @@ const Ma_lumotlar = () => {
                             </div>
                         </div>
                         <div className="flex justify-end gap-4 pt-6 mt-4">
-                            <button type="submit" className="bg-indigo-600 text-white px-12 py-4 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center gap-3 shadow-2xl shadow-indigo-600/20 hover:bg-indigo-500 active:scale-95 transition-all">
+                            <button type="submit" className="bg-indigo-600 text-white px-12 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] md:text-xs flex items-center gap-3 shadow-2xl shadow-indigo-600/20 hover:bg-indigo-500 active:scale-95 transition-all">
                                 <Save size={20} />
                                 {editingId ? 'Yangilash' : 'Saqlash'}
                             </button>
@@ -366,14 +366,14 @@ const Ma_lumotlar = () => {
                         <div className="flex gap-1 bg-[var(--bg-card)] p-1.5 rounded-2xl border border-[var(--border-color)] shadow-inner">
                             <button
                                 onClick={() => setViewMode('grid')}
-                                className={`p-3 rounded-xl transition-all flex items-center gap-2 font-bold text-xs uppercase ${viewMode === 'grid' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
+                                className={`p-3 rounded-xl transition-all flex items-center gap-2 font-bold text-[10px] md:text-xs uppercase ${viewMode === 'grid' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
                                 title="Karta ko'rinishi"
                             >
                                 <Grid size={16} /> KARTALAR
                             </button>
                             <button
                                 onClick={() => setViewMode('table')}
-                                className={`p-3 rounded-xl transition-all flex items-center gap-2 font-bold text-xs uppercase ${viewMode === 'table' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
+                                className={`p-3 rounded-xl transition-all flex items-center gap-2 font-bold text-[10px] md:text-xs uppercase ${viewMode === 'table' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
                                 title="Jadval (Excel) ko'rinishi"
                             >
                                 <List size={16} /> JADVAL
@@ -384,7 +384,7 @@ const Ma_lumotlar = () => {
                                 <button
                                     key={type}
                                     onClick={() => setFilterType(type)}
-                                    className={`flex-1 sm:flex-none px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all whitespace-nowrap ${filterType === type ? 'bg-indigo-600 text-white shadow-2xl shadow-indigo-600/20' : 'bg-[var(--bg-card)] text-[var(--text-secondary)] border border-[var(--border-color)] hover:text-[var(--text-primary)]'}`}
+                                    className={`flex-1 sm:flex-none px-3 py-3 md:px-6 md:py-4 rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest transition-all whitespace-nowrap ${filterType === type ? 'bg-indigo-600 text-white shadow-2xl shadow-indigo-600/20' : 'bg-[var(--bg-card)] text-[var(--text-secondary)] border border-[var(--border-color)] hover:text-[var(--text-primary)]'}`}
                                 >
                                     {type === 'All' ? 'Hammasi' : type}
                                 </button>
@@ -411,7 +411,7 @@ const Ma_lumotlar = () => {
                                             )}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <h4 className="font-black text-[var(--text-primary)] text-lg tracking-tight truncate">{item.name}</h4>
+                                            <h4 className="font-black text-[var(--text-primary)] text-base md:text-lg tracking-tight truncate">{item.name}</h4>
                                             <div className="flex items-center gap-2 mt-1 flex-wrap">
                                                 <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest truncate max-w-[100px]">{item.code || 'Kod yo\'q'}</span>
                                                 <span className="w-1 h-1 bg-white/10 rounded-full shrink-0"></span>
@@ -434,19 +434,19 @@ const Ma_lumotlar = () => {
                         <table className="w-full text-left border-collapse min-w-[800px]">
                             <thead className="bg-[var(--border-color)] text-[var(--text-secondary)] text-[10px] font-black uppercase tracking-widest border-b border-[var(--border-color)]">
                                 <tr>
-                                    <th className="px-6 py-5 w-16 text-center">Rasm</th>
-                                    <th className="px-6 py-5">Nomi</th>
-                                    <th className="px-6 py-5">Artikul (KOD)</th>
-                                    <th className="px-6 py-5">Turi</th>
-                                    <th className="px-6 py-5">Ip / Izoh</th>
-                                    <th className="px-6 py-5 text-center">Birligi</th>
-                                    <th className="px-6 py-5 text-center w-32">Amallar</th>
+                                    <th className="px-3 py-3 md:px-6 md:py-5 w-16 text-center">Rasm</th>
+                                    <th className="px-3 py-3 md:px-6 md:py-5">Nomi</th>
+                                    <th className="px-3 py-3 md:px-6 md:py-5">Artikul (KOD)</th>
+                                    <th className="px-3 py-3 md:px-6 md:py-5">Turi</th>
+                                    <th className="px-3 py-3 md:px-6 md:py-5">Ip / Izoh</th>
+                                    <th className="px-3 py-3 md:px-6 md:py-5 text-center">Birligi</th>
+                                    <th className="px-3 py-3 md:px-6 md:py-5 text-center w-32">Amallar</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5">
                                 {filteredItems.map(item => (
                                     <tr key={item.id} className="hover:bg-white/5 transition-colors group">
-                                        <td className="px-6 py-4">
+                                        <td className="px-3 py-3 md:px-6 md:py-4">
                                             <div className={`w-10 h-10 mx-auto rounded-xl flex items-center justify-center overflow-hidden border border-white/5 shadow-inner ${item.type === 'Mato' ? 'bg-blue-500/10 text-blue-500' : 'bg-amber-500/10 text-amber-500'}`}>
                                                 {item.image_url ? (
                                                     <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
@@ -455,10 +455,10 @@ const Ma_lumotlar = () => {
                                                 )}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 font-black text-[var(--text-primary)] text-sm">{item.name}</td>
-                                        <td className="px-6 py-4 text-xs font-mono font-black text-indigo-400 bg-indigo-500/5 rounded-lg w-max px-2 py-1 my-2 border border-indigo-500/10 shadow-sm inline-block">{item.code || '-'}</td>
-                                        <td className="px-6 py-4 text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">{item.type}</td>
-                                        <td className="px-6 py-4 text-xs font-mono text-gray-400">
+                                        <td className="px-3 py-3 md:px-6 md:py-4 font-black text-[var(--text-primary)] text-xs md:text-sm">{item.name}</td>
+                                        <td className="px-3 py-3 md:px-6 md:py-4 text-[10px] md:text-xs font-mono font-black text-indigo-400 bg-indigo-500/5 rounded-lg w-max px-2 py-1 my-2 border border-indigo-500/10 shadow-sm inline-block">{item.code || '-'}</td>
+                                        <td className="px-3 py-3 md:px-6 md:py-4 text-[10px] md:text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">{item.type}</td>
+                                        <td className="px-3 py-3 md:px-6 md:py-4 text-[10px] md:text-xs font-mono text-gray-400">
                                             {item.type === 'Mato' ? (
                                                 <div className="flex items-center gap-2">
                                                     <span className="font-bold text-[var(--text-primary)]">{item.thread_type || '-'}</span>
@@ -471,8 +471,8 @@ const Ma_lumotlar = () => {
                                                 </div>
                                             )}
                                         </td>
-                                        <td className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-widest text-center">{item.unit}</td>
-                                        <td className="px-6 py-4 text-center">
+                                        <td className="px-3 py-3 md:px-6 md:py-4 text-[10px] md:text-xs font-black text-gray-500 uppercase tracking-widest text-center">{item.unit}</td>
+                                        <td className="px-3 py-3 md:px-6 md:py-4 text-center">
                                             <div className="flex gap-2 justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <button onClick={() => handleEdit(item)} className="p-2 bg-white/5 text-gray-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all"><Edit2 size={16} /></button>
                                                 <button onClick={() => handleDelete(item.id)} className="p-2 bg-white/5 text-gray-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all"><Trash2 size={16} /></button>
