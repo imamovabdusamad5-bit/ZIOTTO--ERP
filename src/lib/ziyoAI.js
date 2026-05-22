@@ -76,7 +76,7 @@ Foydalanuvchiga hech qachon "faktlarni ko'ra olmayapman" demang, har doim quyida
 Agar foydalanuvchi "nega omborda mato yo'q o'zi" deb so'rasa, siz faktlarga qarab: "Hozirgi vaqtda omborimizda mato qoldig'i 0 ga teng ko'rsatilmoqda. Ehtimol ta'minot bo'limi hali yangi matolarni tizimga kiritmagan yoki barcha matolar ishlab chiqarishga olingan bo'lishi mumkin" deb mantiqiy javob bering.`;
 
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
 
         const result = await model.generateContent([
             systemPrompt,
