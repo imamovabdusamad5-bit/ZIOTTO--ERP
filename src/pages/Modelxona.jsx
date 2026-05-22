@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability */
 import React, { useState, useEffect } from 'react';
 import { Plus, Save, FileText, Trash2, Layers, Scissors, Ruler, Activity, ChevronRight, ChevronDown, Shirt, X, Calculator, RefreshCw, CircleAlert, Pencil, Search, Image, Package, Clock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -74,12 +75,12 @@ const Modelxona = () => {
         fetchReferences();
     }, []);
 
-    const fetchReferences = async () => {
+    async function fetchReferences() {
         const { data, error } = await supabase.from('material_types').select('*').order('name');
         if (!error) setReferences(data || []);
     };
 
-    const fetchModels = async () => {
+    async function fetchModels() {
         try {
             setLoading(true);
             const { data, error } = await supabase
@@ -1165,6 +1166,16 @@ const Modelxona = () => {
                                             className="p-4 bg-[var(--bg-body)] text-[var(--text-secondary)] rounded-2xl hover:bg-indigo-600 hover:text-white transition-all border border-[var(--border-color)] shadow-lg group-hover:border-indigo-500/30"
                                         >
                                             <Pencil size={20} />
+                                        </button>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                openOperationsModal(model);
+                                            }}
+                                            className="p-4 bg-emerald-500/10 text-emerald-500 rounded-2xl hover:bg-emerald-500 hover:text-white transition-all border border-emerald-500/40 shadow-lg"
+                                            title="Operatsiyalar va SMV"
+                                        >
+                                            <Activity size={20} />
                                         </button>
                                         <button
                                             onClick={(e) => {

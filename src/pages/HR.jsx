@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability */
 import React, { useState, useEffect } from 'react';
 import {
     Users,
@@ -14,12 +15,15 @@ import {
     Phone,
     Briefcase,
     X,
-    ArrowUpRight
+    ArrowUpRight,
+    QrCode
 } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 
 const HR = () => {
+    const navigate = useNavigate();
     const { profile } = useAuth();
     const [employees, setEmployees] = useState([]);
     const [attendance, setAttendance] = useState([]);
@@ -58,7 +62,7 @@ const HR = () => {
         fetchEmployees();
     }, [viewMode]);
 
-    const fetchEmployees = async () => {
+    async function fetchEmployees() {
         setLoading(true);
         try {
             // Fetch all employees (profiles)

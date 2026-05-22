@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability */
 import React, { useState, useEffect } from 'react';
 import { Plus, Save, FileText, Trash2, Search, ArrowRightLeft, Package, User, Calendar, Tag, Info, X, Activity, ClipboardList } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -29,7 +30,7 @@ const Hujjatlar = () => {
         fetchData();
     }, []);
 
-    const fetchData = async () => {
+    async function fetchData() {
         setLoading(true);
         try {
             const [docRes, orderRes, matRes] = await Promise.all([

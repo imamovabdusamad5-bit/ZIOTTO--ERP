@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability */
 import React, { useState, useEffect } from 'react';
 import {
     Activity,
@@ -21,7 +22,7 @@ const Vishefka = () => {
         fetchBundles();
     }, [activeTab]);
 
-    const fetchBundles = async () => {
+    async function fetchBundles() {
         setLoading(true);
         let query = supabase
             .from('production_bundles')

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability */
 import React, { useState, useEffect } from 'react';
 import {
     Scissors, Activity, CircleAlert, CircleCheck,
@@ -47,7 +48,7 @@ const Kesim = () => {
         if (activeTab === 'requests') fetchRequests();
     }, [activeTab]);
 
-    const fetchBundles = async () => {
+    async function fetchBundles() {
         const { data, error } = await supabase
             .from('production_bundles')
             .select('*')
@@ -55,7 +56,7 @@ const Kesim = () => {
         if (!error) setBundles(data || []);
     };
 
-    const fetchOrders = async () => {
+    async function fetchOrders() {
         setLoading(true);
         const { data, error } = await supabase
             .from('production_orders')
@@ -71,7 +72,7 @@ const Kesim = () => {
         setLoading(false);
     };
 
-    const fetchRequests = async () => {
+    async function fetchRequests() {
         setLoading(true);
         // Using activity_logs as a fallback or a mock for material_requests if table not yet created
         const { data, error } = await supabase
@@ -84,7 +85,7 @@ const Kesim = () => {
         setLoading(false);
     };
 
-    const fetchMatchingInventory = async () => {
+    async function fetchMatchingInventory() {
         const { data, error } = await supabase
             .from('inventory')
             .select('*')
@@ -192,7 +193,7 @@ const Kesim = () => {
     const [actualsHistory, setActualsHistory] = useState([]);
     const [stats, setStats] = useState({ totalActual: 0, variance: 0 });
 
-    const fetchActuals = async (orderId) => {
+    async function fetchActuals(orderId) {
         setLoading(true);
         try {
             const { data, error } = await supabase

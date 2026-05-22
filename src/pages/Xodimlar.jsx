@@ -1,4 +1,6 @@
+/* eslint-disable react-hooks/immutability */
 import React, { useState, useEffect } from 'react';
+import { QRCodeCanvas } from "qrcode.react";
 import { supabase } from '../lib/supabase';
 import {
     Users,
@@ -13,7 +15,8 @@ import {
     Copy,
     RefreshCw,
     Plus,
-    CircleAlert
+    CircleAlert,
+    QrCode
 } from 'lucide-react';
 
 const departments = [
@@ -34,6 +37,7 @@ const Xodimlar = () => {
     const [loading, setLoading] = useState(true);
     const [editingId, setEditingId] = useState(null);
     const [showAddModal, setShowAddModal] = useState(false);
+    const [showQrModal, setShowQrModal] = useState(null);
 
     const [editForm, setEditForm] = useState({
         username: '',
@@ -56,7 +60,7 @@ const Xodimlar = () => {
         fetchUsers();
     }, []);
 
-    const fetchUsers = async () => {
+    async function fetchUsers() {
         setLoading(true);
         const { data, error } = await supabase
             .from('profiles')

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability */
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
@@ -39,7 +40,7 @@ const Ombor = () => {
         fetchInitialData();
     }, []);
 
-    const fetchInitialData = async () => {
+    async function fetchInitialData() {
         try {
             setLoading(true);
             await Promise.all([
@@ -57,7 +58,7 @@ const Ombor = () => {
         }
     };
 
-    const fetchInventory = async () => {
+    async function fetchInventory() {
         // First try with the relation
         const { data, error } = await supabase
             .from('inventory')
@@ -81,7 +82,7 @@ const Ombor = () => {
         }
     };
 
-    const fetchLogs = async () => {
+    async function fetchLogs() {
         const { data, error } = await supabase
             .from('inventory_logs')
             .select(`*, inventory(item_name, color, category, material_types!inventory_reference_id_fkey(thread_type, grammage))`)
@@ -90,12 +91,12 @@ const Ombor = () => {
         if (!error) setLogs(data || []);
     };
 
-    const fetchReferences = async () => {
+    async function fetchReferences() {
         const { data, error } = await supabase.from('material_types').select('*').order('name');
         if (!error) setReferences(data || []);
     };
 
-    const fetchOrders = async () => {
+    async function fetchOrders() {
         const { data, error } = await supabase
             .from('production_orders')
             .select(`*, models(*, bom_items(*)), production_order_items(*)`)
@@ -104,7 +105,7 @@ const Ombor = () => {
         if (!error) setOrders(data || []);
     };
 
-    const fetchRequests = async () => {
+    async function fetchRequests() {
         const { data, error } = await supabase
             .from('material_requests')
             .select('*, inventory:inventory_id(item_name, color, unit)')

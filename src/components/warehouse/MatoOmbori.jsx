@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     ArrowUpRight, ArrowDownLeft, ScrollText, QrCode, Printer, Trash2, CircleCheck, RotateCcw, ChevronDown, ChevronUp, Edit, X, Search, Plus, History, Warehouse, Layers
 } from 'lucide-react';
@@ -1104,7 +1104,7 @@ const MatoOmbori = ({ inventory, references, orders, onRefresh, viewMode }) => {
 
             alert(`${count} ta rulon yaratildi.`);
             onRefresh();
-            fetchRollCounts();
+
         } catch (err) {
             console.error(err);
             alert("Xatolik: " + err.message);

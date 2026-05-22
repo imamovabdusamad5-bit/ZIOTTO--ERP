@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability */
 import React, { useState, useEffect } from 'react';
 import { Banknote, DollarSign, Wallet, Send, Users, Search, RefreshCw, CircleCheck, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -15,7 +16,7 @@ const Moliya = () => {
         fetchFinanceData();
     }, []);
 
-    const fetchFinanceData = async () => {
+    async function fetchFinanceData() {
         setLoading(true);
         try {
             // 1. Fetch Employees

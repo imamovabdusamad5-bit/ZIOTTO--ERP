@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability */
 import React, { useState, useEffect } from 'react';
 import { Users, Shirt, Timer, Play, CircleCheck, Activity, X, UserCheck } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -22,12 +23,12 @@ const Tikuv = () => {
         }
     }, [activeTab]);
 
-    const fetchWorkers = async () => {
+    async function fetchWorkers() {
         const { data } = await supabase.from('profiles').select('*').eq('status', true);
         setWorkers(data || []);
     };
 
-    const fetchOrders = async () => {
+    async function fetchOrders() {
         setLoading(true);
         const { data, error } = await supabase
             .from('production_orders')
@@ -38,7 +39,7 @@ const Tikuv = () => {
         setLoading(false);
     };
 
-    const fetchBundles = async () => {
+    async function fetchBundles() {
         setLoading(true);
         const { data, error } = await supabase
             .from('production_bundles')

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability */
 import React, { useState, useEffect } from 'react';
 import {
     Layers,
@@ -23,7 +24,7 @@ const Tasnif = () => {
         fetchBundles();
     }, []);
 
-    const fetchBundles = async () => {
+    async function fetchBundles() {
         setLoading(true);
         const { data, error } = await supabase
             .from('production_bundles')

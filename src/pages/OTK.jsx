@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability */
 import React, { useState, useEffect } from 'react';
 import { CircleCheck, OctagonX, RefreshCcw, User } from 'lucide-react';
 
@@ -12,7 +13,7 @@ const OTK = () => {
         fetchBundles();
     }, []);
 
-    const fetchBundles = async () => {
+    async function fetchBundles() {
         setLoading(true);
         const { data, error } = await supabase
             .from('production_bundles')

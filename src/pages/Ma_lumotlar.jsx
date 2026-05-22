@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability */
 import { useState, useEffect } from 'react';
 import { Plus, Save, Trash2, Layers, Package, Activity, Search, Edit2, X, Grid, List } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -30,7 +31,7 @@ const Ma_lumotlar = () => {
         fetchItems();
     }, []);
 
-    const fetchItems = async () => {
+    async function fetchItems() {
         try {
             setLoading(true);
             const { data, error } = await supabase

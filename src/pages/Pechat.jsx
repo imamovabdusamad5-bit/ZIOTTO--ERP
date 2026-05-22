@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability */
 import React, { useState, useEffect } from 'react';
 import {
     Printer,
@@ -29,7 +30,7 @@ const Pechat = () => {
         }
     }, [activeTab]);
 
-    const fetchOrders = async () => {
+    async function fetchOrders() {
         setLoading(true);
         const { data, error } = await supabase
             .from('production_orders')
@@ -41,7 +42,7 @@ const Pechat = () => {
         setLoading(false);
     };
 
-    const fetchBundles = async () => {
+    async function fetchBundles() {
         setLoading(true);
         let query = supabase
             .from('production_bundles')

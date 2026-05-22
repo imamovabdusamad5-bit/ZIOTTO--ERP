@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -21,6 +21,7 @@ import Ma_lumotlar from './pages/Ma_lumotlar';
 import Pechat from './pages/Pechat';
 import Vishefka from './pages/Vishefka';
 import Hujjatlar from './pages/Hujjatlar';
+import AttendanceScanner from './pages/AttendanceScanner';
 
 import ZiyoChat from './components/ZiyoChat';
 
@@ -72,6 +73,21 @@ const RoleGuard = ({ children, path }) => {
 };
 
 function App() {
+  useEffect(() => {
+    // Initialize Telegram WebApp
+    if (window.Telegram && window.Telegram.WebApp) {
+      const tg = window.Telegram.WebApp;
+      tg.ready();
+      tg.expand();
+
+      // Keep everything in view
+      tg.enableClosingConfirmation();
+
+      // Optional: Set header color
+      tg.setHeaderColor('secondary_bg_color');
+    }
+  }, []);
+
   return (
     <ThemeProvider>
       <AuthProvider>
@@ -97,6 +113,7 @@ function App() {
               <Route path="vishefka" element={<RoleGuard path="/vishefka"><Vishefka /></RoleGuard>} />
               <Route path="malumotlar" element={<RoleGuard path="/malumotlar"><Ma_lumotlar /></RoleGuard>} />
               <Route path="hujjatlar" element={<RoleGuard path="/hujjatlar"><Hujjatlar /></RoleGuard>} />
+              <Route path="scanner" element={<RoleGuard path="/scanner"><AttendanceScanner /></RoleGuard>} />
             </Route>
           </Routes>
         </BrowserRouter>
@@ -107,4 +124,4 @@ function App() {
 
 export default App;
 
-// Force redeploy - v1.2 (Fixed Lucide Import Crash)
+// Force redeploy - v1.3 (Telegram Mini App Integration Ready)

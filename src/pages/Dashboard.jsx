@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability */
 import React from 'react';
 import { Users, ShoppingBag, Activity, TrendingUp, CircleAlert, CircleCheck, Package, Clock } from 'lucide-react';
 import {

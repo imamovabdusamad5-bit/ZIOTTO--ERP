@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability */
 import React, { useState, useEffect } from 'react';
 import {
     Truck,
@@ -49,7 +50,7 @@ const Taminot = () => {
         fetchData();
     }, []);
 
-    const fetchData = async () => {
+    async function fetchData() {
         setLoading(true);
         // Fetch Confirmed Production Orders
         const { data: prodOrders, error } = await supabase

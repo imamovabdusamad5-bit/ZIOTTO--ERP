@@ -20,7 +20,8 @@ import {
     X,
     Truck,
     LogOut,
-    ShieldCheck
+    ShieldCheck,
+    QrCode
 } from 'lucide-react';
 
 export const menuItems = [
@@ -50,6 +51,7 @@ export const menuItems = [
     { path: '/otk', name: 'OTK (Sifat)', icon: CircleCheck, roles: ['admin', 'otk'], permKey: 'otk' },
     { path: '/dazmol', name: 'Dazmol & Qadoq', icon: Package, roles: ['admin', 'ironing'], permKey: 'ironing' },
     { path: '/hr', name: 'HR (Kadrlar)', icon: Users, roles: ['admin', 'planning', 'director', 'hr_manager', 'tikuv', 'bichuv'], permKey: 'hr' }, // hr might need to be added to Xodimlar if missing
+    { path: '/scanner', name: 'Skaner (QR)', icon: QrCode, roles: ['admin', 'hr_manager', 'gatekeeper'], permKey: 'hr' },
     { path: '/xodimlar', name: 'Xodimlar & Huquqlar', icon: ShieldCheck, roles: ['admin', 'planning'], permKey: 'admin' }, // Restricted usually
     { path: '/moliya', name: 'Moliya & Tannarx', icon: Banknote, roles: ['admin'], permKey: 'finance' },
 ];

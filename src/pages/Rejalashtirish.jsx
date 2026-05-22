@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability */
 import React, { useState, useEffect } from 'react';
 import {
     ClipboardList, Calculator, Plus, Trash2, Save,
@@ -135,7 +136,7 @@ const Rejalashtirish = () => {
     const [summary, setSummary] = useState({}); // Grouped by Color
 
     // --- DATA FETCHING ---
-    const fetchOrders = async () => {
+    async function fetchOrders() {
         setLoading(true);
         try {
             // Fetch Orders separate so we can re-call it

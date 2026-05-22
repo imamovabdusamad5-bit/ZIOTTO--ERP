@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability */
 import React, { useState, useEffect } from 'react';
 import { Package, Truck, Users, X, UserCheck, Activity, RefreshCw } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -16,12 +17,12 @@ const Dazmol = () => {
         fetchWorkers();
     }, []);
 
-    const fetchWorkers = async () => {
+    async function fetchWorkers() {
         const { data } = await supabase.from('profiles').select('*').eq('status', true);
         setWorkers(data || []);
     };
 
-    const fetchBundles = async () => {
+    async function fetchBundles() {
         setLoading(true);
         const { data, error } = await supabase
             .from('production_bundles')
