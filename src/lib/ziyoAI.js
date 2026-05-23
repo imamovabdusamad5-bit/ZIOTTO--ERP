@@ -49,7 +49,7 @@ const fetchAllContext = async () => {
 };
 
 export const processUserMessage = async (message) => {
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyB6Z_LkxViVx0cBj_l-C59od3EvxNqor8g';
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
     if (!apiKey) {
         return {
