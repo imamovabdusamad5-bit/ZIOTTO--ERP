@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 
 const ProErpLogo = () => (
-    <svg className="filter drop-shadow-[0_0_20px_rgba(56,189,248,0.7)] shrink-0" viewBox="0 0 100 100" fill="none" width="90" height="90" xmlns="http://www.w3.org/2000/svg">
+    <svg className="filter drop-shadow-[0_0_20px_rgba(56,189,248,0.7)] shrink-0" viewBox="0 0 100 100" fill="none" width="85" height="85" xmlns="http://www.w3.org/2000/svg">
         <defs>
             <linearGradient id="logoBlue" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#00f2fe" />
@@ -68,12 +68,12 @@ const Login = () => {
 
     return (
         <div className="login-page-container">
-            {/* Direct Injection of User's Exact Custom CSS Styles */}
+            {/* Direct Injection of User's Exact Custom CSS Styles (V2) */}
             <style dangerouslySetInnerHTML={{__html: `
                 .login-page-container {
                     width: 100%;
                     height: 100vh;
-                    background: #020817;
+                    background: radial-gradient(circle at top left, #0f172a, #020617 45%), radial-gradient(circle at bottom right, #0b1120, #020617 50%);
                     color: white;
                     overflow: hidden;
                     font-family: 'Inter', sans-serif;
@@ -87,46 +87,42 @@ const Login = () => {
 
                 /* LEFT SIDE */
                 .left {
-                    width: 55%;
-                    height: 100%;
-                    padding: 60px;
-                    background: radial-gradient(circle at top left, #0f172a, #020617 60%);
-                    position: relative;
+                    width: 58%;
+                    padding: 70px 80px;
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
+                    position: relative;
                 }
 
                 .logo {
                     display: flex;
                     align-items: center;
                     gap: 18px;
-                    margin-bottom: 40px;
+                    margin-bottom: 50px;
                 }
 
-                .logo h1 {
-                    font-size: 64px;
-                    font-weight: 700;
-                    letter-spacing: 2px;
+                .logo-text h1 {
+                    font-size: 58px;
+                    font-weight: 800;
                     line-height: 1;
                 }
 
-                .logo span {
+                .logo-text span {
                     color: #2ea8ff;
                 }
 
-                .tagline {
-                    margin-top: -5px;
+                .logo-text p {
                     color: #94a3b8;
-                    font-size: 14px;
-                    letter-spacing: 2px;
+                    font-size: 13px;
+                    letter-spacing: 3px;
+                    margin-top: 8px;
                 }
 
                 .title {
-                    font-size: 58px;
-                    line-height: 1.2;
-                    font-weight: 700;
-                    margin-top: 20px;
+                    font-size: 68px;
+                    font-weight: 800;
+                    line-height: 1.15;
                     max-width: 700px;
                 }
 
@@ -134,124 +130,152 @@ const Login = () => {
                     color: #2ea8ff;
                 }
 
-                .desc {
-                    margin-top: 30px;
+                .description {
+                    margin-top: 35px;
+                    max-width: 620px;
                     color: #94a3b8;
-                    font-size: 18px;
+                    font-size: 19px;
                     line-height: 1.8;
-                    max-width: 650px;
                 }
 
+                /* FEATURES */
                 .features {
                     display: flex;
                     gap: 20px;
-                    margin-top: 50px;
+                    margin-top: 55px;
                     flex-wrap: wrap;
                 }
 
-                .feature {
+                .feature-box {
                     width: 180px;
-                    height: 110px;
-                    border: 1px solid rgba(255, 255, 255, 0.08);
-                    border-radius: 18px;
+                    height: 130px;
+                    border-radius: 22px;
                     background: rgba(255, 255, 255, 0.03);
-                    backdrop-filter: blur(10px);
-                    padding: 20px;
-                    transition: 0.3s;
+                    border: 1px solid rgba(255, 255, 255, 0.08);
+                    backdrop-filter: blur(20px);
+                    padding: 22px;
+                    transition: .35s;
                 }
 
-                .feature:hover {
-                    transform: translateY(-5px);
+                .feature-box:hover {
+                    transform: translateY(-6px);
                     border-color: #2ea8ff;
-                    box-shadow: 0 0 20px rgba(46, 168, 255, .2);
+                    box-shadow: 0 0 25px rgba(46, 168, 255, .25);
                 }
 
-                .feature h3 {
-                    margin-top: 12px;
-                    font-size: 18px;
+                .feature-icon {
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 14px;
+                    background: linear-gradient(135deg, #2563eb, #38bdf8);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 24px;
                 }
 
-                .feature p {
-                    color: #94a3b8;
-                    font-size: 13px;
+                .feature-box h3 {
+                    margin-top: 18px;
+                    font-size: 20px;
+                    font-weight: 700;
+                }
+
+                .feature-box p {
                     margin-top: 8px;
+                    color: #94a3b8;
+                    font-size: 14px;
                 }
 
                 /* RIGHT SIDE */
                 .right {
-                    width: 45%;
-                    height: 100%;
+                    width: 42%;
                     display: flex;
                     justify-content: center;
                     align-items: center;
-                    background: radial-gradient(circle at center, #0f172a, #020617 70%);
                     position: relative;
                 }
 
-                .login-box {
+                /* GLOW EFFECT */
+                .right::before {
+                    content: '';
+                    position: absolute;
+                    width: 450px;
+                    height: 450px;
+                    background: #2563eb;
+                    filter: blur(160px);
+                    opacity: .18;
+                    pointer-events: none;
+                }
+
+                /* LOGIN CARD */
+                .login-card {
                     width: 480px;
                     padding: 50px;
-                    border-radius: 28px;
+                    border-radius: 32px;
                     background: rgba(255, 255, 255, 0.04);
                     border: 1px solid rgba(255, 255, 255, 0.08);
-                    backdrop-filter: blur(18px);
-                    box-shadow: 0 0 40px rgba(0, 0, 0, .4);
+                    backdrop-filter: blur(30px);
+                    position: relative;
+                    z-index: 10;
+                    box-shadow: 0 0 40px rgba(0, 0, 0, .45), inset 0 0 0 1px rgba(255, 255, 255, .02);
                 }
 
-                .login-box h2 {
-                    font-size: 42px;
-                    margin-bottom: 10px;
-                    font-weight: 700;
+                .login-card h2 {
+                    font-size: 48px;
+                    margin-bottom: 12px;
+                    font-weight: 800;
                 }
 
-                .login-box p {
+                .login-card .sub {
                     color: #94a3b8;
                     margin-bottom: 35px;
-                    font-size: 15px;
+                    font-size: 16px;
                 }
 
+                /* INPUT GROUP */
                 .input-group {
-                    margin-bottom: 20px;
+                    margin-bottom: 22px;
                 }
 
                 .input-group label {
                     display: block;
                     margin-bottom: 10px;
-                    font-size: 14px;
                     color: #cbd5e1;
+                    font-size: 14px;
                     font-weight: 500;
                 }
 
                 .input-group input {
                     width: 100%;
-                    height: 58px;
-                    background: #0f172a;
+                    height: 62px;
+                    border-radius: 16px;
                     border: 1px solid rgba(255, 255, 255, 0.08);
-                    border-radius: 14px;
+                    background: #0f172a;
                     padding: 0 18px;
                     color: white;
                     font-size: 15px;
                     outline: none;
-                    transition: 0.3s;
+                    transition: .3s;
                 }
 
                 .input-group input:focus {
-                    border-color: #2ea8ff;
-                    box-shadow: 0 0 12px rgba(46, 168, 255, .25);
+                    border-color: #38bdf8;
+                    box-shadow: 0 0 18px rgba(56, 189, 248, .25);
                 }
 
+                /* BUTTON */
                 .login-btn {
                     width: 100%;
-                    height: 58px;
+                    height: 62px;
                     border: none;
-                    border-radius: 14px;
+                    border-radius: 18px;
+                    margin-top: 10px;
                     background: linear-gradient(90deg, #2563eb, #38bdf8);
                     color: white;
-                    font-size: 18px;
-                    font-weight: 600;
+                    font-size: 20px;
+                    font-weight: 700;
                     cursor: pointer;
-                    margin-top: 10px;
-                    transition: 0.3s;
+                    transition: .3s;
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -260,7 +284,7 @@ const Login = () => {
 
                 .login-btn:hover {
                     transform: translateY(-2px);
-                    box-shadow: 0 0 20px rgba(56, 189, 248, .35);
+                    box-shadow: 0 0 25px rgba(56, 189, 248, .35);
                 }
 
                 .login-btn:disabled {
@@ -270,34 +294,36 @@ const Login = () => {
                     box-shadow: none;
                 }
 
-                .extra {
-                    margin-top: 20px;
+                /* OPTIONS */
+                .options {
                     display: flex;
                     justify-content: space-between;
-                    color: #94a3b8;
-                    font-size: 14px;
                     align-items: center;
+                    margin-top: 22px;
+                    font-size: 14px;
+                    color: #94a3b8;
                 }
 
-                .extra label {
+                .options label {
                     display: flex;
                     align-items: center;
                     gap: 8px;
                     cursor: pointer;
                 }
 
-                .extra a {
+                .options a {
                     color: #38bdf8;
                     text-decoration: none;
                     font-weight: 500;
                 }
 
-                .extra a:hover {
+                .options a:hover {
                     text-decoration: underline;
                 }
 
+                /* FOOTER */
                 .footer {
-                    margin-top: 35px;
+                    margin-top: 40px;
                     text-align: center;
                     color: #64748b;
                     font-size: 13px;
@@ -310,7 +336,7 @@ const Login = () => {
                     padding: 12px 16px;
                     border-radius: 12px;
                     font-size: 14px;
-                    margin-bottom: 20px;
+                    margin-bottom: 22px;
                     display: flex;
                     align-items: center;
                     gap: 10px;
@@ -335,14 +361,14 @@ const Login = () => {
                     }
 
                     .left {
-                        padding: 40px;
+                        padding: 50px 35px;
                     }
 
                     .title {
-                        font-size: 42px;
+                        font-size: 48px;
                     }
 
-                    .login-box {
+                    .login-card {
                         width: 90%;
                         margin: 40px auto;
                         padding: 30px;
@@ -355,14 +381,12 @@ const Login = () => {
                 {/* LEFT */}
                 <div className="left">
                     <div className="logo">
-                        {/* High-visibility vector logo that matches the pixel-perfect layout and size */}
+                        {/* High-visibility native vector 3D hexagon logo */}
                         <ProErpLogo />
 
-                        <div>
+                        <div className="logo-text">
                             <h1>PRO<span>ERP</span></h1>
-                            <div className="tagline">
-                                BIZNESNI OSON BOSHQARUV
-                            </div>
+                            <p>BIZNESNI OSON BOSHQARUV</p>
                         </div>
                     </div>
 
@@ -370,33 +394,33 @@ const Login = () => {
                         Korxonangizni <span>raqamli kelajakka</span> biz bilan olib chiqing
                     </div>
 
-                    <div className="desc">
-                        PROERP — korxonalarni yagona platformada boshqarish,
-                        ishlab chiqarish, ombor, HR, CRM va moliyaviy jarayonlarni
-                        avtomatlashtirish uchun zamonaviy ERP yechimi.
+                    <div className="description">
+                        PROERP — ishlab chiqarish, ombor, HR,
+                        CRM va moliyaviy jarayonlarni yagona
+                        platformada boshqaruvchi zamonaviy ERP tizimi.
                     </div>
 
                     <div className="features">
-                        <div className="feature">
-                            <span style={{ fontSize: '24px' }}>📦</span>
+                        <div className="feature-box">
+                            <div className="feature-icon">📦</div>
                             <h3>Ombor</h3>
                             <p>Mato va aksessuar nazorati</p>
                         </div>
 
-                        <div className="feature">
-                            <span style={{ fontSize: '24px' }}>👥</span>
+                        <div className="feature-box">
+                            <div className="feature-icon">👥</div>
                             <h3>HRM</h3>
                             <p>Xodimlar boshqaruvi</p>
                         </div>
 
-                        <div className="feature">
-                            <span style={{ fontSize: '24px' }}>📊</span>
+                        <div className="feature-box">
+                            <div className="feature-icon">📊</div>
                             <h3>Analitika</h3>
                             <p>Real vaqt statistikasi</p>
                         </div>
 
-                        <div className="feature">
-                            <span style={{ fontSize: '24px' }}>🔒</span>
+                        <div className="feature-box">
+                            <div className="feature-icon">🔒</div>
                             <h3>Xavfsizlik</h3>
                             <p>Himoyalangan tizim</p>
                         </div>
@@ -405,11 +429,11 @@ const Login = () => {
 
                 {/* RIGHT */}
                 <div className="right">
-                    <div className="login-box">
+                    <div className="login-card">
                         <h2>Tizimga kirish</h2>
-                        <p>
-                            Hisobingizga kirish uchun ma'lumotlarni kiriting
-                        </p>
+                        <div className="sub">
+                            Hisobingizga kirish uchun ma'lumotlaringizni kiriting
+                        </div>
 
                         <form onSubmit={handleSubmit}>
                             {error && (
@@ -453,7 +477,7 @@ const Login = () => {
                             </button>
                         </form>
 
-                        <div className="extra">
+                        <div className="options">
                             <label>
                                 <input type="checkbox" defaultChecked />
                                 Meni eslab qol
