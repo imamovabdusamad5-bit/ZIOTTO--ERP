@@ -18,36 +18,42 @@ import {
 } from 'lucide-react';
 
 const ProErpLogo = ({ className = "w-16 h-16" }) => (
-    <svg className={`${className} filter drop-shadow-[0_0_15px_rgba(59,130,246,0.6)]`} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg className={`${className} filter drop-shadow-[0_0_20px_rgba(56,189,248,0.75)]`} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
-            <linearGradient id="hexGrad1" x1="30%" y1="10%" x2="70%" y2="90%">
+            <linearGradient id="glowBlue" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#00f2fe" />
-                <stop offset="100%" stopColor="#4facfe" />
+                <stop offset="100%" stopColor="#0072ff" />
             </linearGradient>
-            <linearGradient id="hexGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#3b82f6" />
-                <stop offset="50%" stopColor="#1d4ed8" />
-                <stop offset="100%" stopColor="#1e3a8a" />
-            </linearGradient>
-            <linearGradient id="hexGrad3" x1="100%" y1="0%" x2="0%" y2="100%">
+            <linearGradient id="glowCyan" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#38bdf8" />
-                <stop offset="100%" stopColor="#0284c7" />
+                <stop offset="100%" stopColor="#0369a1" />
+            </linearGradient>
+            <linearGradient id="glowDarkBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#0052d4" />
+                <stop offset="50%" stopColor="#4364f7" />
+                <stop offset="100%" stopColor="#6fb1fc" />
             </linearGradient>
         </defs>
-        <g strokeLinecap="round" strokeLinejoin="round">
-            {/* Left face */}
-            <path d="M50 10 L18 28 L18 64 L30 71 L30 35 L50 24 Z" fill="url(#hexGrad2)" />
-            {/* Top-Right face */}
-            <path d="M50 10 L82 28 L82 46 L70 53 L70 35 L50 24 Z" fill="url(#hexGrad1)" />
-            {/* Bottom-Right face / leg */}
-            <path d="M70 53 L82 46 L82 64 L50 82 L18 64 L30 57 L50 68 L70 57 Z" fill="url(#hexGrad3)" />
-            {/* Inner P Loop */}
-            <path d="M50 24 L70 35 L70 53 L50 64 L30 53 L30 42 L50 53 L50 36 L30 35 Z" fill="url(#hexGrad1)" opacity="0.9" />
-            {/* Extra glowing lines for 3D accent */}
-            <path d="M50 10 L50 24" stroke="#ffffff" strokeWidth="1.5" opacity="0.7" />
-            <path d="M18 28 L30 35" stroke="#ffffff" strokeWidth="1.5" opacity="0.7" />
-            <path d="M82 28 L70 35" stroke="#ffffff" strokeWidth="1.5" opacity="0.7" />
-            <path d="M30 71 L50 82" stroke="#ffffff" strokeWidth="1" opacity="0.4" />
+        <g strokeLinejoin="round" strokeLinecap="round">
+            {/* Left Stem Face 1 */}
+            <path d="M20 30 L32 23 L32 77 L20 70 Z" fill="#0b2545" opacity="0.95" />
+            {/* Left Stem Face 2 */}
+            <path d="M32 23 L44 30 L44 70 L32 77 Z" fill="url(#glowDarkBlue)" />
+            
+            {/* Top Chevron loop */}
+            <path d="M44 30 L80 44 L68 53 L44 40 Z" fill="url(#glowBlue)" />
+            <path d="M80 44 L80 56 L68 65 L68 53 Z" fill="url(#glowCyan)" />
+            <path d="M44 40 L68 53 L56 61 L32 47 Z" fill="url(#glowDarkBlue)" />
+            
+            {/* Bottom loop */}
+            <path d="M32 60 L56 74 L80 60 L68 53 L56 61 L32 47 Z" fill="url(#glowBlue)" opacity="0.8" />
+            <path d="M32 77 L56 90 L80 76 L80 60 L56 74 L32 60 Z" fill="url(#glowDarkBlue)" />
+
+            {/* Highlights */}
+            <path d="M32 23 L44 30" stroke="#ffffff" strokeWidth="1.5" opacity="0.6" />
+            <path d="M44 30 L80 44" stroke="#ffffff" strokeWidth="1.5" opacity="0.7" />
+            <path d="M32 23 L32 77" stroke="#ffffff" strokeWidth="1" opacity="0.5" />
+            <path d="M56 90 L80 76" stroke="#00f2fe" strokeWidth="1.5" opacity="0.8" />
         </g>
     </svg>
 );
@@ -90,13 +96,10 @@ const Login = () => {
                             <stop offset="100%" stopColor="transparent" stopOpacity="0" />
                         </radialGradient>
                     </defs>
-                    {/* Glow behind panels */}
                     <circle cx="250" cy="300" r="300" fill="url(#bgGlow)" />
                     <circle cx="750" cy="300" r="300" fill="url(#bgGlow)" />
                     
-                    {/* Abstract network nodes and lines */}
                     <g stroke="#1d4ed8" strokeWidth="0.5" opacity="0.3" strokeDasharray="3 3">
-                        {/* Grid Lines */}
                         <path d="M0 100 L1000 100" />
                         <path d="M0 200 L1000 200" />
                         <path d="M0 300 L1000 300" />
@@ -110,7 +113,6 @@ const Login = () => {
                         <path d="M900 0 L900 600" />
                     </g>
                     
-                    {/* Connections */}
                     <g stroke="#00f2fe" strokeWidth="0.75" opacity="0.5">
                         <line x1="150" y1="200" x2="300" y2="100" />
                         <line x1="300" y1="100" x2="450" y2="200" />
@@ -123,7 +125,6 @@ const Login = () => {
                         <line x1="600" y1="300" x2="750" y2="200" />
                     </g>
                     
-                    {/* Glowing Node Circles */}
                     <g fill="#00f2fe">
                         <circle cx="150" cy="200" r="3" />
                         <circle cx="300" cy="100" r="4" />
@@ -137,7 +138,6 @@ const Login = () => {
                 </svg>
             </div>
 
-            {/* Main Ambient Glow */}
             <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-blue-600/10 blur-[180px] rounded-full pointer-events-none"></div>
             <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-cyan-600/10 blur-[180px] rounded-full pointer-events-none"></div>
 
@@ -149,16 +149,16 @@ const Login = () => {
                         <ProErpLogo className="w-16 h-16" />
                         <div className="flex flex-col">
                             <h1 className="text-4xl font-black tracking-tight flex items-center">
-                                PRO<span className="text-blue-500">ERP</span>
+                                PRO<span className="text-[#38bdf8]">ERP</span>
                             </h1>
                             <div className="w-48 h-[1px] bg-gradient-to-r from-blue-500 to-transparent my-1"></div>
-                            <span className="text-[10px] uppercase tracking-[0.2em] text-cyan-400 font-bold">Biznesingiz uchun oson boshqaruv</span>
+                            <span className="text-[10px] uppercase tracking-[0.25em] text-[#38bdf8] font-bold">Biznesingiz uchun oson boshqaruv</span>
                         </div>
                     </div>
 
                     {/* Main Tagline */}
                     <h2 className="text-4xl xl:text-5xl font-bold leading-tight mt-12 mb-12 animate-in fade-in slide-in-from-left-8 duration-1000 delay-150">
-                        Korxonangizni raqamli kelajakka <span className="text-[#38bdf8] drop-shadow-[0_0_15px_rgba(56,189,248,0.5)] font-extrabold">biz bilan</span> olib boring.
+                        Korxonangizni raqamli kelajakka <span className="text-[#38bdf8] drop-shadow-[0_0_15px_rgba(56,189,248,0.6)] font-black">biz bilan</span> olib boring.
                     </h2>
 
                     {/* Features Grid */}
@@ -207,27 +207,27 @@ const Login = () => {
                 <div className="absolute top-8 left-8 lg:hidden flex items-center gap-3">
                     <ProErpLogo className="w-10 h-10" />
                     <h1 className="text-2xl font-black tracking-tight flex items-center">
-                        PRO<span className="text-blue-500">ERP</span>
+                        PRO<span className="text-[#38bdf8]">ERP</span>
                     </h1>
                 </div>
 
                 <div className="w-full max-w-[460px] relative">
                     {/* Glowing outer box effect */}
-                    <div className="absolute -inset-1.5 bg-gradient-to-r from-blue-500/40 to-cyan-500/40 rounded-[2.5rem] blur opacity-40 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+                    <div className="absolute -inset-1.5 bg-gradient-to-r from-blue-500/30 to-cyan-400/30 rounded-[2.5rem] blur opacity-45"></div>
                     
                     {/* Glassmorphic Login Card */}
-                    <div className="bg-[#0b1329]/80 backdrop-blur-2xl border border-blue-500/35 rounded-[2.5rem] shadow-[0_0_50px_rgba(0,0,0,0.8)] p-8 sm:p-10 animate-in zoom-in-95 duration-500 relative overflow-hidden">
+                    <div className="bg-[#090d1a]/85 backdrop-blur-2xl border border-[#38bdf8]/40 rounded-[2.5rem] shadow-[0_0_50px_rgba(0,0,0,0.85)] p-8 sm:p-10 animate-in zoom-in-95 duration-500 relative overflow-hidden">
                         
                         {/* Interactive operations team arch header */}
-                        <div className="rounded-[2rem_2rem_8rem_8rem] border border-blue-500/30 overflow-hidden relative w-full h-40 mb-6 bg-slate-950">
+                        <div className="rounded-[2.5rem_2.5rem_8rem_8rem] border border-[#00f2fe]/40 overflow-hidden relative w-full h-40 mb-6 bg-slate-950">
                             <img 
                                 src="/login_arch_team.png" 
                                 alt="Operations team" 
-                                className="w-full h-full object-cover filter brightness-[0.85] contrast-[1.05]" 
+                                className="w-full h-full object-cover filter brightness-[0.9] contrast-[1.05]" 
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#0b1329] via-[#0b1329]/20 to-transparent"></div>
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#090d1a] via-[#090d1a]/15 to-transparent"></div>
                             {/* Glowing cyber cyan frame */}
-                            <div className="absolute inset-0 border-2 border-cyan-400/20 rounded-[2rem_2rem_8rem_8rem] pointer-events-none"></div>
+                            <div className="absolute inset-0 border-2 border-cyan-400/30 rounded-[2.5rem_2.5rem_8rem_8rem] pointer-events-none"></div>
                         </div>
 
                         <div className="text-center mb-6">
@@ -239,14 +239,14 @@ const Login = () => {
                             {/* Username input */}
                             <div className="space-y-1">
                                 <div className="relative group">
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-blue-400 transition-colors">
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-[#00f2fe] transition-colors">
                                         <User size={18} />
                                     </div>
                                     <input
                                         required
                                         type="text"
                                         placeholder="Foydalanuvchi nomi"
-                                        className="w-full bg-[#0d162d] border border-slate-700/60 rounded-xl py-3.5 pl-11 pr-4 text-white placeholder:text-slate-500 outline-none focus:border-blue-500 focus:bg-[#0e1935] focus:ring-1 focus:ring-blue-500/30 transition-all font-medium text-sm"
+                                        className="w-full bg-[#0d162d] border border-slate-700/60 rounded-xl py-3.5 pl-11 pr-4 text-white placeholder:text-slate-500 outline-none focus:border-[#00f2fe] focus:bg-[#0e1935] focus:ring-1 focus:ring-[#00f2fe]/20 transition-all font-medium text-sm"
                                         value={username}
                                         onChange={(e) => setUsername(e.target.value)}
                                     />
@@ -256,14 +256,14 @@ const Login = () => {
                             {/* Password input */}
                             <div className="space-y-1">
                                 <div className="relative group">
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-blue-400 transition-colors">
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-[#00f2fe] transition-colors">
                                         <Lock size={18} />
                                     </div>
                                     <input
                                         required
                                         type={showPassword ? "text" : "password"}
                                         placeholder="Parol"
-                                        className="w-full bg-[#0d162d] border border-slate-700/60 rounded-xl py-3.5 pl-11 pr-11 text-white placeholder:text-slate-500 outline-none focus:border-blue-500 focus:bg-[#0e1935] focus:ring-1 focus:ring-blue-500/30 transition-all font-medium text-sm"
+                                        className="w-full bg-[#0d162d] border border-slate-700/60 rounded-xl py-3.5 pl-11 pr-11 text-white placeholder:text-slate-500 outline-none focus:border-[#00f2fe] focus:bg-[#0e1935] focus:ring-1 focus:ring-[#00f2fe]/20 transition-all font-medium text-sm"
                                         value={code}
                                         onChange={(e) => setCode(e.target.value)}
                                     />
@@ -289,7 +289,7 @@ const Login = () => {
                                 <label className="flex items-center gap-2.5 cursor-pointer group">
                                     <div className="relative flex items-center justify-center">
                                         <input type="checkbox" className="peer sr-only" defaultChecked />
-                                        <div className="w-4.5 h-4.5 bg-[#0d162d] border border-slate-600 rounded group-hover:border-blue-500 transition-all peer-checked:bg-blue-600 peer-checked:border-blue-600"></div>
+                                        <div className="w-4.5 h-4.5 bg-[#0d162d] border border-slate-600 rounded group-hover:border-[#00f2fe] transition-all peer-checked:bg-[#0072ff] peer-checked:border-[#0072ff]"></div>
                                         <svg className="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                                             <polyline points="20 6 9 17 4 12"></polyline>
                                         </svg>
@@ -309,7 +309,7 @@ const Login = () => {
                             <button
                                 disabled={loading}
                                 type="submit"
-                                className="w-full bg-gradient-to-r from-[#00b4db] to-[#0083b0] hover:from-[#00c6ff] hover:to-[#0072ff] text-white font-bold text-base py-3.5 rounded-xl shadow-[0_0_20px_rgba(0,180,219,0.25)] hover:shadow-[0_0_30px_rgba(0,180,219,0.45)] transition-all flex items-center justify-center gap-2.5 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-2"
+                                className="w-full bg-gradient-to-r from-[#00c6ff] to-[#0072ff] hover:from-[#00f2fe] hover:to-[#00c6ff] text-white font-bold text-base py-3.5 rounded-xl shadow-[0_0_20px_rgba(0,198,255,0.35)] hover:shadow-[0_0_30px_rgba(0,198,255,0.55)] transition-all flex items-center justify-center gap-2.5 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-2"
                             >
                                 {loading ? (
                                     <Activity size={20} className="animate-spin text-white/70" />

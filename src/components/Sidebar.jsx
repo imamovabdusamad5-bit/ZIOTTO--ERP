@@ -57,33 +57,46 @@ export const menuItems = [
 ];
 
 const ProErpLogo = ({ className = "w-10 h-10" }) => (
-    <svg className={`${className} filter drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]`} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg className={`${className} filter drop-shadow-[0_0_15px_rgba(56,189,248,0.65)]`} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
-            <linearGradient id="sideHexGrad1" x1="30%" y1="10%" x2="70%" y2="90%">
+            <linearGradient id="sideHexGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#00f2fe" />
-                <stop offset="100%" stopColor="#4facfe" />
+                <stop offset="100%" stopColor="#0072ff" />
             </linearGradient>
             <linearGradient id="sideHexGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#3b82f6" />
-                <stop offset="50%" stopColor="#1d4ed8" />
-                <stop offset="100%" stopColor="#1e3a8a" />
-            </linearGradient>
-            <linearGradient id="sideHexGrad3" x1="100%" y1="0%" x2="0%" y2="100%">
                 <stop offset="0%" stopColor="#38bdf8" />
-                <stop offset="100%" stopColor="#0284c7" />
+                <stop offset="100%" stopColor="#0369a1" />
+            </linearGradient>
+            <linearGradient id="sideHexGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#0052d4" />
+                <stop offset="50%" stopColor="#4364f7" />
+                <stop offset="100%" stopColor="#6fb1fc" />
             </linearGradient>
         </defs>
-        <g strokeLinecap="round" strokeLinejoin="round">
-            <path d="M50 10 L18 28 L18 64 L30 71 L30 35 L50 24 Z" fill="url(#sideHexGrad2)" />
-            <path d="M50 10 L82 28 L82 46 L70 53 L70 35 L50 24 Z" fill="url(#sideHexGrad1)" />
-            <path d="M70 53 L82 46 L82 64 L50 82 L18 64 L30 57 L50 68 L70 57 Z" fill="url(#sideHexGrad3)" />
-            <path d="M50 24 L70 35 L70 53 L50 64 L30 53 L30 42 L50 53 L50 36 L30 35 Z" fill="url(#sideHexGrad1)" opacity="0.9" />
-            <path d="M50 10 L50 24" stroke="#ffffff" strokeWidth="1.5" opacity="0.7" />
-            <path d="M18 28 L30 35" stroke="#ffffff" strokeWidth="1.5" opacity="0.7" />
-            <path d="M82 28 L70 35" stroke="#ffffff" strokeWidth="1.5" opacity="0.7" />
+        <g strokeLinejoin="round" strokeLinecap="round">
+            {/* Left Stem Face 1 */}
+            <path d="M20 30 L32 23 L32 77 L20 70 Z" fill="#0b2545" opacity="0.95" />
+            {/* Left Stem Face 2 */}
+            <path d="M32 23 L44 30 L44 70 L32 77 Z" fill="url(#sideHexGrad3)" />
+            
+            {/* Top Chevron loop */}
+            <path d="M44 30 L80 44 L68 53 L44 40 Z" fill="url(#sideHexGrad1)" />
+            <path d="M80 44 L80 56 L68 65 L68 53 Z" fill="url(#sideHexGrad2)" />
+            <path d="M44 40 L68 53 L56 61 L32 47 Z" fill="url(#sideHexGrad3)" />
+            
+            {/* Bottom loop */}
+            <path d="M32 60 L56 74 L80 60 L68 53 L56 61 L32 47 Z" fill="url(#sideHexGrad1)" opacity="0.8" />
+            <path d="M32 77 L56 90 L80 76 L80 60 L56 74 L32 60 Z" fill="url(#sideHexGrad3)" />
+
+            {/* Highlights */}
+            <path d="M32 23 L44 30" stroke="#ffffff" strokeWidth="1.5" opacity="0.6" />
+            <path d="M44 30 L80 44" stroke="#ffffff" strokeWidth="1.5" opacity="0.7" />
+            <path d="M32 23 L32 77" stroke="#ffffff" strokeWidth="1" opacity="0.5" />
+            <path d="M56 90 L80 76" stroke="#00f2fe" strokeWidth="1.5" opacity="0.8" />
         </g>
     </svg>
 );
+
 
 const Sidebar = ({ isOpen, onClose }) => {
     const location = useLocation();
