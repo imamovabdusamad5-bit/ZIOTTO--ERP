@@ -23,42 +23,43 @@ import {
 } from 'lucide-react';
 
 const ProErpLogo = ({ className = "w-16 h-16" }) => (
-    <svg className={`${className} filter drop-shadow-[0_0_20px_rgba(56,189,248,0.75)]`} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg 
+        className={`${className} filter drop-shadow-[0_0_20px_rgba(0,198,255,0.7)] shrink-0`} 
+        viewBox="0 0 100 100" 
+        fill="none" 
+        width="64" 
+        height="64" 
+        xmlns="http://www.w3.org/2000/svg"
+    >
         <defs>
-            <linearGradient id="glowBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id="mainBlue" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#00f2fe" />
                 <stop offset="100%" stopColor="#0072ff" />
             </linearGradient>
-            <linearGradient id="glowCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id="mainCyan" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#38bdf8" />
                 <stop offset="100%" stopColor="#0369a1" />
             </linearGradient>
-            <linearGradient id="glowDarkBlue" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#0052d4" />
-                <stop offset="50%" stopColor="#4364f7" />
-                <stop offset="100%" stopColor="#6fb1fc" />
+            <linearGradient id="mainDark" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#0b2545" />
+                <stop offset="100%" stopColor="#1e3a8a" />
             </linearGradient>
         </defs>
         <g strokeLinejoin="round" strokeLinecap="round">
-            {/* Left Stem Face 1 */}
-            <path d="M20 30 L32 23 L32 77 L20 70 Z" fill="#0b2545" opacity="0.95" />
-            {/* Left Stem Face 2 */}
-            <path d="M32 23 L44 30 L44 70 L32 77 Z" fill="url(#glowDarkBlue)" />
-            
-            {/* Top Chevron loop */}
-            <path d="M44 30 L80 44 L68 53 L44 40 Z" fill="url(#glowBlue)" />
-            <path d="M80 44 L80 56 L68 65 L68 53 Z" fill="url(#glowCyan)" />
-            <path d="M44 40 L68 53 L56 61 L32 47 Z" fill="url(#glowDarkBlue)" />
-            
-            {/* Bottom loop */}
-            <path d="M32 60 L56 74 L80 60 L68 53 L56 61 L32 47 Z" fill="url(#glowBlue)" opacity="0.8" />
-            <path d="M32 77 L56 90 L80 76 L80 60 L56 74 L32 60 Z" fill="url(#glowDarkBlue)" />
-
+            {/* Bold, high-visibility 3D isometric hexagonal ribbon logo */}
+            {/* Left face */}
+            <path d="M15 30 L45 13 L45 87 L15 70 Z" fill="url(#mainDark)" />
+            {/* Top Right face */}
+            <path d="M45 13 L85 36 L85 53 L70 61 L70 45 L45 31 Z" fill="url(#mainBlue)" />
+            {/* Bottom Right face */}
+            <path d="M70 61 L85 53 L85 70 L45 93 L15 76 L30 67 L45 76 Z" fill="url(#mainCyan)" />
+            {/* Center P Inner loop */}
+            <path d="M45 31 L70 45 L70 61 L45 76 L30 67 L30 51 L45 60 L45 42 M45 42 L30 34 Z" fill="url(#mainBlue)" opacity="0.9" />
             {/* Highlights */}
-            <path d="M32 23 L44 30" stroke="#ffffff" strokeWidth="1.5" opacity="0.6" />
-            <path d="M44 30 L80 44" stroke="#ffffff" strokeWidth="1.5" opacity="0.7" />
-            <path d="M32 23 L32 77" stroke="#ffffff" strokeWidth="1" opacity="0.5" />
-            <path d="M56 90 L80 76" stroke="#00f2fe" strokeWidth="1.5" opacity="0.8" />
+            <path d="M45 13 L85 36" stroke="#ffffff" strokeWidth="2" opacity="0.8" />
+            <path d="M15 30 L45 13" stroke="#ffffff" strokeWidth="2" opacity="0.7" />
+            <path d="M45 93 L85 70" stroke="#00f2fe" strokeWidth="2" opacity="0.8" />
+            <path d="M15 76 L45 93" stroke="#00f2fe" strokeWidth="1.5" opacity="0.6" />
         </g>
     </svg>
 );
@@ -168,12 +169,12 @@ const Login = () => {
                 <div className="space-y-12">
                     {/* Logo Section */}
                     <div className="flex items-center gap-5 mb-2 animate-in fade-in slide-in-from-left-8 duration-700">
-                        <ProErpLogo className="w-16 h-16" />
+                        <ProErpLogo className="w-16 h-16 shrink-0" />
                         <div className="flex flex-col">
                             <h1 className="text-4xl font-black tracking-tight flex items-center">
-                                PRO<span className="text-[#0062ff]">ERP</span>
+                                PRO<span className="text-[#38bdf8]">ERP</span>
                             </h1>
-                            <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-slate-400 font-semibold mt-1">
+                            <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-[#38bdf8] font-bold mt-1">
                                 <div className="w-5 h-[1px] bg-slate-700"></div>
                                 <span>Biznesni oson boshqaruv</span>
                                 <div className="w-5 h-[1px] bg-slate-700"></div>
@@ -183,7 +184,7 @@ const Login = () => {
 
                     {/* Main Tagline */}
                     <h2 className="text-4xl xl:text-5xl font-extrabold leading-tight mt-12 animate-in fade-in slide-in-from-left-8 duration-1000 delay-150 max-w-lg">
-                        Korxonangizni raqamli <span className="text-[#00d2ff] drop-shadow-[0_0_15px_rgba(0,210,255,0.4)] font-black">kelajakka</span> biz bilan olib chiqing
+                        Korxonangizni raqamli <span className="text-[#38bdf8] drop-shadow-[0_0_15px_rgba(56,189,248,0.6)] font-black">kelajakka</span> biz bilan olib chiqing
                     </h2>
 
                     {/* Paragraph description */}
@@ -218,9 +219,9 @@ const Login = () => {
                 
                 {/* Mobile Header Logo */}
                 <div className="absolute top-8 left-8 lg:hidden flex items-center gap-3">
-                    <ProErpLogo className="w-10 h-10" />
+                    <ProErpLogo className="w-10 h-10 shrink-0" />
                     <h1 className="text-2xl font-black tracking-tight flex items-center">
-                        PRO<span className="text-[#0062ff]">ERP</span>
+                        PRO<span className="text-[#38bdf8]">ERP</span>
                     </h1>
                 </div>
 

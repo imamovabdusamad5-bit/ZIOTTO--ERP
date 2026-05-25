@@ -57,7 +57,14 @@ export const menuItems = [
 ];
 
 const ProErpLogo = ({ className = "w-10 h-10" }) => (
-    <svg className={`${className} filter drop-shadow-[0_0_15px_rgba(56,189,248,0.65)]`} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg 
+        className={`${className} filter drop-shadow-[0_0_15px_rgba(56,189,248,0.65)] shrink-0`} 
+        viewBox="0 0 100 100" 
+        fill="none" 
+        width="40" 
+        height="40" 
+        xmlns="http://www.w3.org/2000/svg"
+    >
         <defs>
             <linearGradient id="sideHexGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#00f2fe" />
@@ -96,6 +103,7 @@ const ProErpLogo = ({ className = "w-10 h-10" }) => (
         </g>
     </svg>
 );
+
 
 
 const Sidebar = ({ isOpen, onClose }) => {
