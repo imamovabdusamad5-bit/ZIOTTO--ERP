@@ -56,6 +56,35 @@ export const menuItems = [
     { path: '/moliya', name: 'Moliya & Tannarx', icon: Banknote, roles: ['admin'], permKey: 'finance' },
 ];
 
+const ProErpLogo = ({ className = "w-10 h-10" }) => (
+    <svg className={`${className} filter drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]`} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="sideHexGrad1" x1="30%" y1="10%" x2="70%" y2="90%">
+                <stop offset="0%" stopColor="#00f2fe" />
+                <stop offset="100%" stopColor="#4facfe" />
+            </linearGradient>
+            <linearGradient id="sideHexGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#3b82f6" />
+                <stop offset="50%" stopColor="#1d4ed8" />
+                <stop offset="100%" stopColor="#1e3a8a" />
+            </linearGradient>
+            <linearGradient id="sideHexGrad3" x1="100%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#38bdf8" />
+                <stop offset="100%" stopColor="#0284c7" />
+            </linearGradient>
+        </defs>
+        <g strokeLinecap="round" strokeLinejoin="round">
+            <path d="M50 10 L18 28 L18 64 L30 71 L30 35 L50 24 Z" fill="url(#sideHexGrad2)" />
+            <path d="M50 10 L82 28 L82 46 L70 53 L70 35 L50 24 Z" fill="url(#sideHexGrad1)" />
+            <path d="M70 53 L82 46 L82 64 L50 82 L18 64 L30 57 L50 68 L70 57 Z" fill="url(#sideHexGrad3)" />
+            <path d="M50 24 L70 35 L70 53 L50 64 L30 53 L30 42 L50 53 L50 36 L30 35 Z" fill="url(#sideHexGrad1)" opacity="0.9" />
+            <path d="M50 10 L50 24" stroke="#ffffff" strokeWidth="1.5" opacity="0.7" />
+            <path d="M18 28 L30 35" stroke="#ffffff" strokeWidth="1.5" opacity="0.7" />
+            <path d="M82 28 L70 35" stroke="#ffffff" strokeWidth="1.5" opacity="0.7" />
+        </g>
+    </svg>
+);
+
 const Sidebar = ({ isOpen, onClose }) => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -63,38 +92,30 @@ const Sidebar = ({ isOpen, onClose }) => {
     const [expandedMenu, setExpandedMenu] = useState('Ombor');
     const [collapsed, setCollapsed] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
-
+ 
     const filteredMenu = menuItems.filter(item => {
-        // console.log('DEBUG PERMS:', profile?.role, item.name, item.permKey, profile?.permissions);
         if (!profile) return false;
         if (profile.role === 'admin') return true;
-
-        // Extract permission key: prefer explicit permKey, else fallback to path
+ 
         const permKey = item.permKey || item.path.split('?')[0].replace('/', '');
-
-        // Special case for dashboard
+ 
         if (item.path === '/') return true;
-
-        // Check granular permissions (any permission: 'read' or 'full')
-        // Safe check for permissions object presence
+ 
         if (profile.permissions && profile.permissions[permKey]) return true;
-
-        // Fallback to role-based access (for legacy standard roles)
+ 
         return item.roles?.includes(profile.role);
     });
-
+ 
     const handleLogout = async () => {
         await logout();
         navigate('/login');
     };
-
+ 
     return (
         <div className={`fixed left-0 top-0 h-[100dvh] bg-[var(--bg-sidebar)] text-[var(--text-secondary)] flex flex-col shadow-xl z-[70] transition-all duration-300 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 w-64 border-r border-[var(--border-sidebar)]`}>
             <div className="p-6 border-b border-[var(--border-sidebar)] flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
-                        <span className="text-white font-black text-xl italic pr-0.5">P</span>
-                    </div>
+                    <ProErpLogo className="w-9 h-9" />
                     <h1 className="text-2xl font-black text-[var(--text-primary)] tracking-tighter flex items-center">
                         PRO<span className="text-blue-500">ERP</span>
                     </h1>
