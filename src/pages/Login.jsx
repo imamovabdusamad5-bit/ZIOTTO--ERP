@@ -14,7 +14,12 @@ import {
     Users, 
     Shield, 
     X, 
-    CircleAlert
+    CircleAlert,
+    Boxes,
+    Gauge,
+    Cloud,
+    Headphones,
+    Mail
 } from 'lucide-react';
 
 const ProErpLogo = ({ className = "w-16 h-16" }) => (
@@ -58,6 +63,22 @@ const ProErpLogo = ({ className = "w-16 h-16" }) => (
     </svg>
 );
 
+const HexagonFeature = ({ icon: Icon, label }) => (
+    <div className="flex flex-col items-center gap-3 group select-none">
+        <div className="relative w-16 h-16 flex items-center justify-center">
+            {/* Hexagon Border and Background */}
+            <svg className="absolute inset-0 w-full h-full text-slate-800/40 group-hover:text-blue-600/20 filter drop-shadow-[0_0_8px_rgba(30,41,59,0.5)] transition-all duration-300" viewBox="0 0 100 100" fill="currentColor" stroke="currentColor" strokeWidth="2">
+                <path d="M50 5 L90 28 L90 72 L50 95 L10 72 L10 28 Z" stroke="#334155" />
+            </svg>
+            {/* Icon inside */}
+            <div className="relative z-10 text-slate-300 group-hover:text-[#00f2fe] transition-colors duration-300">
+                <Icon size={22} />
+            </div>
+        </div>
+        <span className="text-xs text-slate-400 font-semibold tracking-wide group-hover:text-white transition-colors duration-300 text-center">{label}</span>
+    </div>
+);
+
 const Login = () => {
     const [username, setUsername] = useState('');
     const [code, setCode] = useState('');
@@ -85,118 +106,110 @@ const Login = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#030712] flex font-sans overflow-hidden relative text-white">
+        <div className="min-h-screen bg-[#020617] flex font-sans overflow-hidden relative text-white pb-24">
             
-            {/* Tech World Map & Network Grid Background */}
-            <div className="absolute inset-0 z-0 opacity-25 pointer-events-none overflow-hidden select-none">
-                <svg className="w-full h-full min-w-[1200px]" viewBox="0 0 1000 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {/* Holographic Digital Globe */}
+            <div className="absolute top-1/2 left-[48%] -translate-y-1/2 -translate-x-1/2 w-[550px] h-[550px] opacity-25 z-0 pointer-events-none select-none hidden lg:block">
+                <svg className="w-full h-full text-blue-500" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <defs>
-                        <radialGradient id="bgGlow" cx="50%" cy="50%" r="50%">
-                            <stop offset="0%" stopColor="#1e3a8a" stopOpacity="0.3" />
+                        <radialGradient id="globeGlow" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stopColor="#0062ff" stopOpacity="0.25" />
+                            <stop offset="60%" stopColor="#00f2fe" stopOpacity="0.05" />
                             <stop offset="100%" stopColor="transparent" stopOpacity="0" />
                         </radialGradient>
                     </defs>
-                    <circle cx="250" cy="300" r="300" fill="url(#bgGlow)" />
-                    <circle cx="750" cy="300" r="300" fill="url(#bgGlow)" />
                     
-                    <g stroke="#1d4ed8" strokeWidth="0.5" opacity="0.3" strokeDasharray="3 3">
-                        <path d="M0 100 L1000 100" />
-                        <path d="M0 200 L1000 200" />
-                        <path d="M0 300 L1000 300" />
-                        <path d="M0 400 L1000 400" />
-                        <path d="M0 500 L1000 500" />
-                        <path d="M150 0 L150 600" />
-                        <path d="M300 0 L300 600" />
-                        <path d="M450 0 L450 600" />
-                        <path d="M600 0 L600 600" />
-                        <path d="M750 0 L750 600" />
-                        <path d="M900 0 L900 600" />
-                    </g>
+                    {/* Glow */}
+                    <circle cx="100" cy="100" r="80" fill="url(#globeGlow)" />
                     
-                    <g stroke="#00f2fe" strokeWidth="0.75" opacity="0.5">
-                        <line x1="150" y1="200" x2="300" y2="100" />
-                        <line x1="300" y1="100" x2="450" y2="200" />
-                        <line x1="450" y1="200" x2="600" y2="100" />
-                        <line x1="300" y1="300" x2="450" y2="400" />
-                        <line x1="450" y1="400" x2="600" y2="300" />
-                        <line x1="150" y1="200" x2="300" y2="300" />
-                        <line x1="450" y1="200" x2="450" y2="400" />
-                        <line x1="600" y1="100" x2="750" y2="200" />
-                        <line x1="600" y1="300" x2="750" y2="200" />
-                    </g>
+                    {/* Outer Rings */}
+                    <circle cx="100" cy="100" r="70" stroke="#00f2fe" strokeWidth="0.5" strokeDasharray="2 4" opacity="0.6" />
+                    <circle cx="100" cy="100" r="73" stroke="#0062ff" strokeWidth="0.25" opacity="0.4" />
                     
-                    <g fill="#00f2fe">
-                        <circle cx="150" cy="200" r="3" />
-                        <circle cx="300" cy="100" r="4" />
-                        <circle cx="450" cy="200" r="3.5" />
-                        <circle cx="600" cy="100" r="4" />
-                        <circle cx="750" cy="200" r="3" />
-                        <circle cx="300" cy="300" r="3.5" />
-                        <circle cx="450" cy="400" r="4.5" />
-                        <circle cx="600" cy="300" r="3" />
+                    {/* Latitudes */}
+                    <ellipse cx="100" cy="100" rx="70" ry="20" stroke="#0062ff" strokeWidth="0.4" opacity="0.5" />
+                    <ellipse cx="100" cy="100" rx="70" ry="40" stroke="#0062ff" strokeWidth="0.4" opacity="0.5" />
+                    <ellipse cx="100" cy="100" rx="70" ry="5" stroke="#0062ff" strokeWidth="0.4" opacity="0.5" />
+                    
+                    {/* Longitudes */}
+                    <ellipse cx="100" cy="100" rx="20" ry="70" stroke="#0062ff" strokeWidth="0.4" opacity="0.5" />
+                    <ellipse cx="100" cy="100" rx="40" ry="70" stroke="#0062ff" strokeWidth="0.4" opacity="0.5" />
+                    <ellipse cx="100" cy="100" rx="5" ry="70" stroke="#0062ff" strokeWidth="0.4" opacity="0.5" />
+
+                    {/* Abstract continent dot clusters */}
+                    <g fill="#00f2fe" opacity="0.7">
+                        <circle cx="65" cy="70" r="1.2" />
+                        <circle cx="70" cy="68" r="0.8" />
+                        <circle cx="72" cy="74" r="1" />
+                        <circle cx="60" cy="75" r="1.5" />
+                        <circle cx="78" cy="115" r="1.5" />
+                        <circle cx="82" cy="125" r="1.2" />
+                        <circle cx="80" cy="135" r="0.8" />
+                        <circle cx="110" cy="110" r="1.8" />
+                        <circle cx="115" cy="118" r="1.2" />
+                        <circle cx="120" cy="128" r="1" />
+                        <circle cx="115" cy="70" r="1.5" />
+                        <circle cx="125" cy="65" r="2" />
+                        <circle cx="135" cy="72" r="1.2" />
+                        <circle cx="140" cy="80" r="1.5" />
+                        <circle cx="120" cy="85" r="1" />
+                        <circle cx="145" cy="135" r="1.5" />
+                        <circle cx="150" cy="138" r="1" />
                     </g>
                 </svg>
             </div>
 
+            {/* Ambient Lighting */}
             <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-blue-600/10 blur-[180px] rounded-full pointer-events-none"></div>
             <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-cyan-600/10 blur-[180px] rounded-full pointer-events-none"></div>
 
-            {/* Left Side - Branding & Features (Hidden on Mobile) */}
-            <div className="hidden lg:flex lg:w-1/2 relative flex-col justify-between p-12 xl:p-20 z-10 select-none">
-                <div>
+            {/* Left Side - Branding & Features */}
+            <div className="hidden lg:flex lg:w-1/2 relative flex-col justify-between p-16 xl:p-24 z-10 select-none">
+                <div className="space-y-12">
                     {/* Logo Section */}
                     <div className="flex items-center gap-5 mb-2 animate-in fade-in slide-in-from-left-8 duration-700">
                         <ProErpLogo className="w-16 h-16" />
                         <div className="flex flex-col">
                             <h1 className="text-4xl font-black tracking-tight flex items-center">
-                                PRO<span className="text-[#38bdf8]">ERP</span>
+                                PRO<span className="text-[#0062ff]">ERP</span>
                             </h1>
-                            <div className="w-48 h-[1px] bg-gradient-to-r from-blue-500 to-transparent my-1"></div>
-                            <span className="text-[10px] uppercase tracking-[0.25em] text-[#38bdf8] font-bold">Biznesingiz uchun oson boshqaruv</span>
+                            <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-slate-400 font-semibold mt-1">
+                                <div className="w-5 h-[1px] bg-slate-700"></div>
+                                <span>Biznesni oson boshqaruv</span>
+                                <div className="w-5 h-[1px] bg-slate-700"></div>
+                            </div>
                         </div>
                     </div>
 
                     {/* Main Tagline */}
-                    <h2 className="text-4xl xl:text-5xl font-bold leading-tight mt-12 mb-12 animate-in fade-in slide-in-from-left-8 duration-1000 delay-150">
-                        Korxonangizni raqamli kelajakka <span className="text-[#38bdf8] drop-shadow-[0_0_15px_rgba(56,189,248,0.6)] font-black">biz bilan</span> olib boring.
+                    <h2 className="text-4xl xl:text-5xl font-extrabold leading-tight mt-12 animate-in fade-in slide-in-from-left-8 duration-1000 delay-150 max-w-lg">
+                        Korxonangizni raqamli <span className="text-[#00d2ff] drop-shadow-[0_0_15px_rgba(0,210,255,0.4)] font-black">kelajakka</span> biz bilan olib chiqing
                     </h2>
 
-                    {/* Features Grid */}
-                    <div className="grid grid-cols-2 gap-8 xl:gap-10 animate-in fade-in slide-in-from-left-8 duration-1000 delay-300">
-                        <div className="flex items-center gap-4 group">
-                            <div className="w-12 h-12 rounded-full flex items-center justify-center bg-blue-500/10 border border-blue-500/25 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.15)] group-hover:bg-blue-500 group-hover:text-white transition-all duration-300">
-                                <BarChart3 size={20} />
-                            </div>
-                            <p className="text-sm text-gray-300 font-semibold leading-snug">Barcha jarayonlar <br/> bir platformada</p>
-                        </div>
-                        <div className="flex items-center gap-4 group">
-                            <div className="w-12 h-12 rounded-full flex items-center justify-center bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.15)] group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300">
-                                <Zap size={20} />
-                            </div>
-                            <p className="text-sm text-gray-300 font-semibold leading-snug">Tezkor va samarali <br/> ishlash</p>
-                        </div>
-                        <div className="flex items-center gap-4 group">
-                            <div className="w-12 h-12 rounded-full flex items-center justify-center bg-purple-500/10 border border-purple-500/25 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.15)] group-hover:bg-purple-500 group-hover:text-white transition-all duration-300">
-                                <Shield size={20} />
-                            </div>
-                            <p className="text-sm text-gray-300 font-semibold leading-snug">Xavfsiz va ishonchli <br/> ma'lumotlar</p>
-                        </div>
-                        <div className="flex items-center gap-4 group">
-                            <div className="w-12 h-12 rounded-full flex items-center justify-center bg-amber-500/10 border border-amber-500/25 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.15)] group-hover:bg-amber-500 group-hover:text-white transition-all duration-300">
-                                <Users size={20} />
-                            </div>
-                            <p className="text-sm text-gray-300 font-semibold leading-snug">Jamoa bilan qulay <br/> hamkorlik</p>
-                        </div>
+                    {/* Paragraph description */}
+                    <p className="text-slate-400 text-sm leading-relaxed max-w-md font-medium animate-in fade-in slide-in-from-left-8 duration-1000 delay-250">
+                        PROERP – korxonalarni yagona platformada boshqarish, jarayonlarni avtomatlashtirish va samaradorlikni oshirish uchun zamonaviy ERP yechimi.
+                    </p>
+
+                    {/* 5 Horizontal Hexagon Features */}
+                    <div className="flex items-center gap-8 xl:gap-10 pt-4 animate-in fade-in slide-in-from-left-8 duration-1000 delay-350">
+                        <HexagonFeature icon={Boxes} label="Integratsiya" />
+                        <HexagonFeature icon={BarChart3} label="Analitika" />
+                        <HexagonFeature icon={ShieldCheck} label="Xavfsizlik" />
+                        <HexagonFeature icon={Gauge} label="Samaradorlik" />
+                        <HexagonFeature icon={Cloud} label="Bulutli yechim" />
                     </div>
                 </div>
 
-                {/* Highly Realistic 3D Laptop/Dashboard Mockup */}
-                <div className="relative mt-8 w-full max-w-lg mx-auto animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500">
-                    <img 
-                        src="/dashboard_mockup.png" 
-                        alt="PROERP Dashboard" 
-                        className="w-full h-auto object-contain filter drop-shadow-[0_20px_50px_rgba(30,58,138,0.5)] transition-transform duration-700 hover:scale-[1.02]" 
-                    />
+                {/* Left Column bottom security card */}
+                <div className="bg-[#0b1429]/40 border border-slate-800/60 rounded-2xl p-5 flex items-start gap-4 max-w-md animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-500">
+                    <div className="p-2.5 bg-blue-500/10 rounded-xl text-[#0062ff] shrink-0">
+                        <ShieldCheck size={24} />
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                        <h4 className="text-sm font-bold text-white">Ma'lumotlaringiz biz uchun muhim</h4>
+                        <p className="text-xs text-slate-400 leading-normal font-medium">Yuqori darajadagi xavfsizlik va ishonchlilik kafolatlanadi.</p>
+                    </div>
                 </div>
             </div>
 
@@ -207,63 +220,50 @@ const Login = () => {
                 <div className="absolute top-8 left-8 lg:hidden flex items-center gap-3">
                     <ProErpLogo className="w-10 h-10" />
                     <h1 className="text-2xl font-black tracking-tight flex items-center">
-                        PRO<span className="text-[#38bdf8]">ERP</span>
+                        PRO<span className="text-[#0062ff]">ERP</span>
                     </h1>
                 </div>
 
-                <div className="w-full max-w-[460px] relative">
-                    {/* Glowing outer box effect */}
-                    <div className="absolute -inset-1.5 bg-gradient-to-r from-blue-500/30 to-cyan-400/30 rounded-[2.5rem] blur opacity-45"></div>
-                    
+                <div className="w-full max-w-[460px] relative mt-12 lg:mt-0">
                     {/* Glassmorphic Login Card */}
-                    <div className="bg-[#090d1a]/85 backdrop-blur-2xl border border-[#38bdf8]/40 rounded-[2.5rem] shadow-[0_0_50px_rgba(0,0,0,0.85)] p-8 sm:p-10 animate-in zoom-in-95 duration-500 relative overflow-hidden">
+                    <div className="bg-[#090f1d]/90 backdrop-blur-2xl border border-slate-800/80 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.8)] p-8 sm:p-10 animate-in zoom-in-95 duration-500 relative">
                         
-                        {/* Interactive operations team arch header */}
-                        <div className="rounded-[2.5rem_2.5rem_8rem_8rem] border border-[#00f2fe]/40 overflow-hidden relative w-full h-40 mb-6 bg-slate-950">
-                            <img 
-                                src="/login_arch_team.png" 
-                                alt="Operations team" 
-                                className="w-full h-full object-cover filter brightness-[0.9] contrast-[1.05]" 
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#090d1a] via-[#090d1a]/15 to-transparent"></div>
-                            {/* Glowing cyber cyan frame */}
-                            <div className="absolute inset-0 border-2 border-cyan-400/30 rounded-[2.5rem_2.5rem_8rem_8rem] pointer-events-none"></div>
-                        </div>
-
-                        <div className="text-center mb-6">
-                            <h3 className="text-3xl font-bold text-white mb-2 tracking-tight">Xush kelibsiz!</h3>
+                        <div className="mb-8">
+                            <h3 className="text-3xl font-bold text-white mb-2 tracking-tight">Tizimga kirish</h3>
                             <p className="text-xs text-gray-400">Hisobingizga kirish uchun ma'lumotlaringizni kiriting</p>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-5">
-                            {/* Username input */}
-                            <div className="space-y-1">
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            {/* Username field */}
+                            <div className="space-y-2">
+                                <label className="text-xs text-slate-400 font-semibold block">Foydalanuvchi nomi yoki email</label>
                                 <div className="relative group">
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-[#00f2fe] transition-colors">
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-[#0062ff] transition-colors">
                                         <User size={18} />
                                     </div>
                                     <input
                                         required
                                         type="text"
-                                        placeholder="Foydalanuvchi nomi"
-                                        className="w-full bg-[#0d162d] border border-slate-700/60 rounded-xl py-3.5 pl-11 pr-4 text-white placeholder:text-slate-500 outline-none focus:border-[#00f2fe] focus:bg-[#0e1935] focus:ring-1 focus:ring-[#00f2fe]/20 transition-all font-medium text-sm"
+                                        placeholder="Foydalanuvchi nomi yoki email"
+                                        className="w-full bg-[#050b14] border border-slate-800 rounded-xl py-3.5 pl-11 pr-4 text-white placeholder:text-slate-600 outline-none focus:border-[#0062ff] focus:bg-[#070f1c] focus:ring-1 focus:ring-[#0062ff]/20 transition-all font-medium text-sm"
                                         value={username}
                                         onChange={(e) => setUsername(e.target.value)}
                                     />
                                 </div>
                             </div>
 
-                            {/* Password input */}
-                            <div className="space-y-1">
+                            {/* Password field */}
+                            <div className="space-y-2">
+                                <label className="text-xs text-slate-400 font-semibold block">Parol</label>
                                 <div className="relative group">
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-[#00f2fe] transition-colors">
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-[#0062ff] transition-colors">
                                         <Lock size={18} />
                                     </div>
                                     <input
                                         required
                                         type={showPassword ? "text" : "password"}
-                                        placeholder="Parol"
-                                        className="w-full bg-[#0d162d] border border-slate-700/60 rounded-xl py-3.5 pl-11 pr-11 text-white placeholder:text-slate-500 outline-none focus:border-[#00f2fe] focus:bg-[#0e1935] focus:ring-1 focus:ring-[#00f2fe]/20 transition-all font-medium text-sm"
+                                        placeholder="Parolni kiriting"
+                                        className="w-full bg-[#050b14] border border-slate-800 rounded-xl py-3.5 pl-11 pr-11 text-white placeholder:text-slate-600 outline-none focus:border-[#0062ff] focus:bg-[#070f1c] focus:ring-1 focus:ring-[#0062ff]/20 transition-all font-medium text-sm"
                                         value={code}
                                         onChange={(e) => setCode(e.target.value)}
                                     />
@@ -288,8 +288,8 @@ const Login = () => {
                             <div className="flex items-center justify-between pt-1">
                                 <label className="flex items-center gap-2.5 cursor-pointer group">
                                     <div className="relative flex items-center justify-center">
-                                        <input type="checkbox" className="peer sr-only" defaultChecked />
-                                        <div className="w-4.5 h-4.5 bg-[#0d162d] border border-slate-600 rounded group-hover:border-[#00f2fe] transition-all peer-checked:bg-[#0072ff] peer-checked:border-[#0072ff]"></div>
+                                        <input type="checkbox" className="peer sr-only" />
+                                        <div className="w-4.5 h-4.5 bg-[#050b14] border border-slate-800 rounded group-hover:border-[#0062ff] transition-all peer-checked:bg-[#0062ff] peer-checked:border-[#0062ff]"></div>
                                         <svg className="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                                             <polyline points="20 6 9 17 4 12"></polyline>
                                         </svg>
@@ -301,7 +301,7 @@ const Login = () => {
                                     onClick={() => setShowForgotModal(true)}
                                     className="text-xs text-blue-400 hover:text-blue-300 transition-colors hover:underline decoration-blue-500/30 underline-offset-4"
                                 >
-                                    Parolni unutdingiz?
+                                    Parolni unutdingizmi?
                                 </button>
                             </div>
 
@@ -309,41 +309,58 @@ const Login = () => {
                             <button
                                 disabled={loading}
                                 type="submit"
-                                className="w-full bg-gradient-to-r from-[#00c6ff] to-[#0072ff] hover:from-[#00f2fe] hover:to-[#00c6ff] text-white font-bold text-base py-3.5 rounded-xl shadow-[0_0_20px_rgba(0,198,255,0.35)] hover:shadow-[0_0_30px_rgba(0,198,255,0.55)] transition-all flex items-center justify-center gap-2.5 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-2"
+                                className="w-full bg-[#0062ff] hover:bg-[#0052d4] text-white font-semibold text-sm py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-2"
                             >
                                 {loading ? (
                                     <Activity size={20} className="animate-spin text-white/70" />
                                 ) : (
                                     <>
-                                        <LogIn size={18} />
                                         <span>Kirish</span>
+                                        <LogIn size={16} />
                                     </>
                                 )}
                             </button>
                             
                             {/* "yoki" divider */}
                             <div className="flex items-center gap-3 my-4 opacity-50">
-                                <div className="h-px bg-slate-700 flex-1"></div>
+                                <div className="h-px bg-slate-800 flex-1"></div>
                                 <span className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold">yoki</span>
-                                <div className="h-px bg-slate-700 flex-1"></div>
+                                <div className="h-px bg-slate-800 flex-1"></div>
                             </div>
 
                             {/* SSO button */}
                             <button
                                 type="button"
-                                className="w-full bg-[#0d162d]/40 hover:bg-[#0d162d] border border-slate-700/60 text-slate-300 hover:text-white font-medium py-3 rounded-xl transition-all flex items-center justify-center gap-2.5 active:scale-[0.98] text-xs"
+                                className="w-full bg-transparent hover:bg-slate-900 border border-[#0062ff]/30 hover:border-[#0062ff]/60 text-[#0062ff] hover:text-blue-400 font-semibold py-3 rounded-xl transition-all flex items-center justify-center gap-2 text-xs"
                             >
-                                <ShieldCheck size={16} className="text-blue-400" />
-                                <span>Single Sign-On (SSO)</span>
+                                <ShieldCheck size={16} />
+                                <span>SSO orqali kirish</span>
                             </button>
                         </form>
-                    </div>
 
-                    {/* Footer text */}
-                    <div className="mt-6 flex items-center justify-center gap-2 text-slate-500 text-xs">
-                        <Lock size={12} className="text-slate-600" />
-                        <span>Ma'lumotlaringiz xavfsiz himoyalangan</span>
+                        {/* Prompt for non-user */}
+                        <p className="text-center text-xs text-slate-400 mt-6 font-medium">
+                            PROERP foydalanuvchisi emasmisiz?{" "}
+                            <a href="mailto:info@proerp.uz" className="text-[#0062ff] hover:underline font-semibold ml-1">
+                                Administrator bilan bog'laning
+                            </a>
+                        </p>
                     </div>
+                </div>
+            </div>
+
+            {/* Global Footer */}
+            <div className="absolute bottom-0 left-0 right-0 p-8 flex flex-col sm:flex-row items-center justify-between border-t border-slate-900 bg-[#020617]/50 backdrop-blur-md text-xs text-slate-400 font-medium z-10">
+                <p>© 2024 PROERP. Barcha huquqlar himoyalangan.</p>
+                <div className="flex items-center gap-6 mt-4 sm:mt-0">
+                    <div className="flex items-center gap-2 select-none">
+                        <Headphones size={14} className="text-[#0062ff]" />
+                        <span>Qo'llab-quvvatlash</span>
+                    </div>
+                    <a href="mailto:info@proerp.uz" className="flex items-center gap-2 hover:text-white transition-colors">
+                        <Mail size={14} />
+                        <span>info@proerp.uz</span>
+                    </a>
                 </div>
             </div>
 
