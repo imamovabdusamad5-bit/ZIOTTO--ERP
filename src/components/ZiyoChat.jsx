@@ -8,7 +8,7 @@ const ZiyoChat = () => {
     const [messages, setMessages] = useState(() => {
         const saved = localStorage.getItem('ziyo_chat_history');
         return saved ? JSON.parse(saved) : [
-            { id: 1, text: "Assalomu alaykum! Men Ziyo - Ziotto tizimining aqlli yordamchisiman. Ombor holatini bilish uchun 'Omborda nima kam?' deb yozishingiz mumkin.", sender: 'bot', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
+            { id: 1, text: "Assalomu alaykum! Men Ziyo - PRO ERP tizimining aqlli yordamchisiman. Ombor holatini bilish uchun 'Omborda nima kam?' deb yozishingiz mumkin.", sender: 'bot', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
         ];
     });
     const [input, setInput] = useState('');

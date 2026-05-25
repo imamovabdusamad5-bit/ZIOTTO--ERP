@@ -92,10 +92,12 @@ const Sidebar = ({ isOpen, onClose }) => {
         <div className={`fixed left-0 top-0 h-[100dvh] bg-[var(--bg-sidebar)] text-[var(--text-secondary)] flex flex-col shadow-xl z-[70] transition-all duration-300 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 w-64 border-r border-[var(--border-sidebar)]`}>
             <div className="p-6 border-b border-[var(--border-sidebar)] flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center">
-                        <Shirt className="text-white w-5 h-5" />
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+                        <span className="text-white font-black text-xl italic pr-0.5">P</span>
                     </div>
-                    <h1 className="text-xl font-black bg-[#fbbf24] text-[#0d4745] px-3 py-1 rounded-lg tracking-tighter">ZIOTTO</h1>
+                    <h1 className="text-2xl font-black text-[var(--text-primary)] tracking-tighter flex items-center">
+                        PRO<span className="text-blue-500">ERP</span>
+                    </h1>
                 </div>
                 <button
                     onClick={onClose}

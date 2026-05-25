@@ -122,8 +122,8 @@ const Layout = () => {
                         >
                             <Menu size={28} />
                         </button>
-                        <h2 className="text-lg md:text-xl font-black text-[var(--text-primary)] tracking-tight uppercase">
-                            Ziotto <span className="text-indigo-500">ERP</span>
+                        <h2 className="text-lg md:text-xl font-black text-[var(--text-primary)] tracking-tight flex items-center">
+                            PRO<span className="text-blue-500 ml-1">ERP</span>
                         </h2>
                     </div>
                     <div className="flex items-center gap-4">
