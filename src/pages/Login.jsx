@@ -7,40 +7,6 @@ import {
     CircleAlert
 } from 'lucide-react';
 
-const ProErpLogo = () => (
-    <svg className="filter drop-shadow-[0_0_20px_rgba(56,189,248,0.7)] shrink-0" viewBox="0 0 100 100" fill="none" width="85" height="85" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-            <linearGradient id="logoBlue" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#00f2fe" />
-                <stop offset="100%" stopColor="#0072ff" />
-            </linearGradient>
-            <linearGradient id="logoCyan" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#38bdf8" />
-                <stop offset="100%" stopColor="#0369a1" />
-            </linearGradient>
-            <linearGradient id="logoDark" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#0b2545" />
-                <stop offset="100%" stopColor="#1e3a8a" />
-            </linearGradient>
-        </defs>
-        <g strokeLinejoin="round" strokeLinecap="round">
-            {/* Left face */}
-            <path d="M15 30 L45 13 L45 87 L15 70 Z" fill="url(#logoDark)" />
-            {/* Top Right face */}
-            <path d="M45 13 L85 36 L85 53 L70 61 L70 45 L45 31 Z" fill="url(#logoBlue)" />
-            {/* Bottom Right face */}
-            <path d="M70 61 L85 53 L85 70 L45 93 L15 76 L30 67 L45 76 Z" fill="url(#logoCyan)" />
-            {/* Center P Inner loop */}
-            <path d="M45 31 L70 45 L70 61 L45 76 L30 67 L30 51 L45 60 L45 42 M45 42 L30 34 Z" fill="url(#logoBlue)" opacity="0.9" />
-            {/* Highlights */}
-            <path d="M45 13 L85 36" stroke="#ffffff" strokeWidth="2" opacity="0.8" />
-            <path d="M15 30 L45 13" stroke="#ffffff" strokeWidth="2" opacity="0.7" />
-            <path d="M45 93 L85 70" stroke="#00f2fe" strokeWidth="2" opacity="0.8" />
-            <path d="M15 76 L45 93" stroke="#00f2fe" strokeWidth="1.5" opacity="0.6" />
-        </g>
-    </svg>
-);
-
 const Login = () => {
     const [username, setUsername] = useState('');
     const [code, setCode] = useState('');
@@ -68,27 +34,39 @@ const Login = () => {
 
     return (
         <div className="login-page-container">
-            {/* Direct Injection of User's Exact Custom CSS Styles (V2) */}
+            {/* Direct Injection of User's Exact Custom CSS Styles (V3 with Imgur Logo) */}
             <style dangerouslySetInnerHTML={{__html: `
                 .login-page-container {
                     width: 100%;
                     height: 100vh;
-                    background: radial-gradient(circle at top left, #0f172a, #020617 45%), radial-gradient(circle at bottom right, #0b1120, #020617 50%);
+                    background: #020617;
                     color: white;
                     overflow: hidden;
                     font-family: 'Inter', sans-serif;
                 }
 
+                html, body {
+                    width: 100%;
+                    height: 100%;
+                    overflow: hidden;
+                }
+
+                .login-page-container {
+                    background:
+                    radial-gradient(circle at top left, #0f172a, #020617 45%),
+                    radial-gradient(circle at bottom right, #111827, #020617 50%);
+                }
+
                 .container {
                     width: 100%;
-                    height: 100vh;
+                    min-height: 100vh;
                     display: flex;
                 }
 
-                /* LEFT SIDE */
+                /* LEFT */
                 .left {
-                    width: 58%;
-                    padding: 70px 80px;
+                    width: 60%;
+                    padding: 60px 70px;
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
@@ -99,7 +77,13 @@ const Login = () => {
                     display: flex;
                     align-items: center;
                     gap: 18px;
-                    margin-bottom: 50px;
+                    margin-bottom: 45px;
+                }
+
+                .logo img {
+                    width: 85px;
+                    height: 85px;
+                    object-fit: contain;
                 }
 
                 .logo-text h1 {
@@ -114,16 +98,16 @@ const Login = () => {
 
                 .logo-text p {
                     color: #94a3b8;
-                    font-size: 13px;
-                    letter-spacing: 3px;
                     margin-top: 8px;
+                    font-size: 12px;
+                    letter-spacing: 3px;
                 }
 
                 .title {
-                    font-size: 68px;
+                    font-size: 72px;
                     font-weight: 800;
-                    line-height: 1.15;
-                    max-width: 700px;
+                    line-height: 1.1;
+                    max-width: 820px;
                 }
 
                 .title span {
@@ -132,92 +116,93 @@ const Login = () => {
 
                 .description {
                     margin-top: 35px;
-                    max-width: 620px;
+                    max-width: 650px;
                     color: #94a3b8;
-                    font-size: 19px;
+                    font-size: 18px;
                     line-height: 1.8;
                 }
 
                 /* FEATURES */
                 .features {
                     display: flex;
-                    gap: 20px;
+                    gap: 22px;
                     margin-top: 55px;
                     flex-wrap: wrap;
                 }
 
                 .feature-box {
-                    width: 180px;
-                    height: 130px;
-                    border-radius: 22px;
+                    width: 190px;
+                    height: 135px;
                     background: rgba(255, 255, 255, 0.03);
                     border: 1px solid rgba(255, 255, 255, 0.08);
+                    border-radius: 24px;
                     backdrop-filter: blur(20px);
                     padding: 22px;
-                    transition: .35s;
+                    transition: .3s;
                 }
 
                 .feature-box:hover {
-                    transform: translateY(-6px);
-                    border-color: #2ea8ff;
-                    box-shadow: 0 0 25px rgba(46, 168, 255, .25);
+                    transform: translateY(-5px);
+                    border-color: #38bdf8;
+                    box-shadow: 0 0 20px rgba(56, 189, 248, .25);
                 }
 
-                .feature-icon {
-                    width: 50px;
-                    height: 50px;
-                    border-radius: 14px;
-                    background: linear-gradient(135deg, #2563eb, #38bdf8);
+                .icon {
+                    width: 54px;
+                    height: 54px;
+                    border-radius: 16px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     font-size: 24px;
+                    background: linear-gradient(135deg, #2563eb, #38bdf8);
                 }
 
                 .feature-box h3 {
-                    margin-top: 18px;
-                    font-size: 20px;
+                    margin-top: 16px;
+                    font-size: 21px;
                     font-weight: 700;
                 }
 
                 .feature-box p {
-                    margin-top: 8px;
+                    margin-top: 7px;
                     color: #94a3b8;
                     font-size: 14px;
                 }
 
-                /* RIGHT SIDE */
+                /* RIGHT */
                 .right {
-                    width: 42%;
+                    width: 40%;
                     display: flex;
                     justify-content: center;
                     align-items: center;
+                    padding-right: 70px;
                     position: relative;
                 }
 
-                /* GLOW EFFECT */
+                /* GLOW */
                 .right::before {
                     content: '';
                     position: absolute;
-                    width: 450px;
-                    height: 450px;
+                    width: 500px;
+                    height: 500px;
                     background: #2563eb;
                     filter: blur(160px);
-                    opacity: .18;
+                    opacity: .15;
                     pointer-events: none;
                 }
 
                 /* LOGIN CARD */
                 .login-card {
-                    width: 480px;
+                    width: 470px;
                     padding: 50px;
                     border-radius: 32px;
                     background: rgba(255, 255, 255, 0.04);
                     border: 1px solid rgba(255, 255, 255, 0.08);
                     backdrop-filter: blur(30px);
+                    box-shadow: 0 0 40px rgba(0, 0, 0, .45), inset 0 0 0 1px rgba(255, 255, 255, .02);
                     position: relative;
                     z-index: 10;
-                    box-shadow: 0 0 40px rgba(0, 0, 0, .45), inset 0 0 0 1px rgba(255, 255, 255, .02);
                 }
 
                 .login-card h2 {
@@ -226,10 +211,10 @@ const Login = () => {
                     font-weight: 800;
                 }
 
-                .login-card .sub {
+                .sub {
                     color: #94a3b8;
+                    font-size: 15px;
                     margin-bottom: 35px;
-                    font-size: 16px;
                 }
 
                 /* INPUT GROUP */
@@ -248,7 +233,7 @@ const Login = () => {
                 .input-group input {
                     width: 100%;
                     height: 62px;
-                    border-radius: 16px;
+                    border-radius: 18px;
                     border: 1px solid rgba(255, 255, 255, 0.08);
                     background: #0f172a;
                     padding: 0 18px;
@@ -260,7 +245,7 @@ const Login = () => {
 
                 .input-group input:focus {
                     border-color: #38bdf8;
-                    box-shadow: 0 0 18px rgba(56, 189, 248, .25);
+                    box-shadow: 0 0 20px rgba(56, 189, 248, .25);
                 }
 
                 /* BUTTON */
@@ -269,12 +254,12 @@ const Login = () => {
                     height: 62px;
                     border: none;
                     border-radius: 18px;
-                    margin-top: 10px;
                     background: linear-gradient(90deg, #2563eb, #38bdf8);
                     color: white;
-                    font-size: 20px;
+                    font-size: 19px;
                     font-weight: 700;
                     cursor: pointer;
+                    margin-top: 10px;
                     transition: .3s;
                     display: flex;
                     align-items: center;
@@ -284,7 +269,7 @@ const Login = () => {
 
                 .login-btn:hover {
                     transform: translateY(-2px);
-                    box-shadow: 0 0 25px rgba(56, 189, 248, .35);
+                    box-shadow: 0 0 22px rgba(56, 189, 248, .35);
                 }
 
                 .login-btn:disabled {
@@ -325,8 +310,8 @@ const Login = () => {
                 .footer {
                     margin-top: 40px;
                     text-align: center;
-                    color: #64748b;
                     font-size: 13px;
+                    color: #64748b;
                 }
 
                 .error-alert {
@@ -364,12 +349,17 @@ const Login = () => {
                         padding: 50px 35px;
                     }
 
+                    .right {
+                        padding: 40px 20px;
+                    }
+
                     .title {
-                        font-size: 48px;
+                        font-size: 50px;
                     }
 
                     .login-card {
-                        width: 90%;
+                        width: 100%;
+                        max-width: 500px;
                         margin: 40px auto;
                         padding: 30px;
                     }
@@ -381,8 +371,8 @@ const Login = () => {
                 {/* LEFT */}
                 <div className="left">
                     <div className="logo">
-                        {/* High-visibility native vector 3D hexagon logo */}
-                        <ProErpLogo />
+                        {/* Perfect glowing high-res Imgur Logo exactly as provided */}
+                        <img src="https://i.imgur.com/8Km9tLL.png" alt="PROERP Logo" className="shrink-0" />
 
                         <div className="logo-text">
                             <h1>PRO<span>ERP</span></h1>
@@ -402,25 +392,25 @@ const Login = () => {
 
                     <div className="features">
                         <div className="feature-box">
-                            <div className="feature-icon">📦</div>
+                            <div className="icon">📦</div>
                             <h3>Ombor</h3>
                             <p>Mato va aksessuar nazorati</p>
                         </div>
 
                         <div className="feature-box">
-                            <div className="feature-icon">👥</div>
+                            <div className="icon">👥</div>
                             <h3>HRM</h3>
                             <p>Xodimlar boshqaruvi</p>
                         </div>
 
                         <div className="feature-box">
-                            <div className="feature-icon">📊</div>
+                            <div className="icon">📊</div>
                             <h3>Analitika</h3>
                             <p>Real vaqt statistikasi</p>
                         </div>
 
                         <div className="feature-box">
-                            <div className="feature-icon">🔒</div>
+                            <div className="icon">🔒</div>
                             <h3>Xavfsizlik</h3>
                             <p>Himoyalangan tizim</p>
                         </div>
