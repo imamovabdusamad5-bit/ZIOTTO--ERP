@@ -87,7 +87,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             <div className="p-6 border-b border-[var(--border-sidebar)] flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <svg 
-                        className="w-9 h-9 filter drop-shadow-[0_0_12px_rgba(56,189,248,0.7)] shrink-0 animate-pulse" 
+                        className="w-9 h-9 filter drop-shadow-[0_0_10px_rgba(0,198,255,0.7)] shrink-0 animate-pulse" 
                         viewBox="0 0 100 100" 
                         fill="none" 
                         width="36" 
@@ -95,44 +95,52 @@ const Sidebar = ({ isOpen, onClose }) => {
                         xmlns="http://www.w3.org/2000/svg"
                     >
                         <defs>
-                            <linearGradient id="glowBlueMini" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <linearGradient id="pBlueMini" x1="0%" y1="0%" x2="100%" y2="100%">
                                 <stop offset="0%" stopColor="#00f2fe" />
-                                <stop offset="100%" stopColor="#0072ff" />
+                                <stop offset="50%" stopColor="#00c6ff" />
+                                <stop offset="100%" stopColor="#0062ff" />
                             </linearGradient>
-                            <linearGradient id="glowCyanMini" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stopColor="#38bdf8" />
-                                <stop offset="100%" stopColor="#0369a1" />
+                            <linearGradient id="pCyanMini" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stopColor="#00f2fe" />
+                                <stop offset="100%" stopColor="#0099ff" />
                             </linearGradient>
-                            <linearGradient id="glowDarkBlueMini" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stopColor="#0052d4" />
-                                <stop offset="50%" stopColor="#4364f7" />
-                                <stop offset="100%" stopColor="#6fb1fc" />
+                            <linearGradient id="pDarkMini" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stopColor="#0a1d37" />
+                                <stop offset="100%" stopColor="#020815" />
+                            </linearGradient>
+                            <linearGradient id="pBevelMini" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.75" />
+                                <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
                             </linearGradient>
                         </defs>
                         <g strokeLinejoin="round" strokeLinecap="round">
-                            {/* Left Stem Face 1 */}
-                            <path d="M20 30 L32 23 L32 77 L20 70 Z" fill="#0b2545" opacity="0.95" />
-                            {/* Left Stem Face 2 */}
-                            <path d="M32 23 L44 30 L44 70 L32 77 Z" fill="url(#glowDarkBlueMini)" />
+                            {/* Back Bezel/Dark Shadow Plate */}
+                            <path d="M22 65 L22 35 L48 20 L78 37 L78 57 L48 74 Z" fill="url(#pDarkMini)" />
                             
-                            {/* Top Chevron loop */}
-                            <path d="M44 30 L80 44 L68 53 L44 40 Z" fill="url(#glowBlueMini)" />
-                            <path d="M80 44 L80 56 L68 65 L68 53 Z" fill="url(#glowCyanMini)" />
-                            <path d="M44 40 L68 53 L56 61 L32 47 Z" fill="url(#glowDarkBlueMini)" />
+                            {/* Outer Left Vertical Column */}
+                            <path d="M22 35 L34 28 L34 78 L22 85 Z" fill="url(#pBlueMini)" />
                             
-                            {/* Bottom loop */}
-                            <path d="M32 60 L56 74 L80 60 L68 53 L56 61 L32 47 Z" fill="url(#glowBlueMini)" opacity="0.8" />
-                            <path d="M32 77 L56 90 L80 76 L80 60 L56 74 L32 60 Z" fill="url(#glowDarkBlueMini)" />
+                            {/* Glossy Upper Ribbon Loop forming the curve of P */}
+                            <path d="M34 28 L58 14 L82 28 L82 52 L58 66 L58 48 L70 41 L70 35 L58 28 L34 42 Z" fill="url(#pCyanMini)" />
+                            
+                            {/* Inner Volumetric Stem face */}
+                            <path d="M46 42 L58 35 L58 85 L46 92 Z" fill="url(#pBlueMini)" />
+                            
+                            {/* Chrome Bevel Highlights */}
+                            <path d="M34 42 L58 28 L58 35 L34 49 Z" fill="url(#pBevelMini)" opacity="0.55" />
+                            <path d="M58 48 L70 41 L70 47 L58 54 Z" fill="url(#pBevelMini)" opacity="0.45" />
+                            <path d="M58 66 L82 52 L82 58 L58 72 Z" fill="url(#pDarkMini)" opacity="0.6" />
+                            <path d="M34 49 L58 35 L70 42 L70 54 L58 61 L34 75 Z" fill="url(#pCyanMini)" opacity="0.8" />
 
-                            {/* Highlights */}
-                            <path d="M32 23 L44 30" stroke="#ffffff" strokeWidth="1.5" opacity="0.6" />
-                            <path d="M44 30 L80 44" stroke="#ffffff" strokeWidth="1.5" opacity="0.7" />
-                            <path d="M32 23 L32 77" stroke="#ffffff" strokeWidth="1" opacity="0.5" />
-                            <path d="M56 90 L80 76" stroke="#00f2fe" strokeWidth="1.5" opacity="0.8" />
+                            {/* Bright Edge Lines for Glossiness */}
+                            <path d="M58 14 L82 28" stroke="#ffffff" strokeWidth="1.75" opacity="0.75" />
+                            <path d="M34 28 L58 14" stroke="#ffffff" strokeWidth="1.75" opacity="0.85" />
+                            <path d="M22 35 L34 28" stroke="#ffffff" strokeWidth="1.5" opacity="0.7" />
+                            <path d="M58 85 L46 92" stroke="#00f2fe" strokeWidth="1.75" opacity="0.9" />
                         </g>
                     </svg>
-                    <h1 className="text-2xl font-black text-[var(--text-primary)] tracking-tighter flex items-center">
-                        PRO<span className="text-blue-500">ERP</span>
+                    <h1 className="text-2xl font-black text-[var(--text-primary)] tracking-tighter flex items-center leading-none">
+                        PRO<span className="bg-gradient-to-r from-[#00f2fe] to-[#0062ff] bg-clip-text text-transparent ml-0.5">ERP</span>
                     </h1>
                 </div>
                 <button

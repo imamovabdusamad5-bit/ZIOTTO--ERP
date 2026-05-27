@@ -18,7 +18,7 @@ import {
 
 const ProErpLogo = ({ className = "w-20 h-20" }) => (
     <svg 
-        className={`${className} filter drop-shadow-[0_0_25px_rgba(56,189,248,0.85)] shrink-0`} 
+        className={`${className} filter drop-shadow-[0_0_20px_rgba(0,198,255,0.75)] shrink-0`} 
         viewBox="0 0 100 100" 
         fill="none" 
         width="85" 
@@ -26,40 +26,50 @@ const ProErpLogo = ({ className = "w-20 h-20" }) => (
         xmlns="http://www.w3.org/2000/svg"
     >
         <defs>
-            <linearGradient id="glowBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id="pBlue" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#00f2fe" />
-                <stop offset="100%" stopColor="#0072ff" />
+                <stop offset="50%" stopColor="#00c6ff" />
+                <stop offset="100%" stopColor="#0062ff" />
             </linearGradient>
-            <linearGradient id="glowCyan" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#38bdf8" />
-                <stop offset="100%" stopColor="#0369a1" />
+            <linearGradient id="pCyan" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#00f2fe" />
+                <stop offset="100%" stopColor="#0099ff" />
             </linearGradient>
-            <linearGradient id="glowDarkBlue" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#0052d4" />
-                <stop offset="50%" stopColor="#4364f7" />
-                <stop offset="100%" stopColor="#6fb1fc" />
+            <linearGradient id="pDark" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#0a1d37" />
+                <stop offset="100%" stopColor="#020815" />
+            </linearGradient>
+            <linearGradient id="pBevel" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.75" />
+                <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
             </linearGradient>
         </defs>
+        
+        {/* Volumetric 3D Hexagonal "P" Ribbon Icon */}
         <g strokeLinejoin="round" strokeLinecap="round">
-            {/* Left Stem Face 1 */}
-            <path d="M20 30 L32 23 L32 77 L20 70 Z" fill="#0b2545" opacity="0.95" />
-            {/* Left Stem Face 2 */}
-            <path d="M32 23 L44 30 L44 70 L32 77 Z" fill="url(#glowDarkBlue)" />
+            {/* Back Bezel/Dark Shadow Plate */}
+            <path d="M22 65 L22 35 L48 20 L78 37 L78 57 L48 74 Z" fill="url(#pDark)" />
             
-            {/* Top Chevron loop */}
-            <path d="M44 30 L80 44 L68 53 L44 40 Z" fill="url(#glowBlue)" />
-            <path d="M80 44 L80 56 L68 65 L68 53 Z" fill="url(#glowCyan)" />
-            <path d="M44 40 L68 53 L56 61 L32 47 Z" fill="url(#glowDarkBlue)" />
+            {/* Outer Left Vertical Column of Hexagon */}
+            <path d="M22 35 L34 28 L34 78 L22 85 Z" fill="url(#pBlue)" />
             
-            {/* Bottom loop */}
-            <path d="M32 60 L56 74 L80 60 L68 53 L56 61 L32 47 Z" fill="url(#glowBlue)" opacity="0.8" />
-            <path d="M32 77 L56 90 L80 76 L80 60 L56 74 L32 60 Z" fill="url(#glowDarkBlue)" />
+            {/* Glossy Upper Ribbon Loop forming the curve of P */}
+            <path d="M34 28 L58 14 L82 28 L82 52 L58 66 L58 48 L70 41 L70 35 L58 28 L34 42 Z" fill="url(#pCyan)" />
+            
+            {/* Inner Volumetric Stem face (diagonal cut/tail) */}
+            <path d="M46 42 L58 35 L58 85 L46 92 Z" fill="url(#pBlue)" />
+            
+            {/* Chrome Bevel Highlights */}
+            <path d="M34 42 L58 28 L58 35 L34 49 Z" fill="url(#pBevel)" opacity="0.55" />
+            <path d="M58 48 L70 41 L70 47 L58 54 Z" fill="url(#pBevel)" opacity="0.45" />
+            <path d="M58 66 L82 52 L82 58 L58 72 Z" fill="url(#pDark)" opacity="0.6" />
+            <path d="M34 49 L58 35 L70 42 L70 54 L58 61 L34 75 Z" fill="url(#pCyan)" opacity="0.8" />
 
-            {/* Highlights */}
-            <path d="M32 23 L44 30" stroke="#ffffff" strokeWidth="1.5" opacity="0.6" />
-            <path d="M44 30 L80 44" stroke="#ffffff" strokeWidth="1.5" opacity="0.7" />
-            <path d="M32 23 L32 77" stroke="#ffffff" strokeWidth="1" opacity="0.5" />
-            <path d="M56 90 L80 76" stroke="#00f2fe" strokeWidth="1.5" opacity="0.8" />
+            {/* Bright Edge Lines for Glossiness */}
+            <path d="M58 14 L82 28" stroke="#ffffff" strokeWidth="1.75" opacity="0.75" />
+            <path d="M34 28 L58 14" stroke="#ffffff" strokeWidth="1.75" opacity="0.85" />
+            <path d="M22 35 L34 28" stroke="#ffffff" strokeWidth="1.5" opacity="0.7" />
+            <path d="M58 85 L46 92" stroke="#00f2fe" strokeWidth="1.75" opacity="0.9" />
         </g>
     </svg>
 );
@@ -164,20 +174,19 @@ const Login = () => {
             <div className="w-full min-h-screen flex flex-col lg:flex-row relative z-10">
                 {/* Left Side: Branding & Features */}
                 <div className="hidden lg:flex lg:w-[56%] flex-col justify-between p-12 xl:p-16 select-none relative">
-                    {/* Header: Logo and Title */}
-                    <div className="flex items-center gap-4.5 animate-in fade-in slide-in-from-left-6 duration-700">
-                        <ProErpLogo className="w-16 h-16 shrink-0" />
+                    {/* Header: Logo and Title (Sync to new stylized logo card) */}
+                    <div className="flex items-center gap-5 animate-in fade-in slide-in-from-left-6 duration-700">
+                        <ProErpLogo className="w-18 h-18 shrink-0" />
                         <div className="flex flex-col">
-                            <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-0.5 leading-none">
-                                <span className="text-white font-extrabold">PRO</span>
-                                <span className="text-[#0062ff] font-extrabold">ERP</span>
+                            <h1 className="text-4xl xl:text-5xl font-black tracking-tight flex items-center leading-none text-white">
+                                PRO<span className="bg-gradient-to-r from-[#00f2fe] to-[#0062ff] bg-clip-text text-transparent">ERP</span>
                             </h1>
-                            <div className="flex items-center gap-1.5 mt-1.5">
-                                <span className="h-[1px] w-2 bg-slate-600" />
-                                <p className="text-[#94a3b8] uppercase tracking-[0.25em] text-[8.5px] font-semibold leading-none">
+                            <div className="flex items-center gap-2 mt-2.5">
+                                <span className="h-[2px] w-6 bg-gradient-to-r from-transparent to-[#00f2fe]" />
+                                <p className="text-white uppercase tracking-[0.25em] text-[10px] xl:text-[11px] font-bold leading-none">
                                     Biznesni oson boshqaruv
                                 </p>
-                                <span className="h-[1px] w-2 bg-slate-600" />
+                                <span className="h-[2px] w-6 bg-gradient-to-r from-[#0062ff] to-transparent" />
                             </div>
                         </div>
                     </div>
@@ -417,8 +426,8 @@ const Login = () => {
                     {/* Mobile Header Logo */}
                     <div className="absolute top-8 left-8 lg:hidden flex items-center gap-3">
                         <ProErpLogo className="w-11 h-11 shrink-0" />
-                        <h1 className="text-2xl font-black tracking-tighter flex items-center">
-                            PRO<span className="text-[#0062ff]">ERP</span>
+                        <h1 className="text-2xl font-black tracking-tighter flex items-center text-white">
+                            PRO<span className="bg-gradient-to-r from-[#00f2fe] to-[#0062ff] bg-clip-text text-transparent">ERP</span>
                         </h1>
                     </div>
 
