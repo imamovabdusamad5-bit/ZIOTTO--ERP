@@ -347,12 +347,21 @@ const Xodimlar = () => {
                                                 </button>
                                             </div>
                                         ) : (
-                                            <button
-                                                onClick={() => handleEdit(user)}
-                                                className="p-4 bg-white/5 text-gray-500 rounded-2xl hover:bg-indigo-600 hover:text-white hover:scale-110 transition-all border border-white/5"
-                                            >
-                                                <Pencil size={20} />
-                                            </button>
+                                            <div className="flex items-center justify-end gap-2">
+                                                <button
+                                                    onClick={() => setShowQrModal(user)}
+                                                    className="p-4 bg-white/5 text-gray-400 rounded-2xl hover:bg-indigo-600 hover:text-white hover:scale-110 transition-all border border-white/5"
+                                                    title="QR Kodni chop etish"
+                                                >
+                                                    <QrCode size={20} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleEdit(user)}
+                                                    className="p-4 bg-white/5 text-gray-500 rounded-2xl hover:bg-indigo-600 hover:text-white hover:scale-110 transition-all border border-white/5"
+                                                >
+                                                    <Pencil size={20} />
+                                                </button>
+                                            </div>
                                         )}
                                     </td>
                                 </tr>
@@ -421,6 +430,43 @@ const Xodimlar = () => {
                                 Xodimni Saqlash
                             </button>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {/* QR Code Modal */}
+            {showQrModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl animate-in fade-in duration-300">
+                    <div className="bg-white text-black w-full max-w-sm rounded-[2rem] p-10 shadow-2xl animate-in zoom-in-95 duration-300 relative flex flex-col items-center">
+                        <div className="absolute top-0 right-0 p-4">
+                            <button onClick={() => setShowQrModal(null)} className="text-gray-400 hover:text-black transition-colors">
+                                <X size={24} />
+                            </button>
+                        </div>
+                        <h3 className="text-xl font-black text-center mb-2 tracking-tight">{showQrModal.username}</h3>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-8">{showQrModal.department || 'Xodim'}</p>
+                        
+                        <div className="bg-gray-50 p-6 rounded-3xl border-2 border-gray-100 shadow-inner mb-8">
+                            <QRCodeCanvas 
+                                value={JSON.stringify({ id: showQrModal.id, code: showQrModal.unique_code })} 
+                                size={200}
+                                level={"H"}
+                                fgColor={"#000000"}
+                                bgColor={"#ffffff"}
+                            />
+                        </div>
+                        
+                        <div className="text-center space-y-1 mb-8">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">ID KOD</p>
+                            <p className="text-lg font-mono font-bold">{showQrModal.unique_code}</p>
+                        </div>
+
+                        <button 
+                            onClick={() => window.print()}
+                            className="w-full bg-black hover:bg-gray-800 text-white font-black py-4 rounded-2xl transition-all uppercase tracking-widest text-xs flex justify-center items-center gap-2"
+                        >
+                            <Copy size={16} /> QR Kodni Chop Etish
+                        </button>
                     </div>
                 </div>
             )}

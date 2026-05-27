@@ -345,6 +345,70 @@ const Sozlamalar = () => {
                     )}
                 </div>
 
+                {/* Integrations Section (Ultra Only) */}
+                <div className={`p-8 bg-[var(--bg-card)] rounded-[2.5rem] border ${isUltra ? 'border-[var(--border-color)]' : 'border-amber-500/30 bg-amber-500/5'} shadow-2xl relative overflow-hidden`}>
+                    {!isUltra && (
+                        <div className="absolute inset-0 z-20 bg-[var(--bg-body)]/60 backdrop-blur-[2px] flex items-center justify-center">
+                            <div className="bg-[var(--bg-card)] px-6 py-4 rounded-2xl border border-[var(--border-color)] shadow-2xl flex items-center gap-3">
+                                <Lock className="text-amber-500" size={24} />
+                                <div>
+                                    <h4 className="font-bold text-[var(--text-primary)]">Ultra Tarif</h4>
+                                    <p className="text-xs text-[var(--text-secondary)]">Telegram va SMS integratsiyalari</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    
+                    <h3 className="text-xl font-black text-[var(--text-primary)] mb-6 tracking-tight flex items-center gap-3">
+                        <MessageSquare className={isUltra ? "text-indigo-500" : "text-amber-500"} />
+                        Tashqi Integratsiyalar <span className="ml-2 text-[9px] bg-amber-500/20 text-amber-500 px-2 py-1 rounded-full uppercase tracking-widest">Ultra</span>
+                    </h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+                        <div className="p-6 bg-black/20 rounded-3xl border border-white/5 space-y-4">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-[#0088cc]/20 rounded-full flex items-center justify-center text-[#0088cc]">
+                                        <Send size={20} />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-white">Telegram Bot</h4>
+                                        <p className="text-[10px] text-gray-400">Kunlik ish haqi hisoboti</p>
+                                    </div>
+                                </div>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" className="sr-only peer" disabled={!isUltra} />
+                                    <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0088cc]"></div>
+                                </label>
+                            </div>
+                            <input 
+                                type="text" 
+                                placeholder="Bot Token (Masalan: 123456:ABC-DEF)" 
+                                disabled={!isUltra}
+                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-[#0088cc] outline-none disabled:opacity-50"
+                            />
+                        </div>
+                        
+                        <div className="p-6 bg-black/20 rounded-3xl border border-white/5 space-y-4 opacity-50">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center text-green-500">
+                                        <MessageSquare size={20} />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-white">SMS Xabarnoma</h4>
+                                        <p className="text-[10px] text-gray-400">Tez kunda</p>
+                                    </div>
+                                </div>
+                                <label className="relative inline-flex items-center cursor-not-allowed">
+                                    <input type="checkbox" className="sr-only peer" disabled />
+                                    <div className="w-11 h-6 bg-gray-700 rounded-full after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {/* Info Section */}
                 <div className="bg-[var(--bg-card)] rounded-[2.5rem] p-6 md:p-8 border border-[var(--border-color)] shadow-xl grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-2">

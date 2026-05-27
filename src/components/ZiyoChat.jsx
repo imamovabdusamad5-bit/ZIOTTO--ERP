@@ -3,7 +3,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Bot, Send, X, Sparkles, MessageSquare, Minimize2, TriangleAlert } from 'lucide-react';
 import { processUserMessage } from '../lib/ziyoAI';
 
+import { useAuth } from '../context/AuthContext';
+
 const ZiyoChat = () => {
+    const { tenant } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState(() => {
         const saved = localStorage.getItem('ziyo_chat_history');
@@ -15,6 +18,23 @@ const ZiyoChat = () => {
     const [isTyping, setIsTyping] = useState(false);
     const [hasAlert, setHasAlert] = useState(false); // Global alert state
     const messagesEndRef = useRef(null);
+    
+    const [queriesToday, setQueriesToday] = useState(0);
+
+    const tier = tenant?.plan_tier || 'standart';
+
+    useEffect(() => {
+        // Track queries for today
+        const today = new Date().toDateString();
+        const storedDate = localStorage.getItem('ziyo_queries_date');
+        if (storedDate !== today) {
+            localStorage.setItem('ziyo_queries_date', today);
+            localStorage.setItem('ziyo_queries_count', '0');
+            setQueriesToday(0);
+        } else {
+            setQueriesToday(parseInt(localStorage.getItem('ziyo_queries_count') || '0', 10));
+        }
+    }, [isOpen]);
 
     useEffect(() => {
         localStorage.setItem('ziyo_chat_history', JSON.stringify(messages));
@@ -33,6 +53,18 @@ const ZiyoChat = () => {
         e.preventDefault();
         if (!input.trim()) return;
 
+        // Pro tier limit check
+        if (tier === 'pro' && queriesToday >= 5) {
+            setMessages(prev => [...prev, {
+                id: Date.now() + 1,
+                text: "⚠️ Diqqat: Siz PRO tarifidasiz va bugungi 5 ta bepul so'rov limitini tugatdingiz. Cheksiz suhbat uchun ULTRA tarifiga o'ting.",
+                sender: 'bot',
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            }]);
+            setInput('');
+            return;
+        }
+
         const newUserMsg = {
             id: Date.now(),
             text: input,
@@ -43,6 +75,12 @@ const ZiyoChat = () => {
         setMessages(prev => [...prev, newUserMsg]);
         setInput('');
         setIsTyping(true);
+
+        if (tier === 'pro') {
+            const newCount = queriesToday + 1;
+            setQueriesToday(newCount);
+            localStorage.setItem('ziyo_queries_count', newCount.toString());
+        }
 
         // Process message with ZiyoAI
         try {
@@ -65,6 +103,11 @@ const ZiyoChat = () => {
             setIsTyping(false);
         }
     };
+
+    // Hide chat entirely if tier is standart
+    if (tier === 'standart') {
+        return null;
+    }
 
     return (
         <div className={`fixed z-50 flex flex-col items-end pointer-events-none transition-all duration-300

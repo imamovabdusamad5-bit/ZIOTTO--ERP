@@ -37,39 +37,62 @@ const ProtectedRoute = ({ children }) => {
 
 // New Role Based Guard
 const RoleGuard = ({ children, path }) => {
-  const { profile, loading } = useAuth();
+  const { profile, tenant, loading } = useAuth();
 
   if (loading) return null;
   if (!profile) return <Navigate to="/login" />;
 
-  // Admin always has access
-  if (profile.role === 'admin') return children;
-
+  // Admin always has access to EVERYTHING, regardless of Role (but still subject to Tier if we wanted, though usually Admin overrides or respects tier. Let's make Tier checking explicit below)
+  
   // Find the menu item for this path
-  // Handle sub-paths if necessary, but for now exact match or parent match
   const item = menuItems.find(i => i.path === path || (i.subItems && i.subItems.some(s => s.path.startsWith(path))));
-
+  
   if (!item) {
-    // If no rule defined, assume strictly protected or public?
-    // For safety, if it's not in the menu, it might be public or hidden.
-    // But we are using this guard explicitly.
-    // Let's assume passed path IS the key.
     return children;
   }
 
+  // --- TIER CHECK (Feature Gating) ---
+  // Define required tiers for specific routes
+  const requiredTiers = {
+    '/reja': ['pro', 'ultra'],
+    '/moliya': ['pro', 'ultra'],
+    '/scanner': ['pro', 'ultra'],
+  };
+
+  if (requiredTiers[path] && tenant) {
+    const currentTier = tenant.plan_tier || 'standart';
+    if (!requiredTiers[path].includes(currentTier)) {
+      return (
+        <div className="flex flex-col items-center justify-center min-h-[80vh] p-8 text-center animate-in fade-in zoom-in duration-500">
+          <div className="bg-amber-500/10 p-6 rounded-full mb-6 border border-amber-500/20 shadow-[0_0_30px_rgba(245,158,11,0.2)]">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-500"><path d="M2 18v3c0 .6.4 1 1 1h4v-3h3v-3h2l1.4-1.4a6.5 6.5 0 1 0-4-4Z"/><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"/></svg>
+          </div>
+          <h2 className="text-3xl font-black text-[var(--text-primary)] mb-3">Premium Xizmat</h2>
+          <p className="text-[var(--text-secondary)] max-w-md mb-8">
+            Bu bo'lim faqat <b>{requiredTiers[path][0].toUpperCase()}</b> yoki undan yuqori tarifda ishlaydi. 
+            Imkoniyatlarni kengaytirish uchun tarifingizni oshiring.
+          </p>
+          <button className="bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold px-8 py-3 rounded-2xl shadow-lg hover:shadow-amber-500/25 transition-all active:scale-95 uppercase tracking-wider text-sm flex items-center gap-2">
+            Tarifni Oshirish
+          </button>
+        </div>
+      );
+    }
+  }
+
+  // --- ROLE CHECK ---
+  if (profile.role === 'admin') return children;
+
   const permKey = item.permKey || item.path.split('?')[0].replace('/', '');
 
-  // 1. Check Permissions Object
   if (profile.permissions && profile.permissions[permKey]) {
     return children;
   }
 
-  // 2. Check Role List
   if (item.roles && item.roles.includes(profile.role)) {
     return children;
   }
 
-  // If we got here, access is denied
   return <div className="p-10 text-center text-red-500 font-bold">Huquqingiz yetmaydi (403 Access Denied)</div>;
 };
 
