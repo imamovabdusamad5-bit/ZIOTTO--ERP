@@ -2,13 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, Outlet } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 import { Activity, Menu, CircleCheck, Eye, EyeOff, History, RotateCcw, Sun, Moon } from 'lucide-react';
 import Sidebar from './Sidebar';
 
 const Layout = () => {
     const { theme, toggleTheme } = useTheme();
+    const { tenant } = useAuth();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [alerts, setAlerts] = useState([]);
+
+    const companyName = tenant?.name || 'PROERP';
+    const isMaster = tenant?.domain_slug === 'ziotto' || !tenant;
 
     // Initialize from localStorage safely
     const [hiddenAlertKeys, setHiddenAlertKeys] = useState(() => {
@@ -122,8 +127,12 @@ const Layout = () => {
                         >
                             <Menu size={28} />
                         </button>
-                        <h2 className="text-lg md:text-xl font-black text-[var(--text-primary)] tracking-tight flex items-center">
-                            PRO<span className="text-blue-500 ml-1">ERP</span>
+                        <h2 className="text-lg md:text-xl font-black text-[var(--text-primary)] tracking-tight flex items-center uppercase truncate max-w-[200px] md:max-w-none">
+                            {isMaster ? (
+                                <>PRO<span className="text-blue-500 ml-1">ERP</span></>
+                            ) : (
+                                <span className="text-blue-500">{companyName}</span>
+                            )}
                         </h2>
                     </div>
                     <div className="flex items-center gap-4">

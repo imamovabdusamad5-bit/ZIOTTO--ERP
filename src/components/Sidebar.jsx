@@ -59,7 +59,7 @@ export const menuItems = [
 const Sidebar = ({ isOpen, onClose }) => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { profile, logout } = useAuth();
+    const { profile, logout, tenant } = useAuth();
     const [expandedMenu, setExpandedMenu] = useState('Ombor');
     const [collapsed, setCollapsed] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
@@ -81,6 +81,9 @@ const Sidebar = ({ isOpen, onClose }) => {
         await logout();
         navigate('/login');
     };
+
+    const companyName = tenant?.name || 'PROERP';
+    const isMaster = tenant?.domain_slug === 'ziotto' || !tenant;
  
     return (
         <div className={`fixed left-0 top-0 h-[100dvh] bg-[var(--bg-sidebar)] text-[var(--text-secondary)] flex flex-col shadow-xl z-[70] transition-all duration-300 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 w-64 border-r border-[var(--border-sidebar)]`}>
@@ -139,8 +142,12 @@ const Sidebar = ({ isOpen, onClose }) => {
                             <path d="M58 85 L46 92" stroke="#00f2fe" strokeWidth="1.75" opacity="0.9" />
                         </g>
                     </svg>
-                    <h1 className="text-2xl font-black text-[var(--text-primary)] tracking-tighter flex items-center leading-none">
-                        PRO<span className="bg-gradient-to-r from-[#00f2fe] to-[#0062ff] bg-clip-text text-transparent ml-0.5">ERP</span>
+                    <h1 className="text-xl font-black text-[var(--text-primary)] tracking-tighter flex items-center leading-none uppercase truncate">
+                        {isMaster ? (
+                            <>PRO<span className="bg-gradient-to-r from-[#00f2fe] to-[#0062ff] bg-clip-text text-transparent ml-0.5">ERP</span></>
+                        ) : (
+                            <span className="bg-gradient-to-r from-[#00f2fe] to-[#0062ff] bg-clip-text text-transparent">{companyName}</span>
+                        )}
                     </h1>
                 </div>
                 <button

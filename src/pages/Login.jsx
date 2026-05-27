@@ -205,19 +205,13 @@ const Login = () => {
                         <ProErpLogo className="w-20 h-20 shrink-0" />
                         <div className="flex flex-col">
                             <h1 className="text-4xl font-extrabold tracking-tight flex items-center gap-0.5 leading-none">
-                                {isMaster ? (
-                                    <>
-                                        <span className="text-white font-extrabold">PRO</span>
-                                        <span className="text-[#0062ff] font-extrabold">ERP</span>
-                                    </>
-                                ) : (
-                                    <span className="text-white font-extrabold uppercase">{companyName}</span>
-                                )}
+                                <span className="text-white font-extrabold">PRO</span>
+                                <span className="text-[#0062ff] font-extrabold">ERP</span>
                             </h1>
                             <div className="flex items-center gap-1.5 mt-2">
                                 <span className="h-[1px] w-3 bg-slate-600" />
                                 <p className="text-[#94a3b8] uppercase tracking-[0.25em] text-[10px] font-semibold leading-none">
-                                    {isMaster ? 'Biznesni oson boshqaruv' : 'Biznes boshqaruv tizimi'}
+                                    Biznesni oson boshqaruv
                                 </p>
                                 <span className="h-[1px] w-3 bg-slate-600" />
                             </div>
@@ -235,7 +229,7 @@ const Login = () => {
                             </h2>
                             {/* Subtitle Description */}
                             <p className="text-[#94a3b8] text-lg leading-[1.75] max-w-xl font-medium animate-in fade-in slide-in-from-left-6 duration-1000 delay-250">
-                                {companyName} – korxonani yagona platformada boshqarish, jarayonlarni avtomatlashtirish va samaradorlikni oshirish uchun zamonaviy ERP yechimi.
+                                PROERP – korxonani yagona platformada boshqarish, jarayonlarni avtomatlashtirish va samaradorlikni oshirish uchun zamonaviy ERP yechimi.
                             </p>
                         </div>
 
