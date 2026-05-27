@@ -23,6 +23,7 @@ import {
     Activity
 } from 'lucide-react';
 import * as faceapi from '@vladmandic/face-api';
+import { useAuth } from '../context/AuthContext';
 
 const departments = [
     { role: 'admin', name: 'Rahbar (Admin)' },
@@ -38,6 +39,7 @@ const departments = [
 ];
 
 const Xodimlar = () => {
+    const { tenant } = useAuth();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [editingId, setEditingId] = useState(null);
@@ -592,6 +594,7 @@ const Xodimlar = () => {
                                     autoPlay 
                                     playsInline 
                                     muted 
+                                    onPlaying={() => setFaceStatus("Kamera tayyor. Kameraga qarab 'Yuzni Skanerlash' tugmasini bosing.")}
                                     className="w-full h-full object-cover scale-x-[-1]"
                                 />
                             )}
