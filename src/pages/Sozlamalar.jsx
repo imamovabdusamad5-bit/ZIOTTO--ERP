@@ -24,11 +24,12 @@ const Sozlamalar = () => {
     const [tempImage, setTempImage] = useState(null);
 
     const THEMES = [
-        { id: 'classic', name: 'Classic Dark', color: '#0f172a', preview: 'bg-slate-900' },
-        { id: 'purple', name: 'Midnight Purple', color: '#2e1065', preview: 'bg-purple-950' },
-        { id: 'emerald', name: 'Emerald Forest', color: '#064e3b', preview: 'bg-emerald-950' },
-        { id: 'ruby', name: 'Ruby Red', color: '#450a0a', preview: 'bg-red-950' },
-        { id: 'ocean', name: 'Ocean Blue', color: '#082f49', preview: 'bg-sky-950' }
+        { id: 'classic', name: 'Standart (Default)', preview: 'bg-slate-900 border-gray-600' },
+        { id: 'space', name: 'Cosmic Space', preview: 'bg-[#050b14] border-[#00f2fe]' },
+        { id: 'sunset', name: 'Neon Sunset', preview: 'bg-[#17091c] border-[#d946ef]' },
+        { id: 'cyber', name: 'Cyber Matrix', preview: 'bg-[#020a06] border-[#10b981]' },
+        { id: 'royal', name: 'Royal Amethyst', preview: 'bg-[#10051a] border-[#a855f7]' },
+        { id: 'custom', name: 'O\'zingiz Tanlang', preview: 'bg-gradient-to-br from-red-500 via-green-500 to-blue-500 border-white' }
     ];
 
     const isUltra = formData.plan_tier === 'ultra';
@@ -38,6 +39,57 @@ const Sozlamalar = () => {
             fetchSettings();
         }
     }, [tenant]);
+
+    // Simple color darkener/lightener
+    const adjustColor = (color, amount) => {
+        return '#' + color.replace(/^#/, '').replace(/../g, color => ('0'+Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
+    };
+
+    // Live preview
+    useEffect(() => {
+        if (!tenant) return;
+        const root = document.documentElement;
+        const theme = formData.sidebar_theme;
+        
+        if (theme && theme.startsWith('custom:')) {
+            const hex = theme.split(':')[1];
+            root.className = 'theme-custom';
+            root.style.setProperty('--bg-body', adjustColor(hex, -40));
+            root.style.setProperty('--bg-sidebar', adjustColor(hex, -20));
+            root.style.setProperty('--bg-sidebar-footer', adjustColor(hex, -30));
+            root.style.setProperty('--bg-card', adjustColor(hex, -35) + 'CC');
+            root.style.setProperty('--color-primary', hex);
+            root.style.setProperty('--border-sidebar', hex + '44');
+        } else if (theme && theme !== 'classic') {
+            root.className = `theme-${theme}`;
+            root.removeAttribute('style');
+        } else {
+            root.className = '';
+            root.removeAttribute('style');
+        }
+
+        return () => {
+            // Restore on unmount (only if not saved)
+            // Wait, when saving, the page reloads, so unmount cleanup is fine
+            const originalTheme = tenant?.sidebar_theme;
+            if (originalTheme && originalTheme.startsWith('custom:')) {
+                const hex = originalTheme.split(':')[1];
+                root.className = 'theme-custom';
+                root.style.setProperty('--bg-body', adjustColor(hex, -40));
+                root.style.setProperty('--bg-sidebar', adjustColor(hex, -20));
+                root.style.setProperty('--bg-sidebar-footer', adjustColor(hex, -30));
+                root.style.setProperty('--bg-card', adjustColor(hex, -35) + 'CC');
+                root.style.setProperty('--color-primary', hex);
+                root.style.setProperty('--border-sidebar', hex + '44');
+            } else if (originalTheme && originalTheme !== 'classic') {
+                root.className = `theme-${originalTheme}`;
+                root.removeAttribute('style');
+            } else {
+                root.className = '';
+                root.removeAttribute('style');
+            }
+        };
+    }, [formData.sidebar_theme, tenant]);
 
     const fetchSettings = async () => {
         setLoading(true);
@@ -139,7 +191,7 @@ const Sozlamalar = () => {
             if (error) throw error;
             alert("Sozlamalar muvaffaqiyatli saqlandi! O'zgarishlar darhol kuchga kiradi.");
             
-            // Reload page to apply new logo and theme
+            // Reload page to apply new logo and theme globally
             window.location.reload();
         } catch (error) {
             alert("Xatolik: " + error.message);
@@ -148,9 +200,20 @@ const Sozlamalar = () => {
         }
     };
 
+    const handleThemeClick = (themeId) => {
+        if (themeId === 'custom') {
+            setFormData(prev => ({ ...prev, sidebar_theme: 'custom:#3b82f6' })); // default custom color
+        } else {
+            setFormData(prev => ({ ...prev, sidebar_theme: themeId }));
+        }
+    };
+
     if (loading) {
         return <div className="py-20 text-center"><Activity className="animate-spin mx-auto text-indigo-500" /></div>;
     }
+
+    const isCustomActive = formData.sidebar_theme?.startsWith('custom:');
+    const customColor = isCustomActive ? formData.sidebar_theme.split(':')[1] : '#3b82f6';
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 pb-20 max-w-4xl mx-auto">
@@ -250,21 +313,36 @@ const Sozlamalar = () => {
                         <Palette className="text-indigo-500" />
                         Tizim Dizayni (Mavzular) <span className="ml-2 text-[9px] bg-amber-500/20 text-amber-500 px-2 py-1 rounded-full uppercase tracking-widest">Ultra</span>
                     </h3>
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 relative z-10">
-                        {THEMES.map(theme => (
-                            <button
-                                key={theme.id}
-                                type="button"
-                                onClick={() => setFormData(prev => ({ ...prev, sidebar_theme: theme.id }))}
-                                className={`flex flex-col items-center gap-3 p-4 rounded-2xl border-2 transition-all ${formData.sidebar_theme === theme.id ? 'border-indigo-500 bg-indigo-500/10 scale-105 shadow-[0_0_20px_rgba(99,102,241,0.2)]' : 'border-[var(--border-color)] bg-[var(--bg-body)] hover:border-gray-500'}`}
-                            >
-                                <div className={`w-12 h-12 rounded-full ${theme.preview} border-2 border-white/10 shadow-inner`} />
-                                <span className={`text-[10px] font-black uppercase tracking-widest text-center ${formData.sidebar_theme === theme.id ? 'text-indigo-400' : 'text-gray-400'}`}>
-                                    {theme.name}
-                                </span>
-                            </button>
-                        ))}
+                    <div className="grid grid-cols-2 md:grid-cols-6 gap-4 relative z-10">
+                        {THEMES.map(theme => {
+                            const isActive = theme.id === 'custom' ? isCustomActive : formData.sidebar_theme === theme.id;
+                            return (
+                                <button
+                                    key={theme.id}
+                                    type="button"
+                                    onClick={() => handleThemeClick(theme.id)}
+                                    className={`flex flex-col items-center gap-3 p-4 rounded-2xl border-2 transition-all ${isActive ? 'border-indigo-500 bg-indigo-500/10 scale-105 shadow-[0_0_20px_rgba(99,102,241,0.2)]' : 'border-[var(--border-color)] bg-[var(--bg-body)] hover:border-gray-500'}`}
+                                >
+                                    <div className={`w-12 h-12 rounded-full ${theme.preview} border-2 border-white/10 shadow-inner flex items-center justify-center`} />
+                                    <span className={`text-[9px] font-black uppercase tracking-widest text-center leading-tight ${isActive ? 'text-indigo-400' : 'text-gray-400'}`}>
+                                        {theme.name}
+                                    </span>
+                                </button>
+                            );
+                        })}
                     </div>
+                    
+                    {isCustomActive && (
+                        <div className="mt-6 p-4 bg-black/20 rounded-2xl border border-white/5 flex items-center gap-4 animate-in fade-in slide-in-from-top-4">
+                            <label className="text-sm font-bold text-white flex-1">Maxsus rangingizni tanlang:</label>
+                            <input 
+                                type="color" 
+                                value={customColor} 
+                                onChange={(e) => setFormData(prev => ({ ...prev, sidebar_theme: `custom:${e.target.value}` }))}
+                                className="w-16 h-12 rounded cursor-pointer bg-transparent border-0"
+                            />
+                        </div>
+                    )}
                 </div>
 
                 {/* Info Section */}

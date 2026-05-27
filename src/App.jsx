@@ -73,6 +73,18 @@ const RoleGuard = ({ children, path }) => {
   return <div className="p-10 text-center text-red-500 font-bold">Huquqingiz yetmaydi (403 Access Denied)</div>;
 };
 
+const ThemeSetter = () => {
+  const { tenant } = useAuth();
+  useEffect(() => {
+    if (tenant?.sidebar_theme && tenant.sidebar_theme !== 'classic') {
+      document.documentElement.className = `theme-${tenant.sidebar_theme}`;
+    } else {
+      document.documentElement.className = '';
+    }
+  }, [tenant?.sidebar_theme]);
+  return null;
+};
+
 function App() {
   useEffect(() => {
     // Initialize Telegram WebApp
@@ -92,6 +104,7 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
+        <ThemeSetter />
         <BrowserRouter>
           <ZiyoChat />
           <Routes>

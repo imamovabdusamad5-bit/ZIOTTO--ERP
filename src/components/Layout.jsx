@@ -105,14 +105,9 @@ const Layout = () => {
     const hiddenCount = alerts.length - visibleAlerts.length;
     // Show panel if there are ANY alerts (even if all are hidden)
     const showPanel = alerts.length > 0;
-    
-    // Determine sidebar theme class
-    const sidebarThemeClass = tenant?.sidebar_theme && tenant.sidebar_theme !== 'classic' 
-        ? `theme-${tenant.sidebar_theme}` 
-        : '';
 
     return (
-        <div className={`min-h-screen bg-[var(--bg-body)] text-[var(--text-primary)] flex transition-colors duration-300 ${sidebarThemeClass}`}>
+        <div className="min-h-screen bg-[var(--bg-body)] text-[var(--text-primary)] flex transition-colors duration-300">
             {/* Mobile Sidebar Overlay */}
             {isSidebarOpen && (
                 <div

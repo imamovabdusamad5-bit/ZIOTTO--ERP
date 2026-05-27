@@ -35,28 +35,64 @@
 }
 
 /* --- THEMES --- */
-.theme-purple {
-  --bg-sidebar: #2e1065; /* Midnight Purple */
-  --bg-sidebar-footer: #1e0a44;
-  --border-sidebar: rgba(216, 180, 254, 0.15);
+.theme-space {
+  --bg-body: #050b14;
+  --bg-card: rgba(11, 21, 38, 0.7);
+  --bg-card-hover: rgba(18, 34, 59, 0.85);
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --border-color: rgba(0, 242, 254, 0.15);
+  --input-bg: rgba(5, 11, 20, 0.8);
+  
+  --bg-sidebar: #07101d;
+  --bg-sidebar-footer: #03060b;
+  --border-sidebar: rgba(0, 242, 254, 0.1);
+  --color-primary: #00f2fe;
 }
 
-.theme-emerald {
-  --bg-sidebar: #064e3b; /* Emerald Forest */
-  --bg-sidebar-footer: #022c22;
-  --border-sidebar: rgba(110, 231, 183, 0.15);
+.theme-sunset {
+  --bg-body: #17091c;
+  --bg-card: rgba(36, 11, 46, 0.6);
+  --bg-card-hover: rgba(48, 14, 61, 0.8);
+  --text-primary: #fdf4ff;
+  --text-secondary: #f0abfc;
+  --border-color: rgba(217, 70, 239, 0.2);
+  --input-bg: rgba(23, 9, 28, 0.8);
+  
+  --bg-sidebar: #1f0b26;
+  --bg-sidebar-footer: #120517;
+  --border-sidebar: rgba(217, 70, 239, 0.15);
+  --color-primary: #d946ef;
 }
 
-.theme-ruby {
-  --bg-sidebar: #450a0a; /* Ruby Red */
-  --bg-sidebar-footer: #2b0606;
-  --border-sidebar: rgba(252, 165, 165, 0.15);
+.theme-cyber {
+  --bg-body: #020a06;
+  --bg-card: rgba(4, 20, 12, 0.7);
+  --bg-card-hover: rgba(7, 33, 19, 0.9);
+  --text-primary: #ecfdf5;
+  --text-secondary: #6ee7b7;
+  --border-color: rgba(16, 185, 129, 0.2);
+  --input-bg: rgba(2, 10, 6, 0.8);
+  
+  --bg-sidebar: #03120b;
+  --bg-sidebar-footer: #010805;
+  --border-sidebar: rgba(16, 185, 129, 0.15);
+  --color-primary: #10b981;
 }
 
-.theme-ocean {
-  --bg-sidebar: #082f49; /* Ocean Blue */
-  --bg-sidebar-footer: #041d2e;
-  --border-sidebar: rgba(125, 211, 252, 0.15);
+.theme-royal {
+  --bg-body: #10051a;
+  --bg-card: rgba(25, 8, 41, 0.7);
+  --bg-card-hover: rgba(35, 11, 56, 0.85);
+  --text-primary: #faf5ff;
+  --text-secondary: #d8b4fe;
+  --border-color: rgba(168, 85, 247, 0.2);
+  --input-bg: rgba(16, 5, 26, 0.8);
+  
+  --bg-sidebar: #170726;
+  --bg-sidebar-footer: #0a0312;
+  --border-sidebar: rgba(168, 85, 247, 0.15);
+  --color-primary: #a855f7;
 }
 
 body {
