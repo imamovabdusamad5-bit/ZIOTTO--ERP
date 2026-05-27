@@ -105,9 +105,14 @@ const Layout = () => {
     const hiddenCount = alerts.length - visibleAlerts.length;
     // Show panel if there are ANY alerts (even if all are hidden)
     const showPanel = alerts.length > 0;
+    
+    // Determine sidebar theme class
+    const sidebarThemeClass = tenant?.sidebar_theme && tenant.sidebar_theme !== 'classic' 
+        ? `theme-${tenant.sidebar_theme}` 
+        : '';
 
     return (
-        <div className="min-h-screen bg-[var(--bg-body)] text-[var(--text-primary)] flex transition-colors duration-300">
+        <div className={`min-h-screen bg-[var(--bg-body)] text-[var(--text-primary)] flex transition-colors duration-300 ${sidebarThemeClass}`}>
             {/* Mobile Sidebar Overlay */}
             {isSidebarOpen && (
                 <div
@@ -127,9 +132,14 @@ const Layout = () => {
                         >
                             <Menu size={28} />
                         </button>
-                        <h2 className="text-lg md:text-xl font-black text-[var(--text-primary)] tracking-tight flex items-center uppercase truncate max-w-[200px] md:max-w-none">
-                            <span className="text-blue-500">{companyName}</span>
-                        </h2>
+                        <div className="flex items-center gap-3">
+                            {tenant?.logo_url && (
+                                <img src={tenant.logo_url} alt="Logo" className="w-8 h-8 object-contain drop-shadow-md" />
+                            )}
+                            <h2 className="text-lg md:text-xl font-black text-[var(--text-primary)] tracking-tight flex items-center uppercase truncate max-w-[200px] md:max-w-none">
+                                <span className="text-blue-500">{companyName}</span>
+                            </h2>
+                        </div>
                     </div>
                     <div className="flex items-center gap-4">
                         <button

@@ -90,52 +90,48 @@ const Sidebar = ({ isOpen, onClose }) => {
         <div className={`fixed left-0 top-0 h-[100dvh] bg-[var(--bg-sidebar)] text-[var(--text-secondary)] flex flex-col shadow-xl z-[70] transition-all duration-300 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 w-64 border-r border-[var(--border-sidebar)]`}>
             <div className="p-6 border-b border-[var(--border-sidebar)] flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    {tenant?.logo_url ? (
-                        <img src={tenant.logo_url} alt="Logo" className="w-10 h-10 object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
-                    ) : (
-                        <svg 
-                            className="w-9 h-9 filter drop-shadow-[0_0_10px_rgba(0,198,255,0.7)] shrink-0 animate-pulse" 
-                            viewBox="0 0 100 100" 
-                            fill="none" 
-                            width="36" 
-                            height="36" 
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <defs>
-                                <linearGradient id="pBlueMini" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" stopColor="#00f2fe" />
-                                    <stop offset="50%" stopColor="#00c6ff" />
-                                    <stop offset="100%" stopColor="#0062ff" />
-                                </linearGradient>
-                                <linearGradient id="pCyanMini" x1="0%" y1="0%" x2="0%" y2="100%">
-                                    <stop offset="0%" stopColor="#00f2fe" />
-                                    <stop offset="100%" stopColor="#0099ff" />
-                                </linearGradient>
-                                <linearGradient id="pDarkMini" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" stopColor="#0a1d37" />
-                                    <stop offset="100%" stopColor="#020815" />
-                                </linearGradient>
-                                <linearGradient id="pBevelMini" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" stopColor="#ffffff" stopOpacity="0.75" />
-                                    <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
-                                </linearGradient>
-                            </defs>
-                            <g strokeLinejoin="round" strokeLinecap="round">
-                                <path d="M22 65 L22 35 L48 20 L78 37 L78 57 L48 74 Z" fill="url(#pDarkMini)" />
-                                <path d="M22 35 L34 28 L34 78 L22 85 Z" fill="url(#pBlueMini)" />
-                                <path d="M34 28 L58 14 L82 28 L82 52 L58 66 L58 48 L70 41 L70 35 L58 28 L34 42 Z" fill="url(#pCyanMini)" />
-                                <path d="M46 42 L58 35 L58 85 L46 92 Z" fill="url(#pBlueMini)" />
-                                <path d="M34 42 L58 28 L58 35 L34 49 Z" fill="url(#pBevelMini)" opacity="0.55" />
-                                <path d="M58 48 L70 41 L70 47 L58 54 Z" fill="url(#pBevelMini)" opacity="0.45" />
-                                <path d="M58 66 L82 52 L82 58 L58 72 Z" fill="url(#pDarkMini)" opacity="0.6" />
-                                <path d="M34 49 L58 35 L70 42 L70 54 L58 61 L34 75 Z" fill="url(#pCyanMini)" opacity="0.8" />
-                                <path d="M58 14 L82 28" stroke="#ffffff" strokeWidth="1.75" opacity="0.75" />
-                                <path d="M34 28 L58 14" stroke="#ffffff" strokeWidth="1.75" opacity="0.85" />
-                                <path d="M22 35 L34 28" stroke="#ffffff" strokeWidth="1.5" opacity="0.7" />
-                                <path d="M58 85 L46 92" stroke="#00f2fe" strokeWidth="1.75" opacity="0.9" />
-                            </g>
-                        </svg>
-                    )}
+                    <svg 
+                        className="w-9 h-9 filter drop-shadow-[0_0_10px_rgba(0,198,255,0.7)] shrink-0 animate-pulse" 
+                        viewBox="0 0 100 100" 
+                        fill="none" 
+                        width="36" 
+                        height="36" 
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <defs>
+                            <linearGradient id="pBlueMini" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stopColor="#00f2fe" />
+                                <stop offset="50%" stopColor="#00c6ff" />
+                                <stop offset="100%" stopColor="#0062ff" />
+                            </linearGradient>
+                            <linearGradient id="pCyanMini" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stopColor="#00f2fe" />
+                                <stop offset="100%" stopColor="#0099ff" />
+                            </linearGradient>
+                            <linearGradient id="pDarkMini" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stopColor="#0a1d37" />
+                                <stop offset="100%" stopColor="#020815" />
+                            </linearGradient>
+                            <linearGradient id="pBevelMini" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.75" />
+                                <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+                            </linearGradient>
+                        </defs>
+                        <g strokeLinejoin="round" strokeLinecap="round">
+                            <path d="M22 65 L22 35 L48 20 L78 37 L78 57 L48 74 Z" fill="url(#pDarkMini)" />
+                            <path d="M22 35 L34 28 L34 78 L22 85 Z" fill="url(#pBlueMini)" />
+                            <path d="M34 28 L58 14 L82 28 L82 52 L58 66 L58 48 L70 41 L70 35 L58 28 L34 42 Z" fill="url(#pCyanMini)" />
+                            <path d="M46 42 L58 35 L58 85 L46 92 Z" fill="url(#pBlueMini)" />
+                            <path d="M34 42 L58 28 L58 35 L34 49 Z" fill="url(#pBevelMini)" opacity="0.55" />
+                            <path d="M58 48 L70 41 L70 47 L58 54 Z" fill="url(#pBevelMini)" opacity="0.45" />
+                            <path d="M58 66 L82 52 L82 58 L58 72 Z" fill="url(#pDarkMini)" opacity="0.6" />
+                            <path d="M34 49 L58 35 L70 42 L70 54 L58 61 L34 75 Z" fill="url(#pCyanMini)" opacity="0.8" />
+                            <path d="M58 14 L82 28" stroke="#ffffff" strokeWidth="1.75" opacity="0.75" />
+                            <path d="M34 28 L58 14" stroke="#ffffff" strokeWidth="1.75" opacity="0.85" />
+                            <path d="M22 35 L34 28" stroke="#ffffff" strokeWidth="1.5" opacity="0.7" />
+                            <path d="M58 85 L46 92" stroke="#00f2fe" strokeWidth="1.75" opacity="0.9" />
+                        </g>
+                    </svg>
                     <h1 className="text-xl font-black text-[var(--text-primary)] tracking-tighter flex items-center leading-none uppercase truncate">
                         <span className="bg-gradient-to-r from-[#00f2fe] to-[#0062ff] bg-clip-text text-transparent">{companyName}</span>
                     </h1>

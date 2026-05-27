@@ -28,10 +28,35 @@
   --border-color: rgba(255, 255, 255, 0.1);
   --input-bg: rgba(2, 6, 23, 0.5);
 
-  /* Sidebar Dark */
+  /* Sidebar Dark (Classic) */
   --bg-sidebar: #1a1c2e;
   --bg-sidebar-footer: #141625;
   --border-sidebar: rgba(255, 255, 255, 0.05);
+}
+
+/* --- THEMES --- */
+.theme-purple {
+  --bg-sidebar: #2e1065; /* Midnight Purple */
+  --bg-sidebar-footer: #1e0a44;
+  --border-sidebar: rgba(216, 180, 254, 0.15);
+}
+
+.theme-emerald {
+  --bg-sidebar: #064e3b; /* Emerald Forest */
+  --bg-sidebar-footer: #022c22;
+  --border-sidebar: rgba(110, 231, 183, 0.15);
+}
+
+.theme-ruby {
+  --bg-sidebar: #450a0a; /* Ruby Red */
+  --bg-sidebar-footer: #2b0606;
+  --border-sidebar: rgba(252, 165, 165, 0.15);
+}
+
+.theme-ocean {
+  --bg-sidebar: #082f49; /* Ocean Blue */
+  --bg-sidebar-footer: #041d2e;
+  --border-sidebar: rgba(125, 211, 252, 0.15);
 }
 
 body {
