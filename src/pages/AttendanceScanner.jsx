@@ -12,6 +12,7 @@ import {
     LogOut
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import * as faceapi from '@vladmandic/face-api';
 
 const AttendanceScanner = () => {
     const { tenant } = useAuth();
@@ -20,20 +21,118 @@ const AttendanceScanner = () => {
     const [scanResult, setScanResult] = useState(null);
     const [loading, setLoading] = useState(false);
     const scannerRef = useRef(null);
+    const videoRef = useRef(null);
+    const [modelsLoaded, setModelsLoaded] = useState(false);
+    const [profiles, setProfiles] = useState([]);
+    const isScanningFace = useRef(false);
 
     const isUltra = tenant?.plan_tier === 'ultra';
 
     useEffect(() => {
         if (mode === 'qr') {
+            stopFaceScanner();
             startQrScanner();
+        } else if (mode === 'face') {
+            if (scannerRef.current) {
+                scannerRef.current.clear().catch(e => console.error(e));
+                scannerRef.current = null;
+            }
+            loadFaceDependencies();
         }
         return () => {
             if (scannerRef.current) {
                 scannerRef.current.clear().catch(e => console.error(e));
                 scannerRef.current = null;
             }
+            stopFaceScanner();
         };
     }, [mode]);
+
+    const loadFaceDependencies = async () => {
+        try {
+            // Fetch users with face_descriptors
+            const { data: users } = await supabase.from('profiles').select('*').not('face_descriptor', 'is', null);
+            if (users) {
+                setProfiles(users);
+            }
+            
+            // Load models if not loaded
+            if (!modelsLoaded) {
+                await Promise.all([
+                    faceapi.nets.ssdMobilenetv1.loadFromUri('/models'),
+                    faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+                    faceapi.nets.faceRecognitionNet.loadFromUri('/models')
+                ]);
+                setModelsLoaded(true);
+            }
+            startFaceScanner();
+        } catch (error) {
+            console.error("Face init error:", error);
+        }
+    };
+
+    const startFaceScanner = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            if (videoRef.current) {
+                videoRef.current.srcObject = stream;
+                isScanningFace.current = true;
+                scanFaceLoop();
+            }
+        } catch (error) {
+            console.error("Camera error", error);
+        }
+    };
+
+    const stopFaceScanner = () => {
+        isScanningFace.current = false;
+        if (videoRef.current && videoRef.current.srcObject) {
+            videoRef.current.srcObject.getTracks().forEach(track => track.stop());
+        }
+    };
+
+    const scanFaceLoop = async () => {
+        if (!isScanningFace.current || !videoRef.current || loading) {
+            if (isScanningFace.current) requestAnimationFrame(scanFaceLoop);
+            return;
+        }
+
+        try {
+            const detection = await faceapi.detectSingleFace(videoRef.current).withFaceLandmarks().withFaceDescriptor();
+            
+            if (detection && profiles.length > 0) {
+                // Find best match manually
+                let bestMatch = null;
+                let minDistance = 0.5; // Threshold
+                
+                profiles.forEach(profile => {
+                    if (profile.face_descriptor) {
+                        const dbDesc = new Float32Array(profile.face_descriptor);
+                        const distance = faceapi.euclideanDistance(detection.descriptor, dbDesc);
+                        if (distance < minDistance) {
+                            minDistance = distance;
+                            bestMatch = profile;
+                        }
+                    }
+                });
+
+                if (bestMatch) {
+                    isScanningFace.current = false; // Pause
+                    await handleScanSuccess(JSON.stringify({ id: bestMatch.id, code: bestMatch.unique_code }), null, bestMatch);
+                    // handleScanSuccess will resume after 4s by resetting loading and we manually restart loop
+                    setTimeout(() => {
+                        isScanningFace.current = true;
+                        scanFaceLoop();
+                    }, 4000);
+                    return;
+                }
+            }
+        } catch (e) {
+            console.error(e);
+        }
+        
+        requestAnimationFrame(scanFaceLoop);
+    };
 
     const startQrScanner = () => {
         try {
@@ -234,10 +333,29 @@ const AttendanceScanner = () => {
                     </div>
 
                     {mode === 'face' && (
-                        <div className="w-full h-full flex flex-col items-center justify-center text-center p-8">
-                            <ScanFace size={64} className="text-indigo-500/50 mb-6" />
-                            <h3 className="text-xl font-bold text-gray-300 mb-2">Face ID Tez Kunda!</h3>
-                            <p className="text-gray-500 text-sm">Sun'iy intellekt modeli o'rnatilmoqda...</p>
+                        <div className="w-full h-full flex flex-col items-center justify-center relative p-0 overflow-hidden rounded-[3rem]">
+                            {!modelsLoaded ? (
+                                <div className="text-indigo-400 animate-pulse flex flex-col items-center justify-center p-8 text-center">
+                                    <Activity size={48} className="mb-4" />
+                                    <span>AI Modellar yuklanmoqda...</span>
+                                </div>
+                            ) : (
+                                <video 
+                                    ref={videoRef}
+                                    autoPlay 
+                                    playsInline 
+                                    muted 
+                                    className="w-full h-full object-cover scale-x-[-1]"
+                                />
+                            )}
+                            {/* Scanning overlay UI */}
+                            {modelsLoaded && (
+                                <>
+                                    <div className="absolute inset-0 border-[8px] border-white/5 pointer-events-none rounded-[3rem]" />
+                                    <div className="absolute w-[60%] h-[60%] border-2 border-dashed border-white/30 rounded-[100%] pointer-events-none opacity-50" />
+                                    <p className="absolute bottom-6 text-white font-black uppercase tracking-widest text-sm drop-shadow-md">Yuzni kameraga tuting</p>
+                                </>
+                            )}
                         </div>
                     )}
                 </div>

@@ -16,8 +16,11 @@ import {
     RefreshCw,
     Plus,
     CircleAlert,
-    QrCode
+    QrCode,
+    ScanFace,
+    Camera
 } from 'lucide-react';
+import * as faceapi from '@vladmandic/face-api';
 
 const departments = [
     { role: 'admin', name: 'Rahbar (Admin)' },
@@ -39,6 +42,11 @@ const Xodimlar = () => {
     const [showAddModal, setShowAddModal] = useState(false);
     const [showQrModal, setShowQrModal] = useState(null);
 
+    const [showFaceModal, setShowFaceModal] = useState(null);
+    const [modelsLoaded, setModelsLoaded] = useState(false);
+    const [faceStatus, setFaceStatus] = useState('');
+    const videoRef = React.useRef(null);
+
     const [editForm, setEditForm] = useState({
         username: '',
         unique_code: '',
@@ -58,7 +66,21 @@ const Xodimlar = () => {
 
     useEffect(() => {
         fetchUsers();
+        loadModels();
     }, []);
+
+    const loadModels = async () => {
+        try {
+            await Promise.all([
+                faceapi.nets.ssdMobilenetv1.loadFromUri('/models'),
+                faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+                faceapi.nets.faceRecognitionNet.loadFromUri('/models')
+            ]);
+            setModelsLoaded(true);
+        } catch (e) {
+            console.error("Models failed to load", e);
+        }
+    };
 
     async function fetchUsers() {
         setLoading(true);
@@ -152,6 +174,59 @@ const Xodimlar = () => {
             fetchUsers();
         } else {
             alert('Xatolik: ' + error.message);
+        }
+    };
+
+    const handleStartFaceScan = async (user) => {
+        setShowFaceModal(user);
+        setFaceStatus('Kamera ishga tushmoqda...');
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            if (videoRef.current) {
+                videoRef.current.srcObject = stream;
+            }
+            setFaceStatus("Kameraga qarab turing. Yuz aniqlanmoqda...");
+        } catch (e) {
+            setFaceStatus('Kameraga ulanishda xatolik: ' + e.message);
+        }
+    };
+
+    const stopFaceVideo = () => {
+        if (videoRef.current && videoRef.current.srcObject) {
+            videoRef.current.srcObject.getTracks().forEach(t => t.stop());
+        }
+    };
+
+    const handleRegisterFace = async () => {
+        if (!videoRef.current || !modelsLoaded) return;
+        setFaceStatus("Yuzni skanerlash...");
+        
+        const detections = await faceapi.detectSingleFace(videoRef.current)
+            .withFaceLandmarks()
+            .withFaceDescriptor();
+            
+        if (!detections) {
+            setFaceStatus("Yuz aniqlanmadi. Yaxshiroq yorug'likda kameraga qarang.");
+            return;
+        }
+
+        setFaceStatus("Yuz tanildi! Bazaga saqlanmoqda...");
+        const descriptor = Array.from(detections.descriptor); // Convert Float32Array to standard array for JSONB
+
+        const { error } = await supabase
+            .from('profiles')
+            .update({ face_descriptor: descriptor })
+            .eq('id', showFaceModal.id);
+
+        if (error) {
+            setFaceStatus('Saqlashda xatolik: ' + error.message);
+        } else {
+            setFaceStatus("Muvaffaqiyatli saqlandi! ✔️");
+            setTimeout(() => {
+                stopFaceVideo();
+                setShowFaceModal(null);
+                fetchUsers();
+            }, 2000);
         }
     };
 
@@ -349,6 +424,13 @@ const Xodimlar = () => {
                                         ) : (
                                             <div className="flex items-center justify-end gap-2">
                                                 <button
+                                                    onClick={() => handleStartFaceScan(user)}
+                                                    className={`p-4 rounded-2xl transition-all border ${user.face_descriptor ? 'bg-green-500/10 text-green-500 border-green-500/30' : 'bg-white/5 text-gray-400 border-white/5 hover:bg-indigo-600 hover:text-white hover:scale-110'}`}
+                                                    title={user.face_descriptor ? "Face ID saqlangan. Qayta olish uchun bosing" : "Face ID ro'yxatdan o'tkazish"}
+                                                >
+                                                    {user.face_descriptor ? <CheckCircle2 size={20} /> : <ScanFace size={20} />}
+                                                </button>
+                                                <button
                                                     onClick={() => setShowQrModal(user)}
                                                     className="p-4 bg-white/5 text-gray-400 rounded-2xl hover:bg-indigo-600 hover:text-white hover:scale-110 transition-all border border-white/5"
                                                     title="QR Kodni chop etish"
@@ -466,6 +548,51 @@ const Xodimlar = () => {
                             className="w-full bg-black hover:bg-gray-800 text-white font-black py-4 rounded-2xl transition-all uppercase tracking-widest text-xs flex justify-center items-center gap-2"
                         >
                             <Copy size={16} /> QR Kodni Chop Etish
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Face ID Modal */}
+            {showFaceModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-xl animate-in fade-in duration-300">
+                    <div className="bg-[#0f172a] border border-white/10 w-full max-w-lg rounded-[3rem] p-8 shadow-2xl relative flex flex-col items-center">
+                        <div className="absolute top-0 right-0 p-4 z-10">
+                            <button onClick={() => { stopFaceVideo(); setShowFaceModal(null); }} className="text-gray-400 hover:text-white transition-colors bg-black/40 rounded-full p-2">
+                                <X size={24} />
+                            </button>
+                        </div>
+                        
+                        <h3 className="text-xl font-black text-white text-center mb-1 tracking-tight">Face ID: {showFaceModal.username}</h3>
+                        <p className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-6">{faceStatus}</p>
+
+                        <div className="w-full aspect-square bg-black rounded-[2rem] overflow-hidden relative border-4 border-indigo-500/30 mb-6 flex items-center justify-center">
+                            {!modelsLoaded ? (
+                                <div className="text-indigo-400 animate-pulse flex flex-col items-center">
+                                    <Activity size={48} className="mb-4" />
+                                    <span>AI Modellar yuklanmoqda...</span>
+                                </div>
+                            ) : (
+                                <video 
+                                    ref={videoRef}
+                                    autoPlay 
+                                    playsInline 
+                                    muted 
+                                    className="w-full h-full object-cover scale-x-[-1]"
+                                />
+                            )}
+                            
+                            {/* Scanning overlay UI */}
+                            <div className="absolute inset-0 border-[8px] border-white/5 pointer-events-none rounded-[2rem]" />
+                            <div className="absolute w-[60%] h-[60%] border-2 border-dashed border-white/30 rounded-[100%] pointer-events-none opacity-50" />
+                        </div>
+
+                        <button 
+                            onClick={handleRegisterFace}
+                            disabled={!modelsLoaded}
+                            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-indigo-600/20 uppercase tracking-widest text-xs flex justify-center items-center gap-2 disabled:opacity-50"
+                        >
+                            <Camera size={20} /> Yuzni Skanerlash va Saqlash
                         </button>
                     </div>
                 </div>
