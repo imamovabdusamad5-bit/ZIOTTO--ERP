@@ -59,7 +59,7 @@ const AttendanceScanner = () => {
             // Load models if not loaded
             if (!modelsLoaded) {
                 await Promise.all([
-                    faceapi.nets.ssdMobilenetv1.loadFromUri('/models'),
+                    faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
                     faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
                     faceapi.nets.faceRecognitionNet.loadFromUri('/models')
                 ]);
@@ -98,7 +98,7 @@ const AttendanceScanner = () => {
         }
 
         try {
-            const detection = await faceapi.detectSingleFace(videoRef.current).withFaceLandmarks().withFaceDescriptor();
+            const detection = await faceapi.detectSingleFace(videoRef.current, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
             
             if (detection) {
                 if (profiles.length === 0) {

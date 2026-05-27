@@ -74,7 +74,7 @@ const Xodimlar = () => {
     const loadModels = async () => {
         try {
             await Promise.all([
-                faceapi.nets.ssdMobilenetv1.loadFromUri('/models'),
+                faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
                 faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
                 faceapi.nets.faceRecognitionNet.loadFromUri('/models')
             ]);
@@ -203,7 +203,7 @@ const Xodimlar = () => {
         if (!videoRef.current || !modelsLoaded) return;
         setFaceStatus("Yuzni skanerlash...");
         
-        const detections = await faceapi.detectSingleFace(videoRef.current)
+        const detections = await faceapi.detectSingleFace(videoRef.current, new faceapi.TinyFaceDetectorOptions())
             .withFaceLandmarks()
             .withFaceDescriptor();
             
