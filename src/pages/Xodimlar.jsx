@@ -18,7 +18,8 @@ import {
     CircleAlert,
     QrCode,
     ScanFace,
-    Camera
+    Camera,
+    CheckCircle2
 } from 'lucide-react';
 import * as faceapi from '@vladmandic/face-api';
 

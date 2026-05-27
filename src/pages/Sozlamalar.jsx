@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
-import { Save, UploadCloud, Globe, DollarSign, Activity, Image as ImageIcon, Edit2, Trash2, Palette, Crown, Lock } from 'lucide-react';
+import { Save, UploadCloud, Globe, DollarSign, Activity, Image as ImageIcon, Edit2, Trash2, Palette, Crown, Lock, MessageSquare, Send } from 'lucide-react';
 import ImageCropper from '../components/ImageCropper';
 
 const Sozlamalar = () => {
