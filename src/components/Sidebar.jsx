@@ -143,11 +143,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                         </g>
                     </svg>
                     <h1 className="text-xl font-black text-[var(--text-primary)] tracking-tighter flex items-center leading-none uppercase truncate">
-                        {isMaster ? (
-                            <>PRO<span className="bg-gradient-to-r from-[#00f2fe] to-[#0062ff] bg-clip-text text-transparent ml-0.5">ERP</span></>
-                        ) : (
-                            <span className="bg-gradient-to-r from-[#00f2fe] to-[#0062ff] bg-clip-text text-transparent">{companyName}</span>
-                        )}
+                        <span className="bg-gradient-to-r from-[#00f2fe] to-[#0062ff] bg-clip-text text-transparent">{companyName}</span>
                     </h1>
                 </div>
                 <button

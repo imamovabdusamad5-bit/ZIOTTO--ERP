@@ -128,11 +128,7 @@ const Layout = () => {
                             <Menu size={28} />
                         </button>
                         <h2 className="text-lg md:text-xl font-black text-[var(--text-primary)] tracking-tight flex items-center uppercase truncate max-w-[200px] md:max-w-none">
-                            {isMaster ? (
-                                <>PRO<span className="text-blue-500 ml-1">ERP</span></>
-                            ) : (
-                                <span className="text-blue-500">{companyName}</span>
-                            )}
+                            <span className="text-blue-500">{companyName}</span>
                         </h2>
                     </div>
                     <div className="flex items-center gap-4">

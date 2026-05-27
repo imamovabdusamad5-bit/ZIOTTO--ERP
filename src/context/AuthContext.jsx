@@ -111,7 +111,8 @@ export const AuthProvider = ({ children }) => {
 
             // Subdomain Security: Reject login if user is not from this tenant
             if (tenant && data.company_id !== tenant.id) {
-                return { error: { message: `Ruxsat etilmagan! Siz ${data.companies?.name || 'boshqa korxona'} xodimisiz. Iltimos o'zingizning havolangizdan kiring.` } };
+                // Do not reveal which company they actually belong to!
+                return { error: new Error(`Ruxsat etilmagan! Siz ${tenant.name} xodimi emassiz!`) };
             }
 
             setUser(data);
