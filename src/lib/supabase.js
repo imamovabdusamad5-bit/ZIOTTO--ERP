@@ -32,6 +32,7 @@ client.from = (table) => {
 
     // Helper to proxy the filter builder methods safely
     const proxyFilter = (queryBuilder) => {
+        if (companyId === 'master') return queryBuilder;
         return queryBuilder.eq('company_id', companyId);
     };
 
