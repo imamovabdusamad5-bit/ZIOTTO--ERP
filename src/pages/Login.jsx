@@ -109,49 +109,6 @@ const Login = () => {
     return (
         <div className="relative w-full min-h-screen bg-[#020617] flex font-sans overflow-hidden text-white select-none">
             
-            {/* Custom Embedded CSS Keyframes for Laptop Visuals */}
-            <style dangerouslySetInnerHTML={{__html: `
-                @keyframes float-laptop {
-                    0% { transform: translateY(0px); }
-                    50% { transform: translateY(-10px); }
-                    100% { transform: translateY(0px); }
-                }
-                @keyframes float-holo-left {
-                    0% { transform: translateY(0px) rotate(-1deg); }
-                    50% { transform: translateY(-8px) rotate(1deg); }
-                    100% { transform: translateY(0px) rotate(-1deg); }
-                }
-                @keyframes float-holo-right {
-                    0% { transform: translateY(0px) rotate(1deg); }
-                    50% { transform: translateY(-12px) rotate(-1deg); }
-                    100% { transform: translateY(0px) rotate(1deg); }
-                }
-                @keyframes float-holo-small {
-                    0% { transform: translateY(0px) scale(1); }
-                    50% { transform: translateY(8px) scale(1.05); }
-                    100% { transform: translateY(0px) scale(1); }
-                }
-                @keyframes wave-pulse {
-                    0%, 100% { opacity: 0.3; transform: scale(0.98) translate(-50%, -50%); }
-                    50% { opacity: 0.75; transform: scale(1.02) translate(-50%, -50%); }
-                }
-                .animate-float-laptop {
-                    animation: float-laptop 7s infinite ease-in-out;
-                }
-                .animate-holo-left {
-                    animation: float-holo-left 6s infinite ease-in-out;
-                }
-                .animate-holo-right {
-                    animation: float-holo-right 6.5s infinite ease-in-out;
-                }
-                .animate-holo-small {
-                    animation: float-holo-small 5.5s infinite ease-in-out;
-                }
-                .animate-wave-pulse {
-                    animation: wave-pulse 4.5s infinite ease-in-out;
-                }
-            `}} />
-
             {/* Custom Background Gradients */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,#0b1528_0%,#020617_60%)] z-0 pointer-events-none" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_75%,#080e1e_0%,#020617_65%)] z-0 pointer-events-none" />
@@ -192,7 +149,7 @@ const Login = () => {
                     </div>
 
                     {/* Content Section: Taglines and Grid */}
-                    <div className="my-auto py-4 space-y-8">
+                    <div className="my-auto py-2 space-y-7">
                         {/* Heading */}
                         <div className="space-y-4">
                             <h2 className="text-[44px] xl:text-[50px] font-extrabold leading-[1.15] text-white tracking-tight animate-in fade-in slide-in-from-left-6 duration-1000 delay-150">
@@ -202,7 +159,7 @@ const Login = () => {
                         </div>
 
                         {/* 2x2 Feature Grid with a vertical divider */}
-                        <div className="flex items-center gap-8 pt-2 animate-in fade-in slide-in-from-left-6 duration-1000 delay-350 max-w-xl">
+                        <div className="flex items-center gap-8 pt-1 animate-in fade-in slide-in-from-left-6 duration-1000 delay-350 max-w-xl">
                             {/* Column 1 */}
                             <div className="flex-1 space-y-5">
                                 {/* Item 1 */}
@@ -258,154 +215,17 @@ const Login = () => {
                             </div>
                         </div>
 
-                        {/* Volumetric Laptop & Animated Floating Hologram Panel */}
-                        <div className="relative w-full max-w-2xl h-[330px] flex items-center justify-center select-none pt-4">
+                        {/* Photorealistic Workspace Laptop & Hologram Illustration directly from User Mockup */}
+                        <div className="relative w-full max-w-2xl h-[330px] flex items-center justify-center pt-2 animate-in fade-in duration-1000 delay-300">
+                            {/* Blue Glowing Light Spot underneath */}
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] h-[80%] bg-blue-600/10 rounded-full blur-[80px] pointer-events-none z-0" />
                             
-                            {/* Concentric Energy Waves on desk */}
-                            <div className="absolute top-[62%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[220px] opacity-75 z-0 animate-wave-pulse pointer-events-none">
-                                <svg className="w-full h-full text-blue-500/60" viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <ellipse cx="100" cy="50" rx="90" ry="30" stroke="url(#waveGlow)" strokeWidth="0.75" opacity="0.6" />
-                                    <ellipse cx="100" cy="50" rx="75" ry="25" stroke="url(#waveGlow)" strokeWidth="0.5" strokeDasharray="3 3" opacity="0.4" />
-                                    <ellipse cx="100" cy="50" rx="60" ry="20" stroke="url(#waveGlow)" strokeWidth="0.5" opacity="0.5" />
-                                    <ellipse cx="100" cy="50" rx="45" ry="15" stroke="url(#waveGlow)" strokeWidth="0.8" strokeDasharray="4 8" opacity="0.8" />
-                                    <defs>
-                                        <linearGradient id="waveGlow" x1="0%" y1="0%" x2="100%" y2="0%">
-                                            <stop offset="0%" stopColor="#0062ff" stopOpacity="0" />
-                                            <stop offset="50%" stopColor="#00f2fe" stopOpacity="1" />
-                                            <stop offset="100%" stopColor="#0062ff" stopOpacity="0" />
-                                        </linearGradient>
-                                    </defs>
-                                </svg>
-                            </div>
-
-                            {/* Glowing spot below the laptop */}
-                            <div className="absolute top-[62%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[240px] h-[80px] bg-blue-500/20 rounded-full blur-[35px] pointer-events-none z-0" />
-
-                            {/* Perspective laptop drawing */}
-                            <div className="relative z-10 w-[420px] h-[250px] animate-float-laptop hover:scale-105 transition-transform duration-500">
-                                <svg className="w-full h-full filter drop-shadow-[0_20px_40px_rgba(0,0,0,0.65)]" viewBox="0 0 400 240" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <defs>
-                                        <linearGradient id="laptopBezel" x1="0%" y1="0%" x2="100%" y2="100%">
-                                            <stop offset="0%" stopColor="#1e293b" />
-                                            <stop offset="100%" stopColor="#0f172a" />
-                                        </linearGradient>
-                                        <linearGradient id="laptopBody" x1="0%" y1="0%" x2="0%" y2="100%">
-                                            <stop offset="0%" stopColor="#475569" />
-                                            <stop offset="100%" stopColor="#0f172a" />
-                                        </linearGradient>
-                                        <linearGradient id="screenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                            <stop offset="0%" stopColor="#040815" />
-                                            <stop offset="100%" stopColor="#020617" />
-                                        </linearGradient>
-                                        <linearGradient id="keyboardGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                                            <stop offset="0%" stopColor="#090d16" />
-                                            <stop offset="50%" stopColor="#111827" />
-                                            <stop offset="100%" stopColor="#090d16" />
-                                        </linearGradient>
-                                    </defs>
-
-                                    {/* LAPTOP SCREEN (Tilted Back in Perspective) */}
-                                    <polygon points="80,30 320,30 300,165 100,165" fill="url(#laptopBezel)" stroke="#334155" strokeWidth="1.5" />
-                                    <polygon points="87,36 313,36 295,159 105,159" fill="url(#screenGrad)" stroke="#1e293b" strokeWidth="0.5" />
-
-                                    {/* SCREEN CONTENT - Mockup Dashboard UI */}
-                                    <polygon points="88,38 312,38 310,48 90,48" fill="#0b1329" opacity="0.8" />
-                                    <circle cx="98" cy="43" r="2" fill="#2ea8ff" />
-                                    <line x1="104" y1="43" x2="124" y2="43" stroke="#cbd5e1" strokeWidth="1.5" opacity="0.7" />
-                                    
-                                    <polygon points="89,52 130,52 127,157 106,157" fill="#070c1b" opacity="0.9" />
-                                    <line x1="94" y1="62" x2="114" y2="62" stroke="#475569" strokeWidth="1.5" />
-                                    <line x1="94" y1="74" x2="110" y2="74" stroke="#475569" strokeWidth="1.5" />
-                                    <line x1="94" y1="86" x2="112" y2="86" stroke="#475569" strokeWidth="1.5" />
-                                    <line x1="94" y1="98" x2="108" y2="98" stroke="#475569" strokeWidth="1.5" />
-                                    <line x1="94" y1="110" x2="111" y2="110" stroke="#475569" strokeWidth="1.5" />
-
-                                    {/* Widget 1 (Line Chart representation) */}
-                                    <polygon points="138,56 220,56 218,100 136,100" fill="#0d1933" stroke="#1e293b" strokeWidth="0.5" />
-                                    <polyline points="144,92 160,74 180,82 200,64 212,78" fill="none" stroke="#2ea8ff" strokeWidth="1.5" />
-                                    <circle cx="200" cy="64" r="1.5" fill="#00f2fe" />
-                                    <line x1="144" y1="64" x2="164" y2="64" stroke="#cbd5e1" strokeWidth="1.5" opacity="0.6" />
-
-                                    {/* Widget 2 (Bar Chart representation) */}
-                                    <polygon points="228,56 306,56 303,100 225,100" fill="#0d1933" stroke="#1e293b" strokeWidth="0.5" />
-                                    <line x1="240" y1="94" x2="240" y2="78" stroke="#818cf8" strokeWidth="3.5" />
-                                    <line x1="250" y1="94" x2="250" y2="68" stroke="#818cf8" strokeWidth="3.5" />
-                                    <line x1="260" y1="94" x2="260" y2="82" stroke="#2ea8ff" strokeWidth="3.5" />
-                                    <line x1="270" y1="94" x2="270" y2="74" stroke="#2ea8ff" strokeWidth="3.5" />
-                                    <line x1="280" y1="94" x2="280" y2="62" stroke="#34d399" strokeWidth="3.5" />
-
-                                    {/* Widget 3 (Circular gauge representation) */}
-                                    <polygon points="136,108 218,108 216,152 134,152" fill="#0d1933" stroke="#1e293b" strokeWidth="0.5" />
-                                    <circle cx="176" cy="130" r="14" fill="none" stroke="#1e293b" strokeWidth="3" />
-                                    <path d="M176 116 A 14 14 0 1 1 162 130" fill="none" stroke="#fbbf24" strokeWidth="3" strokeLinecap="round" />
-                                    <line x1="142" y1="116" x2="162" y2="116" stroke="#cbd5e1" strokeWidth="1.5" opacity="0.6" />
-
-                                    {/* Widget 4 (Table list representation) */}
-                                    <polygon points="224,108 302,108 299,152 221,152" fill="#0d1933" stroke="#1e293b" strokeWidth="0.5" />
-                                    <line x1="230" y1="118" x2="292" y2="118" stroke="#475569" strokeWidth="1" />
-                                    <line x1="230" y1="126" x2="292" y2="126" stroke="#475569" strokeWidth="1" />
-                                    <line x1="230" y1="134" x2="284" y2="134" stroke="#475569" strokeWidth="1" />
-                                    <line x1="230" y1="142" x2="276" y2="142" stroke="#475569" strokeWidth="1" />
-
-                                    {/* Dynamic overlay glow on screen */}
-                                    <polygon points="87,36 210,36 180,159 105,159" fill="url(#screenReflect)" opacity="0.04" />
-                                    <defs>
-                                        <linearGradient id="screenReflect" x1="0%" y1="0%" x2="100%" y2="100%">
-                                            <stop offset="0%" stopColor="#ffffff" />
-                                            <stop offset="100%" stopColor="transparent" stopOpacity="0" />
-                                        </linearGradient>
-                                    </defs>
-
-                                    {/* LAPTOP BODY BASE */}
-                                    <polygon points="100,165 300,165 348,206 52,206" fill="url(#laptopBody)" stroke="#475569" strokeWidth="1" />
-                                    <polygon points="112,168 288,168 328,198 72,198" fill="url(#keyboardGrad)" stroke="#1e293b" strokeWidth="0.5" />
-                                    
-                                    <path d="M125,171 L88,195 M145,171 L115,195 M165,171 L142,195 M185,171 L170,195 M200,171 L195,195 M215,171 L220,195 M235,171 L248,195 M255,171 L275,195 M275,171 L302,195" stroke="#1e293b" strokeWidth="0.5" opacity="0.6" />
-                                    <path d="M118,174 L282,174 M110,181 L290,181 M100,188 L300,188 M86,194 L314,194" stroke="#1e293b" strokeWidth="0.5" opacity="0.6" />
-
-                                    <polygon points="175,199 225,199 230,204 170,204" fill="#0f172a" stroke="#334155" strokeWidth="0.5" />
-                                    <polygon points="52,206 348,206 342,212 58,212" fill="#334155" />
-                                    <polygon points="68,207 332,207 329,209 71,209" fill="#00f2fe" opacity="0.8" className="animate-pulse" />
-                                </svg>
-                            </div>
-
-                            {/* FLOATING HOLOGRAPHIC PANELS */}
-                            
-                            {/* Hologram 1 (Left - Pie Chart) */}
-                            <div className="absolute top-[15%] left-[0%] z-20 w-[95px] h-[95px] bg-[#040919]/65 backdrop-blur-[12px] border border-blue-500/20 hover:border-cyan-400/40 rounded-2xl flex flex-col items-center justify-center p-2.5 shadow-2xl shadow-blue-950/40 animate-holo-left hover:scale-110 transition-all duration-300">
-                                <svg className="w-12 h-12 text-[#2ea8ff] filter drop-shadow-[0_0_8px_rgba(46,168,255,0.4)]" viewBox="0 0 36 36" fill="none">
-                                    <circle cx="18" cy="18" r="15.91" fill="none" stroke="#101c38" strokeWidth="3" />
-                                    <circle cx="18" cy="18" r="15.91" fill="none" stroke="#2ea8ff" strokeWidth="3" strokeDasharray="30 70" strokeDashoffset="25" />
-                                    <circle cx="18" cy="18" r="15.91" fill="none" stroke="#fbbf24" strokeWidth="3" strokeDasharray="20 80" strokeDashoffset="95" />
-                                    <circle cx="18" cy="18" r="15.91" fill="none" stroke="#34d399" strokeWidth="3" strokeDasharray="15 85" strokeDashoffset="75" />
-                                </svg>
-                                <div className="flex items-center gap-1.5 mt-2">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
-                                    <span className="text-[9px] text-[#cbd5e1] font-bold uppercase tracking-wider">Tahlillar</span>
-                                </div>
-                            </div>
-
-                            {/* Hologram 2 (Right - Vertical Bar Chart) */}
-                            <div className="absolute top-[48%] right-[-3%] z-20 w-[110px] h-[85px] bg-[#040919]/65 backdrop-blur-[12px] border border-blue-500/20 hover:border-indigo-400/40 rounded-2xl flex flex-col justify-between p-3 shadow-2xl shadow-blue-950/40 animate-holo-right hover:scale-110 transition-all duration-300">
-                                <div className="flex items-end justify-between h-10 px-1 border-b border-slate-800/80">
-                                    <div className="w-2.5 h-6 bg-gradient-to-t from-indigo-600 to-indigo-400 rounded-t-sm shadow-[0_0_6px_rgba(129,140,248,0.3)] animate-pulse" />
-                                    <div className="w-2.5 h-8 bg-gradient-to-t from-[#2ea8ff] to-cyan-400 rounded-t-sm shadow-[0_0_6px_rgba(46,168,255,0.3)] animate-[pulse_3s_infinite]" />
-                                    <div className="w-2.5 h-4 bg-gradient-to-t from-indigo-600 to-indigo-400 rounded-t-sm opacity-60" />
-                                    <div className="w-2.5 h-9 bg-gradient-to-t from-emerald-500 to-emerald-300 rounded-t-sm shadow-[0_0_6px_rgba(52,211,153,0.3)] animate-pulse" />
-                                </div>
-                                <span className="text-[9px] text-[#cbd5e1] font-bold text-center uppercase tracking-wider">Faktlar</span>
-                            </div>
-
-                            {/* Hologram 3 (Far Right - Team Status Icon) */}
-                            <div className="absolute top-[10%] right-[4%] z-20 w-[54px] h-[54px] bg-[#040919]/75 backdrop-blur-[12px] border border-blue-500/20 hover:border-emerald-400/40 rounded-2xl flex items-center justify-center shadow-2xl shadow-blue-950/40 animate-holo-small hover:scale-110 transition-all duration-300">
-                                <svg className="w-6 h-6 text-emerald-400 filter drop-shadow-[0_0_8px_rgba(52,211,153,0.4)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                                    <circle cx="9" cy="7" r="4" />
-                                    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-                                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                                </svg>
-                            </div>
-                            
+                            {/* User's uploaded mockup image directly embedded! */}
+                            <img 
+                                src="/dashboard_mockup.png" 
+                                alt="PROERP premium dashboard workspace" 
+                                className="w-full h-full object-contain rounded-2xl filter drop-shadow-[0_20px_50px_rgba(0,98,255,0.25)] hover:scale-[1.01] transition-transform duration-500 relative z-10" 
+                            />
                         </div>
                     </div>
 
@@ -427,7 +247,7 @@ const Login = () => {
                     <div className="absolute top-8 left-8 lg:hidden flex items-center gap-3">
                         <ProErpLogo className="w-11 h-11 shrink-0" />
                         <h1 className="text-2xl font-black tracking-tighter flex items-center text-white">
-                            PRO<span className="bg-gradient-to-r from-[#00f2fe] to-[#0062ff] bg-clip-text text-transparent">ERP</span>
+                            PRO<span className="bg-gradient-to-r from-[#00f2fe] to-[#0062ff] bg-clip-text text-transparent text-transparent">ERP</span>
                         </h1>
                     </div>
 
