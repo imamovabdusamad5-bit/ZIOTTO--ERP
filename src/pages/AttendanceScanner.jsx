@@ -79,6 +79,7 @@ const AttendanceScanner = () => {
     const startFaceScanner = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            streamRef.current = stream;
             if (videoRef.current) {
                 videoRef.current.srcObject = stream;
                 isScanningFace.current = true;
@@ -89,10 +90,16 @@ const AttendanceScanner = () => {
         }
     };
 
+    const streamRef = useRef(null);
+
     const stopFaceScanner = () => {
         isScanningFace.current = false;
+        if (streamRef.current) {
+            streamRef.current.getTracks().forEach(track => track.stop());
+            streamRef.current = null;
+        }
         if (videoRef.current && videoRef.current.srcObject) {
-            videoRef.current.srcObject.getTracks().forEach(track => track.stop());
+            videoRef.current.srcObject = null;
         }
     };
 

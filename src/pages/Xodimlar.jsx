@@ -195,6 +195,7 @@ const Xodimlar = () => {
         setFaceStatus('Kamera ishga tushmoqda...');
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            streamRef.current = stream;
             if (videoRef.current) {
                 videoRef.current.srcObject = stream;
             }
@@ -204,9 +205,15 @@ const Xodimlar = () => {
         }
     };
 
+    const streamRef = React.useRef(null);
+
     const stopFaceVideo = () => {
+        if (streamRef.current) {
+            streamRef.current.getTracks().forEach(t => t.stop());
+            streamRef.current = null;
+        }
         if (videoRef.current && videoRef.current.srcObject) {
-            videoRef.current.srcObject.getTracks().forEach(t => t.stop());
+            videoRef.current.srcObject = null;
         }
     };
 
