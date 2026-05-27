@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }) => {
         try {
             const { data, error } = await supabase
                 .from('profiles')
-                .select('*, companies(id, name, domain_slug)')
+                .select('*, companies!profiles_company_id_fkey(id, name, domain_slug)')
                 .eq('id', userId)
                 .single();
 
@@ -94,7 +94,7 @@ export const AuthProvider = ({ children }) => {
 
             const { data, error } = await supabase
                 .from('profiles')
-                .select('*, companies(id, name, domain_slug)')
+                .select('*, companies!profiles_company_id_fkey(id, name, domain_slug)')
                 .eq('username', username)
                 .eq('unique_code', code)
                 .eq('status', true)
