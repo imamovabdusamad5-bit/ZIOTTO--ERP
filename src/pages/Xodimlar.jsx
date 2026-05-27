@@ -19,7 +19,8 @@ import {
     QrCode,
     ScanFace,
     Camera,
-    CheckCircle2
+    CheckCircle2,
+    Activity
 } from 'lucide-react';
 import * as faceapi from '@vladmandic/face-api';
 
