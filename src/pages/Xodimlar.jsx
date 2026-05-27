@@ -101,9 +101,9 @@ const Xodimlar = () => {
 
     const handleAdd = async (e) => {
         e.preventDefault();
-        const { error } = await supabase
-            .from('profiles')
-            .insert([{
+        try {
+            const payload = {
+                id: crypto.randomUUID(),
                 username: newUserData.username.toUpperCase(),
                 unique_code: newUserData.unique_code,
                 full_name: newUserData.full_name || newUserData.username,
@@ -111,15 +111,21 @@ const Xodimlar = () => {
                 status: newUserData.status,
                 permissions: newUserData.permissions,
                 role: 'user',
-                company_id: tenant.id
-            }]);
+                company_id: tenant?.id || null
+            };
+            const { error } = await supabase.from('profiles').insert([payload]);
 
-        if (!error) {
-            setShowAddModal(false);
-            setNewUserData({ username: '', unique_code: '', full_name: '', status: true, permissions: {} });
-            fetchUsers();
-        } else {
-            alert('Xatolik: ' + error.message);
+            if (!error) {
+                setShowAddModal(false);
+                setNewUserData({ username: '', unique_code: '', full_name: '', status: true, permissions: {} });
+                fetchUsers();
+            } else {
+                alert('Xatolik: ' + error.message);
+                console.error("Insert error:", error);
+            }
+        } catch (err) {
+            alert('Kutilmagan xatolik: ' + err.message);
+            console.error(err);
         }
     };
 
