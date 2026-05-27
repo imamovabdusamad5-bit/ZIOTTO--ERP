@@ -134,17 +134,34 @@ const AttendanceScanner = () => {
                 // Find best match manually
                 let bestMatch = null;
                 let minDistance = 0.6; // Relaxed threshold to 0.6
+                let debugDistances = [];
                 
                 profiles.forEach(profile => {
                     if (profile.face_descriptor) {
-                        const dbDesc = new Float32Array(profile.face_descriptor);
-                        const distance = faceapi.euclideanDistance(detection.descriptor, dbDesc);
-                        if (distance < minDistance) {
-                            minDistance = distance;
-                            bestMatch = profile;
+                        try {
+                            let parsed = profile.face_descriptor;
+                            if (typeof parsed === 'string') {
+                                if (parsed.startsWith('{')) {
+                                    parsed = JSON.parse(parsed.replace('{', '[').replace('}', ']'));
+                                } else {
+                                    parsed = JSON.parse(parsed);
+                                }
+                            }
+                            const dbDesc = new Float32Array(parsed);
+                            const distance = faceapi.euclideanDistance(detection.descriptor, dbDesc);
+                            debugDistances.push(`${profile.username}: ${distance.toFixed(3)}`);
+                            
+                            if (distance < minDistance) {
+                                minDistance = distance;
+                                bestMatch = profile;
+                            }
+                        } catch (err) {
+                            console.error("Error parsing descriptor for", profile.username, err);
                         }
                     }
                 });
+                
+                window.lastFaceDebug = debugDistances.join(" | ");
 
                 if (bestMatch) {
                     isScanningFace.current = false; // Pause
@@ -159,7 +176,7 @@ const AttendanceScanner = () => {
                     setScanResult({
                         success: false,
                         user: "Yuz taninmadi",
-                        message: "Sizning yuzingiz bazada topilmadi. Yoki biroz yaqinroq keling."
+                        message: "Sizning yuzingiz bazada topilmadi. " + (window.lastFaceDebug || '')
                     });
                     setLoading(true);
                     setTimeout(() => {
