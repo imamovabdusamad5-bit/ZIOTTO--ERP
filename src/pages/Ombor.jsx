@@ -13,8 +13,10 @@ import AksessuarOmbori from '../components/warehouse/AksessuarOmbori';
 import TayyorMahsulotOmbori from '../components/warehouse/TayyorMahsulotOmbori';
 import MaterialRequests from '../components/warehouse/MaterialRequests';
 import OmborTarix from '../components/warehouse/OmborTarix';
+import { useAuth } from '../context/AuthContext';
 
 const Ombor = () => {
+    const { company } = useAuth();
     const [searchParams, setSearchParams] = useSearchParams();
     const initialTab = searchParams.get('tab') || 'Mato';
     const [activeTab, setActiveTab] = useState(initialTab);
@@ -37,8 +39,10 @@ const Ombor = () => {
     }, [searchParams]);
 
     useEffect(() => {
-        fetchInitialData();
-    }, []);
+        if (company?.id) {
+            fetchInitialData();
+        }
+    }, [company]);
 
     async function fetchInitialData() {
         try {
@@ -59,17 +63,20 @@ const Ombor = () => {
     };
 
     async function fetchInventory() {
+        if (!company?.id) return;
         // First try with the relation
         const { data, error } = await supabase
             .from('inventory')
-            .select(`*, material_types!inventory_reference_id_fkey(thread_type, grammage, code)`);
+            .select(`*, material_types!inventory_reference_id_fkey(thread_type, grammage, code)`)
+            .eq('company_id', company.id);
 
         if (error) {
             console.error("Inventory Fetch Error (Relation):", error);
             // If relation fails (e.g. FK missing), try fetching simple inventory
             const { data: simpleData, error: simpleError } = await supabase
                 .from('inventory')
-                .select('*');
+                .select('*')
+                .eq('company_id', company.id);
 
             if (simpleError) {
                 console.error("Inventory Fetch Error (Simple):", simpleError);
@@ -83,32 +90,39 @@ const Ombor = () => {
     };
 
     async function fetchLogs() {
+        if (!company?.id) return;
         const { data, error } = await supabase
             .from('inventory_logs')
             .select(`*, inventory(item_name, color, category, material_types!inventory_reference_id_fkey(thread_type, grammage))`)
+            .eq('company_id', company.id)
             .order('created_at', { ascending: false })
             .limit(50);
         if (!error) setLogs(data || []);
     };
 
     async function fetchReferences() {
-        const { data, error } = await supabase.from('material_types').select('*').order('name');
+        if (!company?.id) return;
+        const { data, error } = await supabase.from('material_types').select('*').eq('company_id', company.id).order('name');
         if (!error) setReferences(data || []);
     };
 
     async function fetchOrders() {
+        if (!company?.id) return;
         const { data, error } = await supabase
             .from('production_orders')
             .select(`*, models(*, bom_items(*)), production_order_items(*)`)
+            .eq('company_id', company.id)
             .neq('status', 'Finished')
             .order('created_at', { ascending: false });
         if (!error) setOrders(data || []);
     };
 
     async function fetchRequests() {
+        if (!company?.id) return;
         const { data, error } = await supabase
             .from('material_requests')
             .select('*, inventory:inventory_id(item_name, color, unit)')
+            .eq('company_id', company.id)
             .order('created_at', { ascending: false });
         if (!error) setRequests(data || []);
     };

@@ -6,18 +6,18 @@ const AuthContext = createContext({});
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [profile, setProfile] = useState(null);
+    const [company, setCompany] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Simple session persistence using localStorage for username-based auth
         const savedUser = localStorage.getItem('erp_user');
         if (savedUser) {
             const userData = JSON.parse(savedUser);
             setUser(userData);
 
-            // Check for master user bypass to avoid DB fetch error (invalid input syntax for type uuid: "master")
             if (userData.id === 'master') {
                 setProfile(userData);
+                setCompany({ id: 'master', name: 'Master Admin' });
                 setLoading(false);
             } else {
                 fetchProfile(userData.id);
@@ -29,14 +29,18 @@ export const AuthProvider = ({ children }) => {
 
     const fetchProfile = async (userId) => {
         try {
+            // Updated to fetch company details through relation
             const { data, error } = await supabase
                 .from('profiles')
-                .select('*')
+                .select('*, companies(id, name)')
                 .eq('id', userId)
                 .single();
 
             if (!error && data) {
                 setProfile(data);
+                if (data.companies) {
+                    setCompany(data.companies);
+                }
             }
         } catch (err) {
             console.error('Error fetching profile:', err);
@@ -47,18 +51,19 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (username, code) => {
         try {
-            // Master Bypass for initial setup
             if (username === 'ADMIN' && code === '9999') {
                 const masterUser = { id: 'master', username: 'ADMIN', role: 'admin', full_name: 'Asosiy Boshqaruvchi', status: true, permissions: {} };
                 setUser(masterUser);
                 setProfile(masterUser);
+                setCompany({ id: 'master', name: 'Master Admin' });
                 localStorage.setItem('erp_user', JSON.stringify(masterUser));
                 return { data: masterUser };
             }
 
+            // Fetch profile and related company
             const { data, error } = await supabase
                 .from('profiles')
-                .select('*')
+                .select('*, companies(id, name)')
                 .eq('username', username)
                 .eq('unique_code', code)
                 .eq('status', true)
@@ -90,7 +95,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, profile, loading, login, logout }}>
+        <AuthContext.Provider value={{ user, profile, company, loading, login, logout }}>
             {!loading && children}
         </AuthContext.Provider>
     );
