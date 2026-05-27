@@ -119,13 +119,14 @@ const AttendanceScanner = () => {
                     setTimeout(() => {
                         setLoading(false);
                         setScanResult(null);
+                        if (isScanningFace.current) scanFaceLoop();
                     }, 3000);
                     return;
                 }
 
                 // Find best match manually
                 let bestMatch = null;
-                let minDistance = 0.55; // Relaxed threshold from 0.5 to 0.55
+                let minDistance = 0.6; // Relaxed threshold to 0.6
                 
                 profiles.forEach(profile => {
                     if (profile.face_descriptor) {
@@ -157,6 +158,7 @@ const AttendanceScanner = () => {
                     setTimeout(() => {
                         setLoading(false);
                         setScanResult(null);
+                        if (isScanningFace.current) scanFaceLoop();
                     }, 2500);
                     return;
                 }
@@ -165,7 +167,7 @@ const AttendanceScanner = () => {
             console.error(e);
         }
         
-        requestAnimationFrame(scanFaceLoop);
+        if (isScanningFace.current) requestAnimationFrame(scanFaceLoop);
     };
 
     const startQrScanner = () => {
