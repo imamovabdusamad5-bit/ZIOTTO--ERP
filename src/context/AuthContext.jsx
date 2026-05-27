@@ -38,7 +38,9 @@ export const AuthProvider = ({ children }) => {
                 if (userData.id === 'master') {
                     setUser(userData);
                     setProfile(userData);
-                    setCompany({ id: 'master', name: 'Master Admin' });
+                    const adminCompany = currentTenant || { id: 'master', name: 'Master Admin' };
+                    setCompany(adminCompany);
+                    localStorage.setItem('erp_company_id', adminCompany.id);
                     setLoading(false);
                 } else {
                     // Only restore if the user belongs to the CURRENT tenant!
@@ -86,8 +88,11 @@ export const AuthProvider = ({ children }) => {
                 const masterUser = { id: 'master', username: 'ADMIN', role: 'admin', full_name: 'Asosiy Boshqaruvchi', status: true, permissions: {} };
                 setUser(masterUser);
                 setProfile(masterUser);
-                setCompany({ id: 'master', name: 'Master Admin' });
-                localStorage.setItem('erp_company_id', 'master');
+                
+                // Use current tenant so ADMIN can see tenant-specific data
+                const adminCompany = tenant || { id: 'master', name: 'Master Admin' };
+                setCompany(adminCompany);
+                localStorage.setItem('erp_company_id', adminCompany.id);
                 localStorage.setItem('erp_user', JSON.stringify(masterUser));
                 return { data: masterUser };
             }
