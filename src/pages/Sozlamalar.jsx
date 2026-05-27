@@ -24,7 +24,8 @@ const Sozlamalar = () => {
     const [tempImage, setTempImage] = useState(null);
 
     const THEMES = [
-        { id: 'classic', name: 'Standart (Default)', preview: 'bg-slate-900 border-gray-600' },
+        { id: 'classic', name: 'Standart (Default)', preview: 'bg-[#020617] border-slate-600' },
+        { id: 'light', name: 'Yorug\' (Oq rang)', preview: 'bg-[#f8fafc] border-gray-300' },
         { id: 'space', name: 'Cosmic Space', preview: 'bg-[#050b14] border-[#00f2fe]' },
         { id: 'sunset', name: 'Neon Sunset', preview: 'bg-[#17091c] border-[#d946ef]' },
         { id: 'cyber', name: 'Cyber Matrix', preview: 'bg-[#020a06] border-[#10b981]' },
@@ -313,7 +314,7 @@ const Sozlamalar = () => {
                         <Palette className="text-indigo-500" />
                         Tizim Dizayni (Mavzular) <span className="ml-2 text-[9px] bg-amber-500/20 text-amber-500 px-2 py-1 rounded-full uppercase tracking-widest">Ultra</span>
                     </h3>
-                    <div className="grid grid-cols-2 md:grid-cols-6 gap-4 relative z-10">
+                    <div className="flex flex-wrap gap-4 relative z-10">
                         {THEMES.map(theme => {
                             const isActive = theme.id === 'custom' ? isCustomActive : formData.sidebar_theme === theme.id;
                             return (
