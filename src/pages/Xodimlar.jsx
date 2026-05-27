@@ -85,10 +85,12 @@ const Xodimlar = () => {
     };
 
     async function fetchUsers() {
+        if (!tenant) return;
         setLoading(true);
         const { data, error } = await supabase
             .from('profiles')
             .select('*')
+            .eq('company_id', tenant.id)
             .order('username', { ascending: true });
 
         if (!error) {
@@ -108,7 +110,8 @@ const Xodimlar = () => {
                 department: newUserData.department,
                 status: newUserData.status,
                 permissions: newUserData.permissions,
-                role: 'user'
+                role: 'user',
+                company_id: tenant.id
             }]);
 
         if (!error) {

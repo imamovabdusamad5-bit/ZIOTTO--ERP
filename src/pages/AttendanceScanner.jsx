@@ -50,8 +50,13 @@ const AttendanceScanner = () => {
 
     const loadFaceDependencies = async () => {
         try {
-            // Fetch users with face_descriptors
-            const { data: users } = await supabase.from('profiles').select('*').not('face_descriptor', 'is', null);
+            // Fetch users with face_descriptors for this specific company
+            const { data: users } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('company_id', tenant.id)
+                .not('face_descriptor', 'is', null);
+                
             if (users) {
                 setProfiles(users);
             }
