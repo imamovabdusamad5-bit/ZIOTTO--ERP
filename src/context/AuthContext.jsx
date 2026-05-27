@@ -80,18 +80,30 @@ export const AuthProvider = ({ children }) => {
 
             setUser(data);
             setProfile(data);
-            localStorage.setItem('erp_user', JSON.stringify(data));
-            return { data };
+            if (data.companies) {
+                setCompany(data.companies);
+                localStorage.setItem('erp_company_id', data.companies.id);
+            }
+            
+            // Remove sensitive fields before storing
+            const safeUser = { ...data };
+            delete safeUser.unique_code;
+            delete safeUser.companies; // optional, but good for cleanliness
+            
+            localStorage.setItem('erp_user', JSON.stringify(safeUser));
+            return { data: safeUser };
         } catch (err) {
-            console.error('Login Catch Error:', err);
-            return { error: { message: 'Tizimda kutilmagan xatolik: ' + err.message } };
+            console.error('Login error:', err);
+            return { error: err };
         }
     };
 
     const logout = () => {
         setUser(null);
         setProfile(null);
+        setCompany(null);
         localStorage.removeItem('erp_user');
+        localStorage.removeItem('erp_company_id');
     };
 
     return (
