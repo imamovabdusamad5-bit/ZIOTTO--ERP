@@ -96,7 +96,7 @@ const Login = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [showForgotModal, setShowForgotModal] = useState(false);
-    const { login } = useAuth();
+    const { login, tenant } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -121,6 +121,9 @@ const Login = () => {
         setCode('');
         setError('');
     };
+
+    const companyName = tenant?.name || 'PROERP';
+    const isMaster = tenant?.domain_slug === 'ziotto' || !tenant;
 
     return (
         <div className="relative w-full min-h-screen bg-[#020617] flex font-sans overflow-hidden text-white select-none">
@@ -202,13 +205,19 @@ const Login = () => {
                         <ProErpLogo className="w-20 h-20 shrink-0" />
                         <div className="flex flex-col">
                             <h1 className="text-4xl font-extrabold tracking-tight flex items-center gap-0.5 leading-none">
-                                <span className="text-white font-extrabold">PRO</span>
-                                <span className="text-[#0062ff] font-extrabold">ERP</span>
+                                {isMaster ? (
+                                    <>
+                                        <span className="text-white font-extrabold">PRO</span>
+                                        <span className="text-[#0062ff] font-extrabold">ERP</span>
+                                    </>
+                                ) : (
+                                    <span className="text-white font-extrabold uppercase">{companyName}</span>
+                                )}
                             </h1>
                             <div className="flex items-center gap-1.5 mt-2">
                                 <span className="h-[1px] w-3 bg-slate-600" />
                                 <p className="text-[#94a3b8] uppercase tracking-[0.25em] text-[10px] font-semibold leading-none">
-                                    Biznesni oson boshqaruv
+                                    {isMaster ? 'Biznesni oson boshqaruv' : 'Biznes boshqaruv tizimi'}
                                 </p>
                                 <span className="h-[1px] w-3 bg-slate-600" />
                             </div>
@@ -226,7 +235,7 @@ const Login = () => {
                             </h2>
                             {/* Subtitle Description */}
                             <p className="text-[#94a3b8] text-lg leading-[1.75] max-w-xl font-medium animate-in fade-in slide-in-from-left-6 duration-1000 delay-250">
-                                PROERP – korxonalarni yagona platformada boshqarish, jarayonlarni avtomatlashtirish va samaradorlikni oshirish uchun zamonaviy ERP yechimi.
+                                {companyName} – korxonani yagona platformada boshqarish, jarayonlarni avtomatlashtirish va samaradorlikni oshirish uchun zamonaviy ERP yechimi.
                             </p>
                         </div>
 
@@ -258,7 +267,11 @@ const Login = () => {
                     <div className="absolute top-8 left-8 lg:hidden flex items-center gap-3">
                         <ProErpLogo className="w-11 h-11 shrink-0" />
                         <h1 className="text-2xl font-black tracking-tighter flex items-center">
-                            PRO<span className="text-[#0062ff]">ERP</span>
+                            {isMaster ? (
+                                <>PRO<span className="text-[#0062ff]">ERP</span></>
+                            ) : (
+                                <span className="uppercase">{companyName}</span>
+                            )}
                         </h1>
                     </div>
 
@@ -268,7 +281,7 @@ const Login = () => {
                             
                             <div className="mb-9">
                                 <h3 className="text-[40px] font-black text-white tracking-tight leading-none mb-3">Tizimga kirish</h3>
-                                <p className="text-sm text-[#94a3b8] font-medium leading-relaxed">Hisobingizga kirish uchun ma'lumotlaringizni kiriting</p>
+                                <p className="text-sm text-[#94a3b8] font-medium leading-relaxed">{companyName} xodimlari uchun yopiq portal</p>
                             </div>
 
                             <form onSubmit={handleSubmit} className="space-y-6">

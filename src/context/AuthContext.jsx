@@ -7,36 +7,67 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [profile, setProfile] = useState(null);
     const [company, setCompany] = useState(null);
+    const [tenant, setTenant] = useState(null); // The company bound to this subdomain
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const savedUser = localStorage.getItem('erp_user');
-        if (savedUser) {
-            const userData = JSON.parse(savedUser);
-            setUser(userData);
+        const initializeApp = async () => {
+            // 1. Determine Subdomain Tenant
+            const hostname = window.location.hostname;
+            
+            // Fetch companies to match the subdomain slug
+            const { data: companiesData } = await supabase.from('companies').select('*');
+            let currentTenant = null;
 
-            if (userData.id === 'master') {
-                setProfile(userData);
-                setCompany({ id: 'master', name: 'Master Admin' });
-                setLoading(false);
-            } else {
-                fetchProfile(userData.id);
+            if (companiesData && companiesData.length > 0) {
+                // Try to find a company whose slug is in the hostname (e.g. 'bonito' in 'bonito-kids.vercel.app')
+                currentTenant = companiesData.find(c => c.domain_slug && hostname.includes(c.domain_slug));
+                
+                // Fallback for localhost or unmatched domains -> default to 'ziotto'
+                if (!currentTenant) {
+                    currentTenant = companiesData.find(c => c.domain_slug === 'ziotto') || companiesData[0];
+                }
+                setTenant(currentTenant);
             }
-        } else {
-            setLoading(false);
-        }
+
+            // 2. Restore Session
+            const savedUser = localStorage.getItem('erp_user');
+            if (savedUser) {
+                const userData = JSON.parse(savedUser);
+                
+                if (userData.id === 'master') {
+                    setUser(userData);
+                    setProfile(userData);
+                    setCompany({ id: 'master', name: 'Master Admin' });
+                    setLoading(false);
+                } else {
+                    // Only restore if the user belongs to the CURRENT tenant!
+                    await fetchProfile(userData.id, currentTenant?.id);
+                }
+            } else {
+                setLoading(false);
+            }
+        };
+
+        initializeApp();
     }, []);
 
-    const fetchProfile = async (userId) => {
+    const fetchProfile = async (userId, tenantId) => {
         try {
-            // Updated to fetch company details through relation
             const { data, error } = await supabase
                 .from('profiles')
-                .select('*, companies(id, name)')
+                .select('*, companies(id, name, domain_slug)')
                 .eq('id', userId)
                 .single();
 
             if (!error && data) {
+                // Security Check: Does the user belong to the subdomain they are visiting?
+                if (data.company_id !== tenantId && data.role !== 'admin') {
+                    // Optional: You could log them out if they switch subdomains
+                    console.warn("User does not belong to this tenant!");
+                }
+                
+                setUser(data);
                 setProfile(data);
                 if (data.companies) {
                     setCompany(data.companies);
@@ -56,26 +87,31 @@ export const AuthProvider = ({ children }) => {
                 setUser(masterUser);
                 setProfile(masterUser);
                 setCompany({ id: 'master', name: 'Master Admin' });
+                localStorage.setItem('erp_company_id', 'master');
                 localStorage.setItem('erp_user', JSON.stringify(masterUser));
                 return { data: masterUser };
             }
 
-            // Fetch profile and related company
             const { data, error } = await supabase
                 .from('profiles')
-                .select('*, companies(id, name)')
+                .select('*, companies(id, name, domain_slug)')
                 .eq('username', username)
                 .eq('unique_code', code)
                 .eq('status', true)
-                .maybeSingle(); // maybeSingle doesn't throw error on 0 rows
+                .maybeSingle();
 
             if (error) {
                 console.error('Login DB Error:', error);
-                return { error: { message: `Bazaga bog'lanishda xatolik: ${error.message}. Iltimos SQL skriptni profil jadvalida ishga tushirganingizni tekshiring.` } };
+                return { error: { message: `Bazaga bog'lanishda xatolik: ${error.message}.` } };
             }
 
             if (!data) {
                 return { error: { message: 'Foydalanuvchi ismi yoki maxsus kod noto\'g\'ri' } };
+            }
+
+            // Subdomain Security: Reject login if user is not from this tenant
+            if (tenant && data.company_id !== tenant.id) {
+                return { error: { message: `Ruxsat etilmagan! Siz ${data.companies?.name || 'boshqa korxona'} xodimisiz. Iltimos o'zingizning havolangizdan kiring.` } };
             }
 
             setUser(data);
@@ -85,10 +121,9 @@ export const AuthProvider = ({ children }) => {
                 localStorage.setItem('erp_company_id', data.companies.id);
             }
             
-            // Remove sensitive fields before storing
             const safeUser = { ...data };
             delete safeUser.unique_code;
-            delete safeUser.companies; // optional, but good for cleanliness
+            delete safeUser.companies;
             
             localStorage.setItem('erp_user', JSON.stringify(safeUser));
             return { data: safeUser };
@@ -107,7 +142,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, profile, company, loading, login, logout }}>
+        <AuthContext.Provider value={{ user, profile, company, tenant, loading, login, logout }}>
             {!loading && children}
         </AuthContext.Provider>
     );
