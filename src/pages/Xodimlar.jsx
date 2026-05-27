@@ -212,7 +212,10 @@ const Xodimlar = () => {
         if (!videoRef.current || !modelsLoaded) return;
         setFaceStatus("Yuzni skanerlash...");
         
-        const detections = await faceapi.detectSingleFace(videoRef.current, new faceapi.TinyFaceDetectorOptions())
+        const detections = await faceapi.detectSingleFace(
+            videoRef.current, 
+            new faceapi.TinyFaceDetectorOptions({ inputSize: 512, scoreThreshold: 0.3 })
+        )
             .withFaceLandmarks()
             .withFaceDescriptor();
             

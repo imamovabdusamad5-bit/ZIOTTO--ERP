@@ -103,7 +103,10 @@ const AttendanceScanner = () => {
         }
 
         try {
-            const detection = await faceapi.detectSingleFace(videoRef.current, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
+            const detection = await faceapi.detectSingleFace(
+                videoRef.current, 
+                new faceapi.TinyFaceDetectorOptions({ inputSize: 512, scoreThreshold: 0.3 })
+            ).withFaceLandmarks().withFaceDescriptor();
             
             if (detection) {
                 if (profiles.length === 0) {
