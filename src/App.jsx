@@ -22,6 +22,7 @@ import Pechat from './pages/Pechat';
 import Vishefka from './pages/Vishefka';
 import Hujjatlar from './pages/Hujjatlar';
 import AttendanceScanner from './pages/AttendanceScanner';
+import Sozlamalar from './pages/Sozlamalar';
 
 import ZiyoChat from './components/ZiyoChat';
 
@@ -114,6 +115,7 @@ function App() {
               <Route path="malumotlar" element={<RoleGuard path="/malumotlar"><Ma_lumotlar /></RoleGuard>} />
               <Route path="hujjatlar" element={<RoleGuard path="/hujjatlar"><Hujjatlar /></RoleGuard>} />
               <Route path="scanner" element={<RoleGuard path="/scanner"><AttendanceScanner /></RoleGuard>} />
+              <Route path="sozlamalar" element={<RoleGuard path="/sozlamalar"><Sozlamalar /></RoleGuard>} />
             </Route>
           </Routes>
         </BrowserRouter>

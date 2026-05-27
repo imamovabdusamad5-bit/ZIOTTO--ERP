@@ -202,7 +202,11 @@ const Login = () => {
                 <div className="hidden lg:flex lg:w-[56%] flex-col justify-between p-16 xl:p-24 select-none relative">
                     {/* Header: Logo and Title */}
                     <div className="flex items-center gap-4.5 animate-in fade-in slide-in-from-left-6 duration-700">
-                        <ProErpLogo className="w-20 h-20 shrink-0" />
+                        {tenant?.logo_url ? (
+                            <img src={tenant.logo_url} alt="Logo" className="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.2)] shrink-0" />
+                        ) : (
+                            <ProErpLogo className="w-20 h-20 shrink-0" />
+                        )}
                         <div className="flex flex-col">
                             <h1 className="text-4xl font-extrabold tracking-tight flex items-center gap-0.5 leading-none">
                                 <span className="text-white font-extrabold">PRO</span>
@@ -259,7 +263,11 @@ const Login = () => {
                 <div className="w-full lg:w-[44%] flex items-center justify-center p-6 sm:p-12 z-10 relative">
                     {/* Mobile Header Logo */}
                     <div className="absolute top-8 left-8 lg:hidden flex items-center gap-3">
-                        <ProErpLogo className="w-11 h-11 shrink-0" />
+                        {tenant?.logo_url ? (
+                            <img src={tenant.logo_url} alt="Logo" className="w-11 h-11 object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.2)] shrink-0" />
+                        ) : (
+                            <ProErpLogo className="w-11 h-11 shrink-0" />
+                        )}
                         <h1 className="text-2xl font-black tracking-tighter flex items-center">
                             {isMaster ? (
                                 <>PRO<span className="text-[#0062ff]">ERP</span></>
