@@ -100,10 +100,24 @@ const AttendanceScanner = () => {
         try {
             const detection = await faceapi.detectSingleFace(videoRef.current).withFaceLandmarks().withFaceDescriptor();
             
-            if (detection && profiles.length > 0) {
+            if (detection) {
+                if (profiles.length === 0) {
+                    setScanResult({
+                        success: false,
+                        user: "Tizimda yuzlar yo'q",
+                        message: "Iltimos, avval Xodimlar bo'limidan yuzingizni ro'yxatdan o'tkazing."
+                    });
+                    setLoading(true);
+                    setTimeout(() => {
+                        setLoading(false);
+                        setScanResult(null);
+                    }, 3000);
+                    return;
+                }
+
                 // Find best match manually
                 let bestMatch = null;
-                let minDistance = 0.5; // Threshold
+                let minDistance = 0.55; // Relaxed threshold from 0.5 to 0.55
                 
                 profiles.forEach(profile => {
                     if (profile.face_descriptor) {
@@ -119,11 +133,23 @@ const AttendanceScanner = () => {
                 if (bestMatch) {
                     isScanningFace.current = false; // Pause
                     await handleScanSuccess(JSON.stringify({ id: bestMatch.id, code: bestMatch.unique_code }), null, bestMatch);
-                    // handleScanSuccess will resume after 4s by resetting loading and we manually restart loop
                     setTimeout(() => {
                         isScanningFace.current = true;
                         scanFaceLoop();
                     }, 4000);
+                    return;
+                } else {
+                    // Face detected but not recognized
+                    setScanResult({
+                        success: false,
+                        user: "Yuz taninmadi",
+                        message: "Sizning yuzingiz bazada topilmadi. Yoki biroz yaqinroq keling."
+                    });
+                    setLoading(true);
+                    setTimeout(() => {
+                        setLoading(false);
+                        setScanResult(null);
+                    }, 2500);
                     return;
                 }
             }
@@ -291,7 +317,7 @@ const AttendanceScanner = () => {
             <div className="w-full max-w-xl relative z-10 flex flex-col items-center">
                 <div className="mb-8 text-center">
                     <h1 className="text-4xl font-black mb-2 uppercase tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">
-                        Ziotto Scanner
+                        PRO ERP SCANNER
                     </h1>
                     <p className="text-gray-400 font-bold uppercase tracking-[0.2em] text-xs">
                         {mode === 'qr' ? "QR kodni kameraga ko'rsating" : "Kameraga qarang"}
