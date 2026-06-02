@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Save, FileText, Trash2, Layers, Scissors, Ruler, Activity, ChevronRight, ChevronDown, Shirt, X, Calculator, RefreshCw, CircleAlert, Pencil, Search, Image, Package, Clock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import ImageCropper from '../components/ImageCropper';
-
+import ModelDetailsModal from '../components/ModelDetailsModal';
 const Modelxona = () => {
     const [models, setModels] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -818,87 +818,22 @@ const Modelxona = () => {
                                         >
                                             <Trash2 size={20} />
                                         </button>
-                                    </div>
-                                    <div className={`p-4 rounded-full bg-[var(--bg-body)] text-[var(--text-secondary)] transition-all ${expandedModel === model.id ? 'rotate-180 text-white bg-indigo-600 border border-indigo-500' : ''}`}>
-                                        <ChevronDown size={20} />
-                                    </div>
                                 </div>
                             </div>
-
-                            {expandedModel === model.id && (
-                                <div className="px-10 pb-10 border-t border-[var(--border-color)] animate-in slide-in-from-top-4 duration-300">
-                                    {/* Department Notes Display (RED ALERT STYLE) */}
-                                    {model.notes?.length > 0 && (
-                                        <div className="mt-8 space-y-4">
-                                            <h5 className="text-[10px] font-black text-rose-500 uppercase tracking-[0.2em] flex items-center gap-3 ml-2">
-                                                <div className="p-1.5 bg-rose-500/20 rounded-lg text-rose-500 animate-pulse border border-rose-500/20">
-                                                    <Activity size={14} />
-                                                </div>
-                                                Bo'limlar uchun muhim ko'rsatmalar
-                                            </h5>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                {model.notes.map((note, idx) => (
-                                                    <div key={idx} className="flex bg-[var(--bg-body)] border border-rose-500/10 rounded-[1.5rem] overflow-hidden shadow-2xl">
-                                                        <div className="bg-rose-600/10 text-rose-500 font-black text-[10px] px-4 flex items-center justify-center min-w-[100px] uppercase tracking-widest border-r border-rose-500/10 text-center leading-tight">
-                                                            {note.department}
-                                                        </div>
-                                                        <div className="p-5 text-[11px] text-[var(--text-secondary)] font-bold leading-relaxed italic">
-                                                            "{note.text}"
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    <div className="mt-10 overflow-hidden rounded-[2.5rem] border border-[var(--border-color)] bg-[var(--bg-body)] shadow-inner">
-                                        <div className="bg-[var(--bg-card)] px-8 py-4 border-b border-[var(--border-color)] flex items-center justify-between">
-                                            <span className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em]">Model Texnik Tarkibi (BOM)</span>
-                                            <span className="text-[10px] font-mono font-black text-indigo-400 uppercase tracking-widest bg-indigo-600/5 px-4 py-1.5 rounded-xl border border-indigo-600/10 shadow-lg">Artikul: {model.code}</span>
-                                        </div>
-                                        <div className="overflow-x-auto">
-                                            <table className="w-full text-left">
-                                                <thead className="bg-[var(--bg-card)] text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest border-b border-[var(--border-color)]">
-                                                    <tr>
-                                                        <th className="px-8 py-5 text-[var(--text-primary)]">Bo'lak (Part)</th>
-                                                        <th className="px-8 py-5">Material Nomi</th>
-                                                        <th className="px-8 py-5">Kodi</th>
-                                                        <th className="px-8 py-5 text-right font-black text-[var(--text-primary)]">Sarf (Me\'yor)</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody className="divide-y divide-[var(--border-color)]">
-                                                    {model.bom_items?.map((item, i) => {
-                                                        const selectedRef = references.find(r => r.id === item.material_type_id);
-                                                        const artikulKodi = selectedRef?.code || '-';
-
-                                                        return (
-                                                            <tr key={i} className="hover:bg-[var(--bg-hover)] transition-colors group/row">
-                                                                <td className="px-8 py-5 font-black text-[var(--text-primary)] uppercase text-[10px] tracking-widest">{item.part_name}</td>
-                                                                <td className="px-8 py-5 text-[var(--text-secondary)] font-bold text-xs">{item.item_name}</td>
-                                                                <td className="px-8 py-5">
-                                                                    <span className="text-[10px] font-mono font-black text-indigo-400 bg-[var(--bg-card)] px-3 py-1.5 rounded-xl border border-[var(--border-color)] shadow-inner">
-                                                                        {artikulKodi}
-                                                                    </span>
-                                                                </td>
-                                                                <td className="px-8 py-5 text-right">
-                                                                    <div className="flex items-center justify-end gap-2 text-indigo-400 font-black">
-                                                                        <span className="text-[15px] tabular-nums tracking-tighter">{item.consumption}</span>
-                                                                        <span className="text-[9px] text-[var(--text-secondary)] uppercase tracking-widest">{item.unit}</span>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                        );
-                                                    })}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
                         </div>
+                    </div>
                     ))
                 )}
             </div>
+
+            {/* Model Details Modal */}
+            {expandedModel && (
+                <ModelDetailsModal
+                    model={models.find(m => m.id === expandedModel)}
+                    onClose={() => setExpandedModel(null)}
+                    onRefresh={fetchModels}
+                />
+            )}
 
             {showCropper && (
                 <ImageCropper
