@@ -8,6 +8,7 @@ const Modelxona = () => {
     const [models, setModels] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
+    const [activeTab, setActiveTab] = useState('barcha');
     const [expandedModel, setExpandedModel] = useState(null);
     const [references, setReferences] = useState([]);
 
@@ -501,6 +502,14 @@ const Modelxona = () => {
             setTempImage(null);
         }
     };
+
+    const filteredModels = models.filter(m => {
+        if (activeTab === 'barcha') return true;
+        if (activeTab === 'tasdiqlangan') return m.status === 'tasdiqlangan';
+        if (activeTab === 'shablonlar') return m.status === 'shablon';
+        if (activeTab === 'arxivlar') return m.status === 'arxiv';
+        return true;
+    });
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
@@ -1102,17 +1111,39 @@ const Modelxona = () => {
                 </div>
             )}
 
+            {/* Tabs */}
+            <div className="flex flex-wrap items-center gap-2 mb-6 bg-[var(--bg-card)] p-2 rounded-2xl border border-[var(--border-color)]">
+                {[
+                    { id: 'barcha', label: 'Barcha Modellar' },
+                    { id: 'tasdiqlangan', label: 'Tasdiqlangan Model' },
+                    { id: 'shablonlar', label: 'Shablonlar' },
+                    { id: 'arxivlar', label: 'Arxivlar' }
+                ].map(tab => (
+                    <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-all ${
+                            activeTab === tab.id
+                                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
+                                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]'
+                        }`}
+                    >
+                        {tab.label}
+                    </button>
+                ))}
+            </div>
+
             {/* Model List */}
             <div className="grid grid-cols-1 gap-4">
                 {loading ? (
                     <div className="p-20 flex justify-center"><Activity className="animate-spin text-indigo-500" /></div>
-                ) : models.length === 0 ? (
-                    <div className="text-center p-20 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200 text-gray-400">
+                ) : filteredModels.length === 0 ? (
+                    <div className="text-center p-20 bg-[var(--bg-card)] rounded-[3rem] border border-[var(--border-color)] text-[var(--text-secondary)] shadow-inner">
                         <Shirt size={48} className="mx-auto mb-4 opacity-20" />
-                        Hali modellar kiritilmagan
+                        Ushbu bo'limda modellar topilmadi
                     </div>
                 ) : (
-                    models.map((model) => (
+                    filteredModels.map((model) => (
                         <div key={model.id} className="bg-[var(--bg-card)] rounded-[2.5rem] border border-[var(--border-color)] overflow-hidden group hover:border-indigo-500/30 transition-all shadow-2xl">
                             <div
                                 className="p-8 flex items-center justify-between cursor-pointer hover:bg-[var(--bg-hover)] transition-colors"
