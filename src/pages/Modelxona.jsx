@@ -292,7 +292,16 @@ const Modelxona = () => {
 
             // Filter out empty notes before saving
             const filteredNotes = (modelInfo.notes || []).filter(n => n.text?.trim() !== '');
-            const modelToSave = { ...modelInfo, notes: filteredNotes };
+            
+            // Faqat kerakli maydonlarni ajratib olamiz (localStorage dagi eski qoldiqlar bazaga ketmasligi uchun)
+            const modelToSave = {
+                name: modelInfo.name,
+                code: modelInfo.code,
+                age_group: modelInfo.age_group,
+                category: modelInfo.category,
+                image_url: modelInfo.image_url,
+                notes: filteredNotes
+            };
 
             // 1. Create or Update Model
             if (editingId) {
