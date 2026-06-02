@@ -48,8 +48,8 @@ const ModelDetailsModal = ({ model, onClose, onRefresh }) => {
     const removeStringItem = (setter, state, idx) => setter(state.filter((_, i) => i !== idx));
 
     return (
-        <div className="fixed inset-0 bg-[#0f111a]/95 backdrop-blur-md z-[100] overflow-y-auto flex justify-center items-start pt-10 pb-20">
-            <div className="bg-[#1a1d27] w-full max-w-7xl min-h-[85vh] rounded-2xl border border-white/5 shadow-2xl flex flex-col overflow-hidden relative">
+        <div className="fixed inset-0 bg-[#1a1d27] z-[100] flex flex-col h-screen w-screen overflow-hidden">
+            <div className="w-full h-full flex flex-col overflow-hidden relative">
                 
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-white/5 bg-[#14161f] sticky top-0 z-10">
@@ -95,7 +95,7 @@ const ModelDetailsModal = ({ model, onClose, onRefresh }) => {
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 p-6 bg-[#0f111a]">
+                <div className="flex-1 p-6 bg-[#0f111a] overflow-y-auto">
                     {activeTab === 'kartasi' && (
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                             
