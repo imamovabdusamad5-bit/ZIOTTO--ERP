@@ -25,7 +25,7 @@ client.from = (table) => {
     const companyId = getCompanyId();
 
     // Tables that do NOT need company filtering (Global tables)
-    const exemptTables = ['profiles', 'companies'];
+    const exemptTables = ['profiles', 'companies', 'models'];
     if (exemptTables.includes(table) || !companyId) {
         return builder;
     }
