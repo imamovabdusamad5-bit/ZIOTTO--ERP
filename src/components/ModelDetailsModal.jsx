@@ -104,9 +104,9 @@ const ModelDetailsModal = ({ model, onClose, onRefresh }) => {
                                 <div className="bg-[#1a1d27] rounded-2xl border border-white/5 p-5 flex flex-col gap-5">
                                     <h3 className="text-white/80 font-black text-xs uppercase tracking-widest border-b border-white/5 pb-3">Model Haqida Ma'lumot</h3>
                                     
-                                    <div className="aspect-square rounded-xl bg-[#0f111a] border border-white/5 overflow-hidden flex items-center justify-center relative group">
+                                    <div className="h-64 w-full p-4 rounded-xl bg-[#0f111a] border border-white/5 overflow-hidden flex items-center justify-center relative group">
                                         {model?.image_url ? (
-                                            <img src={model.image_url} alt="Model" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                            <img src={model.image_url} alt="Model" className="max-w-full max-h-full object-contain transition-transform duration-500 group-hover:scale-105" />
                                         ) : (
                                             <div className="flex flex-col items-center gap-2 text-white/20">
                                                 <Box size={32} />
@@ -202,16 +202,30 @@ const ModelDetailsModal = ({ model, onClose, onRefresh }) => {
                                                 <Plus size={12} /> Qo'shish
                                             </button>
                                         </div>
+                                        <datalist id="size-suggestions">
+                                            <option value="S" />
+                                            <option value="M" />
+                                            <option value="L" />
+                                            <option value="XL" />
+                                            <option value="XXL" />
+                                            <option value="1 yosh" />
+                                            <option value="2 yosh" />
+                                            <option value="3 yosh" />
+                                            <option value="4 yosh" />
+                                            <option value="5 yosh" />
+                                            <option value="6 yosh" />
+                                        </datalist>
                                         <div className="flex flex-wrap gap-2">
                                             {sizes.length === 0 && <span className="text-xs text-white/20 font-bold tracking-widest">Kiritilmagan</span>}
                                             {sizes.map((s, i) => (
                                                 <div key={i} className="flex items-center bg-[#0f111a] border border-white/10 rounded-lg overflow-hidden group">
                                                     <input 
                                                         type="text" 
+                                                        list="size-suggestions"
                                                         value={s} 
                                                         onChange={e => updateStringItem(setSizes, sizes, i, e.target.value)} 
-                                                        placeholder="Masalan: S, M, L"
-                                                        className="bg-transparent text-xs font-bold text-white px-3 py-2 w-24 focus:outline-none focus:bg-white/5 transition-colors"
+                                                        placeholder="Razmer tanlash yoki yozish"
+                                                        className="bg-transparent text-xs font-bold text-white px-3 py-2 w-32 focus:outline-none focus:bg-white/5 transition-colors"
                                                     />
                                                     <button onClick={() => removeStringItem(setSizes, sizes, i)} className="px-2 py-2 text-white/20 hover:bg-red-500/20 hover:text-red-400 transition-colors">
                                                         <X size={12} />
