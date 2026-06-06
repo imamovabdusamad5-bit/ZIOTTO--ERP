@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, Save, CircleDollarSign, Scissors, History, Box, Plus, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
-const ModelDetailsModal = ({ model, onClose, onRefresh }) => {
+const ModelDetailsModal = ({ model, onClose, onRefresh, suggestedSizes = [], suggestedSeasons = [], suggestedComponents = [] }) => {
     const [activeTab, setActiveTab] = useState('kartasi'); // kartasi, xarajatlar, ish_rejasi, xronologiya
     const [saving, setSaving] = useState(false);
 
@@ -204,17 +204,7 @@ const ModelDetailsModal = ({ model, onClose, onRefresh }) => {
                                                 </button>
                                             </div>
                                             <datalist id="size-suggestions">
-                                                <option value="S" />
-                                                <option value="M" />
-                                                <option value="L" />
-                                                <option value="XL" />
-                                                <option value="XXL" />
-                                                <option value="1 yosh" />
-                                                <option value="2 yosh" />
-                                                <option value="3 yosh" />
-                                                <option value="4 yosh" />
-                                                <option value="5 yosh" />
-                                                <option value="6 yosh" />
+                                                {suggestedSizes.map((s, idx) => <option key={idx} value={s} />)}
                                             </datalist>
                                             <div className="flex flex-wrap gap-2">
                                                 {sizes.map((s, i) => (
@@ -245,15 +235,19 @@ const ModelDetailsModal = ({ model, onClose, onRefresh }) => {
                                                     <Plus size={12} /> Qo'shish
                                                 </button>
                                             </div>
+                                            <datalist id="season-suggestions">
+                                                {suggestedSeasons.map((s, idx) => <option key={idx} value={s} />)}
+                                            </datalist>
                                             <div className="flex flex-wrap gap-2">
                                                 {seasons.map((s, i) => (
                                                     <div key={i} className="flex items-center bg-[#0f111a] border border-white/10 rounded-lg overflow-hidden group">
                                                         <input 
                                                             type="text" 
+                                                            list="season-suggestions"
                                                             value={s} 
                                                             onChange={e => updateStringItem(setSeasons, seasons, i, e.target.value)} 
-                                                            placeholder="Masalan: Yozgi"
-                                                            className="bg-transparent text-xs font-bold text-white px-3 py-2 w-24 focus:outline-none focus:bg-white/5 transition-colors"
+                                                            placeholder="Tanlash yoki yozish"
+                                                            className="bg-transparent text-xs font-bold text-white px-3 py-2 w-28 focus:outline-none focus:bg-white/5 transition-colors"
                                                         />
                                                         <button onClick={() => removeStringItem(setSeasons, seasons, i)} className="px-2 py-2 text-white/20 hover:bg-red-500/20 hover:text-red-400 transition-colors">
                                                             <X size={12} />
@@ -273,14 +267,18 @@ const ModelDetailsModal = ({ model, onClose, onRefresh }) => {
                                                     <Plus size={12} /> Qo'shish
                                                 </button>
                                             </div>
+                                            <datalist id="component-suggestions">
+                                                {suggestedComponents.map((c, idx) => <option key={idx} value={c} />)}
+                                            </datalist>
                                             <div className="flex flex-wrap gap-2">
                                                 {components.map((c, i) => (
                                                     <div key={i} className="flex items-center bg-[#0f111a] border border-white/10 rounded-lg overflow-hidden group">
                                                         <input 
                                                             type="text" 
+                                                            list="component-suggestions"
                                                             value={c} 
                                                             onChange={e => updateStringItem(setComponents, components, i, e.target.value)} 
-                                                            placeholder="Masalan: Futbolka"
+                                                            placeholder="Tanlash yoki yozish"
                                                             className="bg-transparent text-xs font-bold text-white px-3 py-2 w-28 focus:outline-none focus:bg-white/5 transition-colors"
                                                         />
                                                         <button onClick={() => removeStringItem(setComponents, components, i)} className="px-2 py-2 text-white/20 hover:bg-red-500/20 hover:text-red-400 transition-colors">

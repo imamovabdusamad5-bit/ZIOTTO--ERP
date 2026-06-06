@@ -832,6 +832,9 @@ const Modelxona = () => {
                     model={models.find(m => m.id === expandedModel)}
                     onClose={() => setExpandedModel(null)}
                     onRefresh={fetchModels}
+                    suggestedSizes={[...new Set(models.flatMap(m => m.sizes || []))].filter(Boolean)}
+                    suggestedSeasons={[...new Set(models.flatMap(m => m.seasons || []))].filter(Boolean)}
+                    suggestedComponents={[...new Set(models.flatMap(m => m.components || []))].filter(Boolean)}
                 />
             )}
 
