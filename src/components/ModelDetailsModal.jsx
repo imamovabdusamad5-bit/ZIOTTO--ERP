@@ -1,16 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Save, CircleDollarSign, Scissors, History, Box, Plus, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 const ModelDetailsModal = ({ model, onClose, onRefresh, suggestedSizes = [], suggestedSeasons = [], suggestedComponents = [] }) => {
     const [activeTab, setActiveTab] = useState('kartasi'); // kartasi, xarajatlar, ish_rejasi, xronologiya
     const [saving, setSaving] = useState(false);
+    const [draftLoaded, setDraftLoaded] = useState(false);
 
-    // Initial state setup to handle missing arrays properly
-    const [colors, setColors] = useState(model?.colors || []);
-    const [sizes, setSizes] = useState(model?.sizes || []);
-    const [seasons, setSeasons] = useState(model?.seasons || []);
-    const [components, setComponents] = useState(model?.components || []);
+    // Initial state setup
+    const [colors, setColors] = useState([]);
+    const [sizes, setSizes] = useState([]);
+    const [seasons, setSeasons] = useState([]);
+    const [components, setComponents] = useState([]);
+
+    // Load Draft Data
+    useEffect(() => {
+        if (!model?.id) return;
+        const draftKey = `draft_model_details_${model.id}`;
+        const draftStr = localStorage.getItem(draftKey);
+        
+        if (draftStr) {
+            try {
+                const parsed = JSON.parse(draftStr);
+                setColors(parsed.colors || []);
+                setSizes(parsed.sizes || []);
+                setSeasons(parsed.seasons || []);
+                setComponents(parsed.components || []);
+            } catch (e) {
+                console.error("Draft parsing error", e);
+            }
+        } else {
+            setColors(model?.colors || []);
+            setSizes(model?.sizes || []);
+            setSeasons(model?.seasons || []);
+            setComponents(model?.components || []);
+        }
+        setDraftLoaded(true);
+    }, [model?.id]);
+
+    // Save Draft Data
+    useEffect(() => {
+        if (!draftLoaded || !model?.id) return;
+        const draftKey = `draft_model_details_${model.id}`;
+        const draft = { colors, sizes, seasons, components };
+        localStorage.setItem(draftKey, JSON.stringify(draft));
+    }, [colors, sizes, seasons, components, draftLoaded, model?.id]);
 
     const handleSave = async () => {
         setSaving(true);
@@ -20,6 +54,9 @@ const ModelDetailsModal = ({ model, onClose, onRefresh, suggestedSizes = [], sug
                 .update({ colors, sizes, seasons, components })
                 .eq('id', model.id);
             if (error) throw error;
+            // Clear draft after successful save
+            localStorage.removeItem(`draft_model_details_${model.id}`);
+            
             // Optionally show an unobtrusive toast/notification
             if (onRefresh) onRefresh();
             onClose(); // Auto close on save for better flow
@@ -72,23 +109,23 @@ const ModelDetailsModal = ({ model, onClose, onRefresh, suggestedSizes = [], sug
                 </div>
 
                 {/* Tabs */}
-                <div className="flex items-center px-6 pt-4 border-b border-white/5 gap-2 overflow-x-auto bg-[#14161f]">
+                <div className="px-6 py-4 bg-[#14161f] border-b border-white/5 flex flex-wrap gap-3 z-10 relative shadow-md">
                     {[
-                        { id: 'kartasi', label: 'Model Kartasi', icon: Box },
-                        { id: 'xarajatlar', label: 'Xarajatlar Varaqasi', icon: CircleDollarSign },
-                        { id: 'ish_rejasi', label: 'Ish Rejasi (Jadval)', icon: Scissors },
-                        { id: 'xronologiya', label: 'Xronologiya', icon: History }
+                        { id: 'kartasi', label: 'Model Kartasi', icon: Box, activeClass: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30 shadow-lg shadow-indigo-500/10 ring-1 ring-indigo-500/20 scale-[1.02]' },
+                        { id: 'xarajatlar', label: 'Xarajatlar Varaqasi', icon: CircleDollarSign, activeClass: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 shadow-lg shadow-emerald-500/10 ring-1 ring-emerald-500/20 scale-[1.02]' },
+                        { id: 'ish_rejasi', label: 'Ish Rejasi (Jadval)', icon: Scissors, activeClass: 'bg-rose-500/10 text-rose-400 border-rose-500/30 shadow-lg shadow-rose-500/10 ring-1 ring-rose-500/20 scale-[1.02]' },
+                        { id: 'xronologiya', label: 'Xronologiya', icon: History, activeClass: 'bg-amber-500/10 text-amber-400 border-amber-500/30 shadow-lg shadow-amber-500/10 ring-1 ring-amber-500/20 scale-[1.02]' }
                     ].map(tab => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`flex items-center gap-2 px-6 py-3.5 text-xs uppercase tracking-wider font-bold rounded-t-xl transition-all border-b-2 ${
+                            className={`flex items-center gap-2.5 px-6 py-3 text-xs uppercase tracking-widest font-black rounded-2xl transition-all duration-300 border ${
                                 activeTab === tab.id
-                                    ? 'bg-[#1a1d27] text-blue-400 border-blue-400'
-                                    : 'text-white/40 border-transparent hover:bg-white/5 hover:text-white/70'
+                                    ? tab.activeClass
+                                    : 'bg-[#0f111a] text-white/40 border-white/5 hover:bg-white/5 hover:text-white/70'
                             }`}
                         >
-                            <tab.icon size={16} />
+                            <tab.icon size={16} className={activeTab === tab.id ? 'animate-pulse' : ''} />
                             {tab.label}
                         </button>
                     ))}
