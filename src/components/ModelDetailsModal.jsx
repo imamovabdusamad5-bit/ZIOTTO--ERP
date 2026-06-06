@@ -195,97 +195,127 @@ const ModelDetailsModal = ({ model, onClose, onRefresh }) => {
                                 <div className="bg-[#1a1d27] rounded-2xl border border-white/5 p-5 flex flex-col gap-6 h-full">
                                     
                                     {/* SIZES */}
-                                    <div className="flex flex-col gap-3">
-                                        <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                                            <h3 className="text-white/80 font-black text-xs uppercase tracking-widest">Razmerlar</h3>
-                                            <button onClick={() => addStringItem(setSizes, sizes)} className="text-[10px] font-black text-emerald-400 hover:text-emerald-300 uppercase tracking-widest bg-emerald-500/10 px-2 py-1 rounded-md transition-colors flex items-center gap-1">
-                                                <Plus size={12} /> Qo'shish
-                                            </button>
+                                    {sizes.length > 0 && (
+                                        <div className="flex flex-col gap-3">
+                                            <div className="flex items-center justify-between border-b border-white/5 pb-2">
+                                                <h3 className="text-white/80 font-black text-xs uppercase tracking-widest">Razmerlar</h3>
+                                                <button onClick={() => addStringItem(setSizes, sizes)} className="text-[10px] font-black text-emerald-400 hover:text-emerald-300 uppercase tracking-widest bg-emerald-500/10 px-2 py-1 rounded-md transition-colors flex items-center gap-1">
+                                                    <Plus size={12} /> Qo'shish
+                                                </button>
+                                            </div>
+                                            <datalist id="size-suggestions">
+                                                <option value="S" />
+                                                <option value="M" />
+                                                <option value="L" />
+                                                <option value="XL" />
+                                                <option value="XXL" />
+                                                <option value="1 yosh" />
+                                                <option value="2 yosh" />
+                                                <option value="3 yosh" />
+                                                <option value="4 yosh" />
+                                                <option value="5 yosh" />
+                                                <option value="6 yosh" />
+                                            </datalist>
+                                            <div className="flex flex-wrap gap-2">
+                                                {sizes.map((s, i) => (
+                                                    <div key={i} className="flex items-center bg-[#0f111a] border border-white/10 rounded-lg overflow-hidden group">
+                                                        <input 
+                                                            type="text" 
+                                                            list="size-suggestions"
+                                                            value={s} 
+                                                            onChange={e => updateStringItem(setSizes, sizes, i, e.target.value)} 
+                                                            placeholder="Razmer tanlash yoki yozish"
+                                                            className="bg-transparent text-xs font-bold text-white px-3 py-2 w-32 focus:outline-none focus:bg-white/5 transition-colors"
+                                                        />
+                                                        <button onClick={() => removeStringItem(setSizes, sizes, i)} className="px-2 py-2 text-white/20 hover:bg-red-500/20 hover:text-red-400 transition-colors">
+                                                            <X size={12} />
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
-                                        <datalist id="size-suggestions">
-                                            <option value="S" />
-                                            <option value="M" />
-                                            <option value="L" />
-                                            <option value="XL" />
-                                            <option value="XXL" />
-                                            <option value="1 yosh" />
-                                            <option value="2 yosh" />
-                                            <option value="3 yosh" />
-                                            <option value="4 yosh" />
-                                            <option value="5 yosh" />
-                                            <option value="6 yosh" />
-                                        </datalist>
-                                        <div className="flex flex-wrap gap-2">
-                                            {sizes.length === 0 && <span className="text-xs text-white/20 font-bold tracking-widest">Kiritilmagan</span>}
-                                            {sizes.map((s, i) => (
-                                                <div key={i} className="flex items-center bg-[#0f111a] border border-white/10 rounded-lg overflow-hidden group">
-                                                    <input 
-                                                        type="text" 
-                                                        list="size-suggestions"
-                                                        value={s} 
-                                                        onChange={e => updateStringItem(setSizes, sizes, i, e.target.value)} 
-                                                        placeholder="Razmer tanlash yoki yozish"
-                                                        className="bg-transparent text-xs font-bold text-white px-3 py-2 w-32 focus:outline-none focus:bg-white/5 transition-colors"
-                                                    />
-                                                    <button onClick={() => removeStringItem(setSizes, sizes, i)} className="px-2 py-2 text-white/20 hover:bg-red-500/20 hover:text-red-400 transition-colors">
-                                                        <X size={12} />
-                                                    </button>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
+                                    )}
 
                                     {/* SEASONS */}
-                                    <div className="flex flex-col gap-3">
-                                        <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                                            <h3 className="text-white/80 font-black text-xs uppercase tracking-widest">Sezon</h3>
-                                            <button onClick={() => addStringItem(setSeasons, seasons)} className="text-[10px] font-black text-amber-400 hover:text-amber-300 uppercase tracking-widest bg-amber-500/10 px-2 py-1 rounded-md transition-colors flex items-center gap-1">
-                                                <Plus size={12} /> Qo'shish
-                                            </button>
+                                    {seasons.length > 0 && (
+                                        <div className="flex flex-col gap-3">
+                                            <div className="flex items-center justify-between border-b border-white/5 pb-2">
+                                                <h3 className="text-white/80 font-black text-xs uppercase tracking-widest">Sezon</h3>
+                                                <button onClick={() => addStringItem(setSeasons, seasons)} className="text-[10px] font-black text-amber-400 hover:text-amber-300 uppercase tracking-widest bg-amber-500/10 px-2 py-1 rounded-md transition-colors flex items-center gap-1">
+                                                    <Plus size={12} /> Qo'shish
+                                                </button>
+                                            </div>
+                                            <div className="flex flex-wrap gap-2">
+                                                {seasons.map((s, i) => (
+                                                    <div key={i} className="flex items-center bg-[#0f111a] border border-white/10 rounded-lg overflow-hidden group">
+                                                        <input 
+                                                            type="text" 
+                                                            value={s} 
+                                                            onChange={e => updateStringItem(setSeasons, seasons, i, e.target.value)} 
+                                                            placeholder="Masalan: Yozgi"
+                                                            className="bg-transparent text-xs font-bold text-white px-3 py-2 w-24 focus:outline-none focus:bg-white/5 transition-colors"
+                                                        />
+                                                        <button onClick={() => removeStringItem(setSeasons, seasons, i)} className="px-2 py-2 text-white/20 hover:bg-red-500/20 hover:text-red-400 transition-colors">
+                                                            <X size={12} />
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
-                                        <div className="flex flex-wrap gap-2">
-                                            {seasons.length === 0 && <span className="text-xs text-white/20 font-bold tracking-widest">Kiritilmagan</span>}
-                                            {seasons.map((s, i) => (
-                                                <div key={i} className="flex items-center bg-[#0f111a] border border-white/10 rounded-lg overflow-hidden group">
-                                                    <input 
-                                                        type="text" 
-                                                        value={s} 
-                                                        onChange={e => updateStringItem(setSeasons, seasons, i, e.target.value)} 
-                                                        placeholder="Masalan: Yozgi"
-                                                        className="bg-transparent text-xs font-bold text-white px-3 py-2 w-24 focus:outline-none focus:bg-white/5 transition-colors"
-                                                    />
-                                                    <button onClick={() => removeStringItem(setSeasons, seasons, i)} className="px-2 py-2 text-white/20 hover:bg-red-500/20 hover:text-red-400 transition-colors">
-                                                        <X size={12} />
-                                                    </button>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
+                                    )}
 
                                     {/* COMPONENTS */}
-                                    <div className="flex flex-col gap-3">
-                                        <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                                            <h3 className="text-white/80 font-black text-xs uppercase tracking-widest">Komplektatsiyalar</h3>
-                                            <button onClick={() => addStringItem(setComponents, components)} className="text-[10px] font-black text-purple-400 hover:text-purple-300 uppercase tracking-widest bg-purple-500/10 px-2 py-1 rounded-md transition-colors flex items-center gap-1">
-                                                <Plus size={12} /> Qo'shish
-                                            </button>
+                                    {components.length > 0 && (
+                                        <div className="flex flex-col gap-3">
+                                            <div className="flex items-center justify-between border-b border-white/5 pb-2">
+                                                <h3 className="text-white/80 font-black text-xs uppercase tracking-widest">Komplektatsiyalar</h3>
+                                                <button onClick={() => addStringItem(setComponents, components)} className="text-[10px] font-black text-purple-400 hover:text-purple-300 uppercase tracking-widest bg-purple-500/10 px-2 py-1 rounded-md transition-colors flex items-center gap-1">
+                                                    <Plus size={12} /> Qo'shish
+                                                </button>
+                                            </div>
+                                            <div className="flex flex-wrap gap-2">
+                                                {components.map((c, i) => (
+                                                    <div key={i} className="flex items-center bg-[#0f111a] border border-white/10 rounded-lg overflow-hidden group">
+                                                        <input 
+                                                            type="text" 
+                                                            value={c} 
+                                                            onChange={e => updateStringItem(setComponents, components, i, e.target.value)} 
+                                                            placeholder="Masalan: Futbolka"
+                                                            className="bg-transparent text-xs font-bold text-white px-3 py-2 w-28 focus:outline-none focus:bg-white/5 transition-colors"
+                                                        />
+                                                        <button onClick={() => removeStringItem(setComponents, components, i)} className="px-2 py-2 text-white/20 hover:bg-red-500/20 hover:text-red-400 transition-colors">
+                                                            <X size={12} />
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
+                                    )}
+
+                                    {/* SUGGESTIONS FOR EMPTY ATTRIBUTES */}
+                                    <div className="mt-auto pt-4 border-t border-white/5">
+                                        <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-3">
+                                            Model turi bo'yicha xususiyat qo'shish:
+                                        </p>
                                         <div className="flex flex-wrap gap-2">
-                                            {components.length === 0 && <span className="text-xs text-white/20 font-bold tracking-widest">Kiritilmagan</span>}
-                                            {components.map((c, i) => (
-                                                <div key={i} className="flex items-center bg-[#0f111a] border border-white/10 rounded-lg overflow-hidden group">
-                                                    <input 
-                                                        type="text" 
-                                                        value={c} 
-                                                        onChange={e => updateStringItem(setComponents, components, i, e.target.value)} 
-                                                        placeholder="Masalan: Futbolka"
-                                                        className="bg-transparent text-xs font-bold text-white px-3 py-2 w-28 focus:outline-none focus:bg-white/5 transition-colors"
-                                                    />
-                                                    <button onClick={() => removeStringItem(setComponents, components, i)} className="px-2 py-2 text-white/20 hover:bg-red-500/20 hover:text-red-400 transition-colors">
-                                                        <X size={12} />
-                                                    </button>
-                                                </div>
-                                            ))}
+                                            {sizes.length === 0 && (
+                                                <button onClick={() => setSizes([''])} className="px-3 py-1.5 bg-white/5 hover:bg-emerald-500/10 hover:text-emerald-400 rounded-lg text-[10px] font-bold text-white/50 uppercase tracking-widest transition-colors border border-white/5 border-dashed">
+                                                    + Razmer
+                                                </button>
+                                            )}
+                                            {seasons.length === 0 && (
+                                                <button onClick={() => setSeasons([''])} className="px-3 py-1.5 bg-white/5 hover:bg-amber-500/10 hover:text-amber-400 rounded-lg text-[10px] font-bold text-white/50 uppercase tracking-widest transition-colors border border-white/5 border-dashed">
+                                                    + Sezon
+                                                </button>
+                                            )}
+                                            {components.length === 0 && (
+                                                <button onClick={() => setComponents([''])} className="px-3 py-1.5 bg-white/5 hover:bg-purple-500/10 hover:text-purple-400 rounded-lg text-[10px] font-bold text-white/50 uppercase tracking-widest transition-colors border border-white/5 border-dashed">
+                                                    + Komplektatsiya
+                                                </button>
+                                            )}
+                                            {sizes.length > 0 && seasons.length > 0 && components.length > 0 && (
+                                                <span className="text-[10px] text-white/20 italic">Barcha xususiyatlar aktivlashtirilgan.</span>
+                                            )}
                                         </div>
                                     </div>
 
