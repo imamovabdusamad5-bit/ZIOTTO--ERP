@@ -234,9 +234,9 @@ const ModelDetailsModal = ({ model, onClose, onRefresh, suggestedSizes = [], sug
                                     {/* SIZES */}
                                     <div className="flex-1 bg-[#0f111a]/50 p-4 rounded-xl border border-white/5 flex flex-col">
                                         <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-3">
-                                            <h3 className="text-white/80 font-black text-xs uppercase tracking-widest">1. Razmer</h3>
-                                            <button onClick={() => addStringItem(setSizes, sizes)} className="text-[10px] font-black text-emerald-400 hover:text-emerald-300 uppercase tracking-widest bg-emerald-500/10 px-2 py-1 rounded-md transition-colors flex items-center gap-1">
-                                                <Plus size={12} /> Qo'shish
+                                            <h3 className="text-white/80 font-black text-sm uppercase tracking-widest">1. Razmer</h3>
+                                            <button onClick={() => addStringItem(setSizes, sizes)} className="text-xs font-black text-emerald-400 hover:text-emerald-300 uppercase tracking-widest bg-emerald-500/10 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1">
+                                                <Plus size={14} /> Qo'shish
                                             </button>
                                         </div>
                                         <datalist id="size-suggestions">
@@ -265,9 +265,9 @@ const ModelDetailsModal = ({ model, onClose, onRefresh, suggestedSizes = [], sug
                                     {/* COMPONENTS */}
                                     <div className="flex-1 bg-[#0f111a]/50 p-4 rounded-xl border border-white/5 flex flex-col">
                                         <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-3">
-                                            <h3 className="text-white/80 font-black text-xs uppercase tracking-widest">2. Komplektatsiya</h3>
-                                            <button onClick={() => addStringItem(setComponents, components)} className="text-[10px] font-black text-purple-400 hover:text-purple-300 uppercase tracking-widest bg-purple-500/10 px-2 py-1 rounded-md transition-colors flex items-center gap-1">
-                                                <Plus size={12} /> Qo'shish
+                                            <h3 className="text-white/80 font-black text-sm uppercase tracking-widest">2. Komplektatsiya</h3>
+                                            <button onClick={() => addStringItem(setComponents, components)} className="text-xs font-black text-purple-400 hover:text-purple-300 uppercase tracking-widest bg-purple-500/10 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1">
+                                                <Plus size={14} /> Qo'shish
                                             </button>
                                         </div>
                                         <datalist id="component-suggestions">
@@ -296,9 +296,9 @@ const ModelDetailsModal = ({ model, onClose, onRefresh, suggestedSizes = [], sug
                                     {/* SEASONS */}
                                     <div className="flex-1 bg-[#0f111a]/50 p-4 rounded-xl border border-white/5 flex flex-col">
                                         <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-3">
-                                            <h3 className="text-white/80 font-black text-xs uppercase tracking-widest">3. Mavsum</h3>
-                                            <button onClick={() => addStringItem(setSeasons, seasons)} className="text-[10px] font-black text-amber-400 hover:text-amber-300 uppercase tracking-widest bg-amber-500/10 px-2 py-1 rounded-md transition-colors flex items-center gap-1">
-                                                <Plus size={12} /> Qo'shish
+                                            <h3 className="text-white/80 font-black text-sm uppercase tracking-widest">3. Mavsum</h3>
+                                            <button onClick={() => addStringItem(setSeasons, seasons)} className="text-xs font-black text-amber-400 hover:text-amber-300 uppercase tracking-widest bg-amber-500/10 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1">
+                                                <Plus size={14} /> Qo'shish
                                             </button>
                                         </div>
                                         <datalist id="season-suggestions">
