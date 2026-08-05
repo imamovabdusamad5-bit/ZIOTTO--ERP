@@ -18,22 +18,22 @@
   --color-primary: #3b82f6; /* default brand color */
 }
 
-.theme-light {
-  /* Light Mode */
-  --bg-body: #f8fafc;
-  --bg-card: rgba(255, 255, 255, 0.8);
-  --bg-card-hover: rgba(255, 255, 255, 0.9);
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --border-color: rgba(0, 0, 0, 0.1);
-  --input-bg: #ffffff;
+.light {
+  /* Light Mode (NOVO Style) */
+  --bg-body: #f4f7fe;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f9fbfd;
+  --text-primary: #2b3674;
+  --text-secondary: #a3aed1;
+  --border-color: rgba(0, 0, 0, 0.05);
+  --input-bg: #f4f7fe;
 
   /* Sidebar Light */
   --bg-sidebar: #ffffff;
-  --bg-sidebar-footer: #f8fafc;
+  --bg-sidebar-footer: #f4f7fe;
   --border-sidebar: rgba(0, 0, 0, 0.05);
   
-  --color-primary: #0F766E;
+  --color-primary: #4318FF;
 }
 
 /* --- THEMES --- */
@@ -108,6 +108,12 @@ body {
   background: var(--bg-card);
   backdrop-filter: blur(16px);
   border: 1px solid var(--border-color);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.light .glass-card {
+  backdrop-filter: none;
+  box-shadow: 14px 17px 40px 4px rgba(112, 144, 176, 0.08);
 }
 
 /* Scrollbar */
