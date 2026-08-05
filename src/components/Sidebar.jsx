@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -57,13 +57,37 @@ export const menuItems = [
     { path: '/sozlamalar', name: 'Sozlamalar', icon: Settings, roles: ['admin'], permKey: 'admin' },
 ];
 
-const Sidebar = ({ isOpen, onClose }) => {
+const Sidebar = ({ isOpen, onClose, sidebarWidth = 256, setSidebarWidth }) => {
     const location = useLocation();
     const navigate = useNavigate();
     const { profile, logout, tenant } = useAuth();
     const [expandedMenu, setExpandedMenu] = useState('Ombor');
     const [collapsed, setCollapsed] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [isResizing, setIsResizing] = useState(false);
+
+    useEffect(() => {
+        const handleMouseMove = (e) => {
+            if (!isResizing) return;
+            let newWidth = e.clientX;
+            if (newWidth < 200) newWidth = 200;
+            if (newWidth > 400) newWidth = 400;
+            if (setSidebarWidth) setSidebarWidth(newWidth);
+        };
+        const handleMouseUp = () => {
+            setIsResizing(false);
+        };
+        if (isResizing) {
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+        }
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [isResizing, setSidebarWidth]);
+
+    const scale = Math.max(0.7, Math.min(1.5, sidebarWidth / 256));
  
     const filteredMenu = menuItems.filter(item => {
         if (!profile) return false;
@@ -87,15 +111,19 @@ const Sidebar = ({ isOpen, onClose }) => {
     const isMaster = tenant?.domain_slug === 'ziotto' || !tenant;
  
     return (
-        <div className={`fixed left-0 top-0 h-[100dvh] bg-[var(--bg-sidebar)] text-[var(--text-sidebar-secondary)] flex flex-col shadow-xl z-[70] transition-all duration-300 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 w-64 border-r border-[var(--border-sidebar)]`}>
-            <div className="p-6 border-b border-[var(--border-sidebar)] flex items-center justify-between">
+        <div className={`fixed left-0 top-0 h-[100dvh] bg-[var(--bg-sidebar)] text-[var(--text-sidebar-secondary)] flex flex-col shadow-xl z-[70] transition-transform duration-300 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 w-[var(--sidebar-width,256px)] border-r border-[var(--border-sidebar)]`}>
+            {/* Drag Handle */}
+            <div
+                onMouseDown={() => setIsResizing(true)}
+                className="absolute top-0 right-0 w-1.5 h-full cursor-col-resize hover:bg-indigo-500/50 active:bg-indigo-500 z-50 transition-colors"
+            />
+            <div className="p-6 border-b border-[var(--border-sidebar)] flex items-center justify-between relative z-10">
                 <div className="flex items-center gap-3">
                     <svg 
-                        className="w-9 h-9 filter drop-shadow-[0_0_10px_rgba(0,198,255,0.7)] shrink-0 animate-pulse" 
+                        className="filter drop-shadow-[0_0_10px_rgba(0,198,255,0.7)] shrink-0 animate-pulse" 
                         viewBox="0 0 100 100" 
                         fill="none" 
-                        width="36" 
-                        height="36" 
+                        style={{ width: `${36 * scale}px`, height: `${36 * scale}px` }}
                         xmlns="http://www.w3.org/2000/svg"
                     >
                         <defs>
@@ -132,7 +160,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                             <path d="M58 85 L46 92" stroke="#00f2fe" strokeWidth="1.75" opacity="0.9" />
                         </g>
                     </svg>
-                    <h1 className="text-xl font-black text-[var(--text-sidebar-primary)] tracking-tighter flex items-center leading-none uppercase truncate">
+                    <h1 className="font-black text-[var(--text-sidebar-primary)] tracking-tighter flex items-center leading-none uppercase truncate" style={{ fontSize: `${20 * scale}px` }}>
                         <span className="bg-gradient-to-r from-[#00f2fe] to-[#0062ff] bg-clip-text text-transparent">{companyName}</span>
                     </h1>
                 </div>
@@ -163,10 +191,10 @@ const Sidebar = ({ isOpen, onClose }) => {
                                             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200 group ${isActive || isExpanded ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400' : inactiveClass}`}
                                         >
                                             <div className="flex items-center gap-3">
-                                                <item.icon size={18} className={isActive || isExpanded ? 'text-indigo-500 dark:text-indigo-400' : 'text-gray-400 group-hover:text-indigo-500'} />
-                                                <span className="text-sm font-medium">{item.name}</span>
+                                                <item.icon style={{ width: `${18 * scale}px`, height: `${18 * scale}px` }} className={isActive || isExpanded ? 'text-indigo-500 dark:text-indigo-400' : 'text-gray-400 group-hover:text-indigo-500'} />
+                                                <span className="font-medium" style={{ fontSize: `${14 * scale}px` }}>{item.name}</span>
                                             </div>
-                                            {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                                            {isExpanded ? <ChevronDown style={{ width: `${14 * scale}px`, height: `${14 * scale}px` }} /> : <ChevronRight style={{ width: `${14 * scale}px`, height: `${14 * scale}px` }} />}
                                         </button>
                                         {isExpanded && (
                                             <ul className="pl-9 space-y-1 animate-in slide-in-from-top-2 duration-200">
@@ -184,8 +212,8 @@ const Sidebar = ({ isOpen, onClose }) => {
                                                                 }`
                                                             }
                                                         >
-                                                            <div className={`w-1 h-1 rounded-full ${location.search.includes(sub.path.split('?')[1]) && location.pathname === '/ombor' ? 'bg-indigo-500' : 'bg-gray-400'}`} />
-                                                            {sub.name}
+                                                            <div className={`w-1 h-1 shrink-0 rounded-full ${location.search.includes(sub.path.split('?')[1]) && location.pathname === '/ombor' ? 'bg-indigo-500' : 'bg-gray-400'}`} style={{ width: `${4 * scale}px`, height: `${4 * scale}px` }} />
+                                                            <span style={{ fontSize: `${12 * scale}px` }}>{sub.name}</span>
                                                         </NavLink>
                                                     </li>
                                                 ))}
@@ -205,8 +233,8 @@ const Sidebar = ({ isOpen, onClose }) => {
                                             }`
                                         }
                                     >
-                                        <item.icon size={18} className="transition-colors" />
-                                        <span className="text-sm font-medium">{item.name}</span>
+                                        <item.icon style={{ width: `${18 * scale}px`, height: `${18 * scale}px` }} className="transition-colors" />
+                                        <span className="font-medium" style={{ fontSize: `${14 * scale}px` }}>{item.name}</span>
                                     </NavLink>
                                 )}
                             </li>
@@ -216,13 +244,13 @@ const Sidebar = ({ isOpen, onClose }) => {
             </nav>
             <div className="p-4 border-t border-[var(--border-sidebar)] bg-[var(--bg-sidebar-footer)]">
                 <div className="flex items-center justify-between px-2">
-                    <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-500 font-bold uppercase">
+                    <div className="flex items-center gap-3 truncate">
+                        <div className="rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-500 font-bold uppercase shrink-0" style={{ width: `${36 * scale}px`, height: `${36 * scale}px`, fontSize: `${16 * scale}px` }}>
                             {profile?.full_name?.charAt(0) || 'A'}
                         </div>
-                        <div>
-                            <p className="text-sm font-semibold text-[var(--text-sidebar-primary)] truncate w-24">{profile?.full_name || 'Admin'}</p>
-                            <p className="text-[10px] text-gray-500 uppercase tracking-widest">{profile?.role || 'Direktor'}</p>
+                        <div className="truncate">
+                            <p className="font-semibold text-[var(--text-sidebar-primary)] truncate" style={{ fontSize: `${14 * scale}px` }}>{profile?.full_name || 'Admin'}</p>
+                            <p className="text-gray-500 uppercase tracking-widest truncate" style={{ fontSize: `${10 * scale}px` }}>{profile?.role || 'Direktor'}</p>
                         </div>
                     </div>
                     <button
