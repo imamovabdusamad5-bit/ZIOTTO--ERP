@@ -125,7 +125,7 @@ const Layout = () => {
 
             <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} sidebarWidth={sidebarWidth} setSidebarWidth={setSidebarWidth} />
 
-            <div className="flex-1 transition-all duration-300 md:pl-[var(--sidebar-width)] flex flex-col min-h-screen min-w-0 w-full overflow-x-hidden">
+            <div className="flex-1 transition-all duration-300 md-sidebar-padding flex flex-col min-h-screen min-w-0 w-full overflow-x-hidden">
                 <header className="bg-[var(--bg-card)] backdrop-blur-xl border-b border-[var(--border-color)] h-16 flex items-center justify-between px-4 md:px-8 sticky top-0 z-30 shrink-0 transition-colors duration-300 shadow-sm">
                     <div className="flex items-center gap-3">
                         <button

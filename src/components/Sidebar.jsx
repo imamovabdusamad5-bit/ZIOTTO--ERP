@@ -111,12 +111,14 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth = 256, setSidebarWidth }) => {
     const isMaster = tenant?.domain_slug === 'ziotto' || !tenant;
  
     return (
-        <div className={`fixed left-0 top-0 h-[100dvh] bg-[var(--bg-sidebar)] text-[var(--text-sidebar-secondary)] flex flex-col shadow-xl z-[70] transition-transform duration-300 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 w-[var(--sidebar-width,256px)] border-r border-[var(--border-sidebar)]`}>
+        <div className={`fixed left-0 top-0 h-[100dvh] bg-[var(--bg-sidebar)] text-[var(--text-sidebar-secondary)] flex flex-col shadow-xl z-[70] transition-transform duration-300 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 border-r border-[var(--border-sidebar)]`} style={{ width: `var(--sidebar-width, 256px)` }}>
             {/* Drag Handle */}
             <div
-                onMouseDown={() => setIsResizing(true)}
-                className="absolute top-0 right-0 w-1.5 h-full cursor-col-resize hover:bg-indigo-500/50 active:bg-indigo-500 z-50 transition-colors"
-            />
+                onMouseDown={(e) => { e.preventDefault(); setIsResizing(true); }}
+                className="absolute top-0 -right-1.5 w-3 h-full cursor-col-resize hover:bg-indigo-500/50 active:bg-indigo-500 z-50 transition-colors flex items-center justify-center group"
+            >
+                <div className="h-12 w-1 bg-gray-400/30 group-hover:bg-white rounded-full transition-colors" />
+            </div>
             <div className="p-6 border-b border-[var(--border-sidebar)] flex items-center justify-between relative z-10">
                 <div className="flex items-center gap-3">
                     <svg 

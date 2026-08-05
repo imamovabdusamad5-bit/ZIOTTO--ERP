@@ -128,6 +128,12 @@ body {
   box-shadow: 14px 17px 40px 4px rgba(112, 144, 176, 0.08);
 }
 
+@media (min-width: 768px) {
+  .md-sidebar-padding {
+    padding-left: var(--sidebar-width, 256px);
+  }
+}
+
 /* Scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
   width: 8px;
