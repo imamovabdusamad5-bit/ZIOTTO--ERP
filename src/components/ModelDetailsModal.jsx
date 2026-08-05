@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Save, CircleDollarSign, Scissors, History, Box, Plus, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { exportComplexTable } from '../utils/ExcelExport';
 
 const ModelDetailsModal = ({ model, onClose, onRefresh, suggestedSizes = [], suggestedSeasons = [], suggestedComponents = [] }) => {
     const [activeTab, setActiveTab] = useState('kartasi'); // kartasi, xarajatlar, ish_rejasi, xronologiya
@@ -12,6 +13,27 @@ const ModelDetailsModal = ({ model, onClose, onRefresh, suggestedSizes = [], sug
     const [sizes, setSizes] = useState([]);
     const [seasons, setSeasons] = useState([]);
     const [components, setComponents] = useState([]);
+    const [bomItems, setBomItems] = useState([]);
+    const [inventory, setInventory] = useState([]);
+
+    // Fetch BOM & Inventory
+    useEffect(() => {
+        const fetchBomAndInv = async () => {
+            // Inventory for balance calculation
+            const { data: invData } = await supabase.from('inventory').select('*');
+            if (invData) setInventory(invData);
+
+            if (!model?.id) return;
+            // Fetch existing BOM
+            const { data: bomData } = await supabase.from('bom_items').select('*').eq('model_id', model.id);
+            if (bomData && bomData.length > 0) {
+                setBomItems(bomData.map(b => ({ ...b, id: b.id || Date.now() + Math.random() })));
+            } else {
+                setBomItems([{ id: Date.now(), item_name: '', part_name: '', is_main: false, consumption: '', department: '', color: '', size_range: '', price: 0 }]);
+            }
+        };
+        fetchBomAndInv();
+    }, [model?.id]);
 
     // Load Draft Data
     useEffect(() => {
@@ -42,9 +64,9 @@ const ModelDetailsModal = ({ model, onClose, onRefresh, suggestedSizes = [], sug
     useEffect(() => {
         if (!draftLoaded || !model?.id) return;
         const draftKey = `draft_model_details_${model.id}`;
-        const draft = { colors, sizes, seasons, components };
+        const draft = { colors, sizes, seasons, components, bomItems };
         localStorage.setItem(draftKey, JSON.stringify(draft));
-    }, [colors, sizes, seasons, components, draftLoaded, model?.id]);
+    }, [colors, sizes, seasons, components, bomItems, draftLoaded, model?.id]);
 
     const handleSave = async () => {
         setSaving(true);
@@ -54,6 +76,28 @@ const ModelDetailsModal = ({ model, onClose, onRefresh, suggestedSizes = [], sug
                 .update({ colors, sizes, seasons, components })
                 .eq('id', model.id);
             if (error) throw error;
+
+            // Save BOM Items
+            await supabase.from('bom_items').delete().eq('model_id', model.id);
+            const bomToInsert = bomItems
+                .filter(b => b.item_name || b.part_name)
+                .map(b => ({
+                    model_id: model.id,
+                    item_name: b.item_name,
+                    part_name: b.part_name,
+                    is_main: b.is_main || false,
+                    consumption: b.consumption || 0,
+                    department: b.department,
+                    color: b.color,
+                    size_range: b.size_range,
+                    price: b.price || 0
+                }));
+            
+            if (bomToInsert.length > 0) {
+                const { error: bomErr } = await supabase.from('bom_items').insert(bomToInsert);
+                if (bomErr) throw bomErr;
+            }
+
             // Clear draft after successful save
             localStorage.removeItem(`draft_model_details_${model.id}`);
             
@@ -83,6 +127,22 @@ const ModelDetailsModal = ({ model, onClose, onRefresh, suggestedSizes = [], sug
         setter(newState);
     };
     const removeStringItem = (setter, state, idx) => setter(state.filter((_, i) => i !== idx));
+
+    // BOM Handlers
+    const addBomRow = () => setBomItems([...bomItems, { id: Date.now(), item_name: '', part_name: '', is_main: false, consumption: '', department: '', color: '', size_range: '', price: 0 }]);
+    const removeBomRow = (idx) => setBomItems(bomItems.filter((_, i) => i !== idx));
+    const updateBom = (idx, field, value) => {
+        const newBom = [...bomItems];
+        newBom[idx][field] = value;
+        setBomItems(newBom);
+    };
+
+    const calculateBalance = (itemName) => {
+        if (!itemName) return '';
+        // Find in inventory ignoring case
+        const found = inventory.find(i => i.name?.toLowerCase().includes(itemName.toLowerCase()));
+        return found ? found.quantity : '0';
+    };
 
     return (
         <div className="fixed inset-0 bg-[#1a1d27] z-[100] flex flex-col h-screen w-screen overflow-hidden">
@@ -331,10 +391,132 @@ const ModelDetailsModal = ({ model, onClose, onRefresh, suggestedSizes = [], sug
                     )}
 
                     {activeTab === 'xarajatlar' && (
-                        <div className="h-full flex flex-col items-center justify-center text-center p-20 border border-dashed border-white/5 rounded-2xl bg-[#1a1d27]/50">
-                            <CircleDollarSign size={48} className="text-white/10 mb-4" />
-                            <h3 className="text-lg font-black text-white/60 tracking-wider uppercase mb-2">Xarajatlar Varaqasi (BOM)</h3>
-                            <p className="text-sm text-white/40 max-w-md">Tez orada ushbu bo'limda mato va detallar sarfi, shuningdek boshqa xarajatlarni hisoblash imkoniyati yaratiladi.</p>
+                        <div className="bg-white rounded-[2rem] p-6 shadow-2xl animate-in slide-in-from-bottom-4 duration-500">
+                            <div className="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
+                                <div>
+                                    <h3 className="text-xl font-black text-gray-800 uppercase tracking-tight flex items-center gap-3">
+                                        <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-500">
+                                            <CircleDollarSign size={24} />
+                                        </div>
+                                        Xarajatlar Varaqasi
+                                    </h3>
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Komplektovka, materiallar va detallar sarfi (BOM)</p>
+                                </div>
+                                <button type="button" onClick={() => exportComplexTable('bom-table', `BOM_${model.code}`)} className="flex items-center gap-2 px-5 py-2.5 bg-emerald-50 hover:bg-emerald-500 text-emerald-600 hover:text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-sm border border-emerald-100">
+                                    Excelga Yuklash
+                                </button>
+                            </div>
+                            
+                            <div className="overflow-x-auto rounded-[1.5rem] border border-gray-200 bg-gray-50 shadow-inner scrollbar-thin scrollbar-thumb-gray-300">
+                                <table id="bom-table" className="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr className="bg-white text-gray-500 text-[9px] uppercase font-black tracking-[0.2em] text-center shadow-sm relative z-10">
+                                            <th className="p-4 border-b border-r border-gray-200 w-12 text-gray-400">№</th>
+                                            <th className="p-4 border-b border-r border-gray-200 min-w-[200px] text-blue-600 bg-blue-50/30">Xom ashyo nomi</th>
+                                            <th className="p-4 border-b border-r border-gray-200 text-rose-600 bg-rose-50/30 min-w-[140px]">Komplektovka</th>
+                                            <th className="p-4 border-b border-r border-gray-200 text-gray-600 w-20">Asosiy</th>
+                                            <th className="p-4 border-b border-r border-gray-200 text-emerald-600 bg-emerald-50/30 w-28">Soni<br/>(dona)</th>
+                                            <th className="p-4 border-b border-r border-gray-200 text-rose-600 bg-rose-50/30 min-w-[140px]">Bo'lim</th>
+                                            <th className="p-4 border-b border-r border-gray-200 text-rose-600 bg-rose-50/30 min-w-[120px]">Rang</th>
+                                            <th className="p-4 border-b border-r border-gray-200 text-rose-600 bg-rose-50/30 min-w-[120px]">Razmer</th>
+                                            <th className="p-4 border-b border-r border-gray-200 text-amber-600 bg-amber-50/30 w-32">Dona narxi</th>
+                                            <th className="p-4 border-b border-r border-gray-200 text-gray-600 w-32">Qoldiq</th>
+                                            <th className="p-4 border-b border-gray-200 w-16 bg-white"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-200 bg-white">
+                                        {bomItems.map((item, idx) => (
+                                            <tr key={item.id || idx} className="hover:bg-gray-50/80 transition-colors group">
+                                                <td className="p-3 border-r border-gray-100 text-center text-[10px] font-black text-gray-400">{idx + 1}</td>
+                                                
+                                                <td className="p-2 border-r border-gray-100">
+                                                    <input type="text" className="w-full px-3 py-2 text-xs font-bold text-gray-700 bg-gray-50 border border-transparent hover:border-gray-200 focus:border-blue-400 focus:bg-white rounded-lg outline-none transition-all placeholder:text-gray-300" value={item.item_name || ''} onChange={e => updateBom(idx, 'item_name', e.target.value)} placeholder="Material nomi..." />
+                                                </td>
+                                                
+                                                <td className="p-2 border-r border-gray-100">
+                                                    <select className="w-full px-3 py-2 text-xs font-bold text-gray-700 bg-gray-50 border border-transparent hover:border-gray-200 focus:border-blue-400 focus:bg-white rounded-lg outline-none transition-all appearance-none cursor-pointer" value={item.part_name || ''} onChange={e => updateBom(idx, 'part_name', e.target.value)}>
+                                                        <option value="">Tanlang</option>
+                                                        {components.map((c, i) => <option key={i} value={c}>{c}</option>)}
+                                                    </select>
+                                                </td>
+                                                
+                                                <td className="p-2 border-r border-gray-100 text-center flex items-center justify-center h-full pt-3">
+                                                    <button type="button" onClick={() => updateBom(idx, 'is_main', !item.is_main)} className={`w-12 h-6 rounded-full relative transition-colors shadow-inner flex-shrink-0 ${item.is_main ? 'bg-blue-500' : 'bg-gray-200'}`}>
+                                                        <div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${item.is_main ? 'translate-x-6' : 'translate-x-0'}`} />
+                                                    </button>
+                                                </td>
+                                                
+                                                <td className="p-2 border-r border-gray-100">
+                                                    <input type="number" className="w-full px-3 py-2 text-xs font-bold text-gray-700 bg-emerald-50/50 border border-transparent hover:border-emerald-200 focus:border-emerald-400 focus:bg-white rounded-lg outline-none transition-all text-center placeholder:text-emerald-200" value={item.consumption || ''} onChange={e => updateBom(idx, 'consumption', e.target.value)} placeholder="0" />
+                                                </td>
+                                                
+                                                <td className="p-2 border-r border-gray-100">
+                                                    <select className="w-full px-3 py-2 text-xs font-bold text-gray-700 bg-gray-50 border border-transparent hover:border-gray-200 focus:border-blue-400 focus:bg-white rounded-lg outline-none transition-all appearance-none cursor-pointer" value={item.department || ''} onChange={e => updateBom(idx, 'department', e.target.value)}>
+                                                        <option value="">Tanlang</option>
+                                                        <option value="Kesim">Kesim</option>
+                                                        <option value="Tikuv">Tikuv</option>
+                                                        <option value="Dazmol">Dazmol</option>
+                                                        <option value="Qadoq">Qadoq</option>
+                                                    </select>
+                                                </td>
+                                                
+                                                <td className="p-2 border-r border-gray-100">
+                                                    <select className="w-full px-3 py-2 text-xs font-bold text-gray-700 bg-gray-50 border border-transparent hover:border-gray-200 focus:border-blue-400 focus:bg-white rounded-lg outline-none transition-all appearance-none cursor-pointer" value={item.color || ''} onChange={e => updateBom(idx, 'color', e.target.value)}>
+                                                        <option value="">Tanlang</option>
+                                                        {colors.map((c, i) => <option key={i} value={c.name}>{c.name}</option>)}
+                                                    </select>
+                                                </td>
+                                                
+                                                <td className="p-2 border-r border-gray-100">
+                                                    <select className="w-full px-3 py-2 text-xs font-bold text-gray-700 bg-gray-50 border border-transparent hover:border-gray-200 focus:border-blue-400 focus:bg-white rounded-lg outline-none transition-all appearance-none cursor-pointer" value={item.size_range || ''} onChange={e => updateBom(idx, 'size_range', e.target.value)}>
+                                                        <option value="">Tanlang</option>
+                                                        {sizes.map((s, i) => <option key={i} value={s}>{s}</option>)}
+                                                    </select>
+                                                </td>
+                                                
+                                                <td className="p-2 border-r border-gray-100">
+                                                    <input type="number" className="w-full px-3 py-2 text-xs font-black text-amber-600 bg-amber-50/50 border border-transparent hover:border-amber-200 focus:border-amber-400 focus:bg-white rounded-lg outline-none transition-all text-right placeholder:text-amber-200" value={item.price || ''} onChange={e => updateBom(idx, 'price', e.target.value)} placeholder="0.00" />
+                                                </td>
+                                                
+                                                <td className="p-2 border-r border-gray-100">
+                                                    <div className="w-full px-3 py-2 text-xs font-black text-gray-400 bg-gray-100/50 border border-gray-200/50 rounded-lg text-right">
+                                                        {calculateBalance(item.item_name)}
+                                                    </div>
+                                                </td>
+                                                
+                                                <td className="p-2 text-center">
+                                                    <div className="flex items-center justify-center gap-1">
+                                                        <button type="button" onClick={() => removeBomRow(idx)} className="w-8 h-8 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all mx-auto shadow-sm opacity-0 group-hover:opacity-100">
+                                                            <Trash2 size={14} />
+                                                        </button>
+                                                        {idx === bomItems.length - 1 && (
+                                                            <button type="button" onClick={addBomRow} className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-all shadow-md active:scale-95">
+                                                                <Plus size={16} />
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        
+                                        {/* Umumiy */}
+                                        <tr className="bg-gray-100 text-gray-800">
+                                            <td colSpan={4} className="p-4 text-right text-[10px] font-black tracking-widest uppercase">Umumiy</td>
+                                            <td className="p-4 text-center text-sm font-black text-emerald-600">{bomItems.reduce((s, i) => s + (parseFloat(i.consumption) || 0), 0)}</td>
+                                            <td colSpan={3} className="border-l border-gray-200"></td>
+                                            <td className="p-4 text-right text-sm font-black text-amber-600 bg-amber-50/50 border-l border-gray-200">{bomItems.reduce((s, i) => s + (parseFloat(i.price) || 0), 0).toLocaleString()}</td>
+                                            <td className="p-4 border-l border-gray-200"></td>
+                                            <td className="p-4 border-l border-gray-200 bg-gray-100">
+                                                {bomItems.length > 1 && (
+                                                    <button type="button" onClick={addBomRow} className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-all shadow-md active:scale-95">
+                                                        <Plus size={16} />
+                                                    </button>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     )}
 
