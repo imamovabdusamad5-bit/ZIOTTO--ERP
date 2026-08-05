@@ -410,48 +410,86 @@ const ModelDetailsModal = ({ model, onClose, onRefresh, suggestedSizes = [], sug
                             <div className="overflow-x-auto rounded-[1.5rem] border border-gray-200 bg-gray-50 shadow-inner scrollbar-thin scrollbar-thumb-gray-300">
                                 <table id="bom-table" className="w-full text-left border-collapse">
                                     <thead>
-                                        <tr className="bg-white text-gray-500 text-[9px] uppercase font-black tracking-[0.2em] text-center shadow-sm relative z-10">
-                                            <th className="p-4 border-b border-r border-gray-200 w-12 text-gray-400">№</th>
-                                            <th className="p-4 border-b border-r border-gray-200 min-w-[200px] text-blue-600 bg-blue-50/30">Xom ashyo nomi</th>
-                                            <th className="p-4 border-b border-r border-gray-200 text-rose-600 bg-rose-50/30 min-w-[140px]">Komplektovka</th>
-                                            <th className="p-4 border-b border-r border-gray-200 text-gray-600 w-20">Asosiy</th>
-                                            <th className="p-4 border-b border-r border-gray-200 text-emerald-600 bg-emerald-50/30 w-28">Soni<br/>(dona)</th>
-                                            <th className="p-4 border-b border-r border-gray-200 text-rose-600 bg-rose-50/30 min-w-[140px]">Bo'lim</th>
-                                            <th className="p-4 border-b border-r border-gray-200 text-rose-600 bg-rose-50/30 min-w-[120px]">Rang</th>
-                                            <th className="p-4 border-b border-r border-gray-200 text-rose-600 bg-rose-50/30 min-w-[120px]">Razmer</th>
-                                            <th className="p-4 border-b border-r border-gray-200 text-amber-600 bg-amber-50/30 w-32">Dona narxi</th>
-                                            <th className="p-4 border-b border-r border-gray-200 text-gray-600 w-32">Qoldiq</th>
+                                        <tr className="bg-white text-gray-600 text-xs font-bold text-center shadow-sm relative z-10">
+                                            <th className="border-b border-r border-gray-200 w-12 bg-gray-50/50">
+                                                <div className="p-4 flex items-center justify-center">№</div>
+                                            </th>
+                                            <th className="border-b border-r border-gray-200 bg-blue-50/30">
+                                                <div className="resize-x overflow-hidden min-w-[200px] max-w-[500px] p-4 flex items-center justify-between">
+                                                    <span className="text-blue-700 uppercase tracking-wider text-[11px]">Xom ashyo nomi</span>
+                                                </div>
+                                            </th>
+                                            <th className="border-b border-r border-gray-200 bg-rose-50/30">
+                                                <div className="resize-x overflow-hidden min-w-[150px] max-w-[400px] p-4 flex items-center justify-between">
+                                                    <span className="text-rose-700 uppercase tracking-wider text-[11px]">Komplektovka</span>
+                                                </div>
+                                            </th>
+                                            <th className="border-b border-r border-gray-200 bg-gray-50/50">
+                                                <div className="p-4 flex items-center justify-center min-w-[80px]">
+                                                    <span className="uppercase tracking-wider text-[11px]">Asosiy</span>
+                                                </div>
+                                            </th>
+                                            <th className="border-b border-r border-gray-200 bg-emerald-50/30">
+                                                <div className="resize-x overflow-hidden min-w-[120px] p-4 flex items-center justify-between">
+                                                    <span className="text-emerald-700 uppercase tracking-wider text-[11px]">Soni (dona)</span>
+                                                </div>
+                                            </th>
+                                            <th className="border-b border-r border-gray-200 bg-rose-50/30">
+                                                <div className="resize-x overflow-hidden min-w-[140px] max-w-[300px] p-4 flex items-center justify-between">
+                                                    <span className="text-rose-700 uppercase tracking-wider text-[11px]">Bo'lim</span>
+                                                </div>
+                                            </th>
+                                            <th className="border-b border-r border-gray-200 bg-rose-50/30">
+                                                <div className="resize-x overflow-hidden min-w-[120px] max-w-[300px] p-4 flex items-center justify-between">
+                                                    <span className="text-rose-700 uppercase tracking-wider text-[11px]">Rang</span>
+                                                </div>
+                                            </th>
+                                            <th className="border-b border-r border-gray-200 bg-rose-50/30">
+                                                <div className="resize-x overflow-hidden min-w-[120px] max-w-[300px] p-4 flex items-center justify-between">
+                                                    <span className="text-rose-700 uppercase tracking-wider text-[11px]">Razmer</span>
+                                                </div>
+                                            </th>
+                                            <th className="border-b border-r border-gray-200 bg-amber-50/30">
+                                                <div className="resize-x overflow-hidden min-w-[140px] p-4 flex items-center justify-between">
+                                                    <span className="text-amber-700 uppercase tracking-wider text-[11px]">Dona narxi</span>
+                                                </div>
+                                            </th>
+                                            <th className="border-b border-r border-gray-200 bg-gray-50/50">
+                                                <div className="resize-x overflow-hidden min-w-[140px] p-4 flex items-center justify-between">
+                                                    <span className="uppercase tracking-wider text-[11px]">Qoldiq</span>
+                                                </div>
+                                            </th>
                                             <th className="p-4 border-b border-gray-200 w-16 bg-white"></th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200 bg-white">
                                         {bomItems.map((item, idx) => (
                                             <tr key={item.id || idx} className="hover:bg-gray-50/80 transition-colors group">
-                                                <td className="p-3 border-r border-gray-100 text-center text-[10px] font-black text-gray-400">{idx + 1}</td>
+                                                <td className="p-3 border-r border-gray-100 text-center text-xs font-bold text-gray-500">{idx + 1}</td>
                                                 
                                                 <td className="p-2 border-r border-gray-100">
-                                                    <input type="text" className="w-full px-3 py-2 text-xs font-bold text-gray-700 bg-gray-50 border border-transparent hover:border-gray-200 focus:border-blue-400 focus:bg-white rounded-lg outline-none transition-all placeholder:text-gray-300" value={item.item_name || ''} onChange={e => updateBom(idx, 'item_name', e.target.value)} placeholder="Material nomi..." />
+                                                    <input type="text" className="w-full px-3 py-2.5 text-sm font-semibold text-gray-800 bg-gray-50 border border-transparent hover:border-gray-200 focus:border-blue-500 focus:bg-white rounded-lg outline-none transition-all placeholder:text-gray-400" value={item.item_name || ''} onChange={e => updateBom(idx, 'item_name', e.target.value)} placeholder="Material nomi..." />
                                                 </td>
                                                 
                                                 <td className="p-2 border-r border-gray-100">
-                                                    <select className="w-full px-3 py-2 text-xs font-bold text-gray-700 bg-gray-50 border border-transparent hover:border-gray-200 focus:border-blue-400 focus:bg-white rounded-lg outline-none transition-all appearance-none cursor-pointer" value={item.part_name || ''} onChange={e => updateBom(idx, 'part_name', e.target.value)}>
+                                                    <select className="w-full px-3 py-2.5 text-sm font-semibold text-gray-800 bg-gray-50 border border-transparent hover:border-gray-200 focus:border-blue-500 focus:bg-white rounded-lg outline-none transition-all appearance-none cursor-pointer" value={item.part_name || ''} onChange={e => updateBom(idx, 'part_name', e.target.value)}>
                                                         <option value="">Tanlang</option>
                                                         {components.map((c, i) => <option key={i} value={c}>{c}</option>)}
                                                     </select>
                                                 </td>
                                                 
-                                                <td className="p-2 border-r border-gray-100 text-center flex items-center justify-center h-full pt-3">
-                                                    <button type="button" onClick={() => updateBom(idx, 'is_main', !item.is_main)} className={`w-12 h-6 rounded-full relative transition-colors shadow-inner flex-shrink-0 ${item.is_main ? 'bg-blue-500' : 'bg-gray-200'}`}>
+                                                <td className="p-2 border-r border-gray-100 text-center flex items-center justify-center h-full pt-4">
+                                                    <button type="button" onClick={() => updateBom(idx, 'is_main', !item.is_main)} className={`w-12 h-6 rounded-full relative transition-colors shadow-inner flex-shrink-0 ${item.is_main ? 'bg-blue-500' : 'bg-gray-300'}`}>
                                                         <div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${item.is_main ? 'translate-x-6' : 'translate-x-0'}`} />
                                                     </button>
                                                 </td>
                                                 
                                                 <td className="p-2 border-r border-gray-100">
-                                                    <input type="number" className="w-full px-3 py-2 text-xs font-bold text-gray-700 bg-emerald-50/50 border border-transparent hover:border-emerald-200 focus:border-emerald-400 focus:bg-white rounded-lg outline-none transition-all text-center placeholder:text-emerald-200" value={item.consumption || ''} onChange={e => updateBom(idx, 'consumption', e.target.value)} placeholder="0" />
+                                                    <input type="number" className="w-full px-3 py-2.5 text-sm font-bold text-gray-800 bg-emerald-50/50 border border-transparent hover:border-emerald-300 focus:border-emerald-500 focus:bg-white rounded-lg outline-none transition-all text-center placeholder:text-emerald-300" value={item.consumption || ''} onChange={e => updateBom(idx, 'consumption', e.target.value)} placeholder="0" />
                                                 </td>
                                                 
                                                 <td className="p-2 border-r border-gray-100">
-                                                    <select className="w-full px-3 py-2 text-xs font-bold text-gray-700 bg-gray-50 border border-transparent hover:border-gray-200 focus:border-blue-400 focus:bg-white rounded-lg outline-none transition-all appearance-none cursor-pointer" value={item.department || ''} onChange={e => updateBom(idx, 'department', e.target.value)}>
+                                                    <select className="w-full px-3 py-2.5 text-sm font-semibold text-gray-800 bg-gray-50 border border-transparent hover:border-gray-200 focus:border-blue-500 focus:bg-white rounded-lg outline-none transition-all appearance-none cursor-pointer" value={item.department || ''} onChange={e => updateBom(idx, 'department', e.target.value)}>
                                                         <option value="">Tanlang</option>
                                                         <option value="Kesim">Kesim</option>
                                                         <option value="Tikuv">Tikuv</option>
@@ -461,25 +499,25 @@ const ModelDetailsModal = ({ model, onClose, onRefresh, suggestedSizes = [], sug
                                                 </td>
                                                 
                                                 <td className="p-2 border-r border-gray-100">
-                                                    <select className="w-full px-3 py-2 text-xs font-bold text-gray-700 bg-gray-50 border border-transparent hover:border-gray-200 focus:border-blue-400 focus:bg-white rounded-lg outline-none transition-all appearance-none cursor-pointer" value={item.color || ''} onChange={e => updateBom(idx, 'color', e.target.value)}>
+                                                    <select className="w-full px-3 py-2.5 text-sm font-semibold text-gray-800 bg-gray-50 border border-transparent hover:border-gray-200 focus:border-blue-500 focus:bg-white rounded-lg outline-none transition-all appearance-none cursor-pointer" value={item.color || ''} onChange={e => updateBom(idx, 'color', e.target.value)}>
                                                         <option value="">Tanlang</option>
                                                         {colors.map((c, i) => <option key={i} value={c.name}>{c.name}</option>)}
                                                     </select>
                                                 </td>
                                                 
                                                 <td className="p-2 border-r border-gray-100">
-                                                    <select className="w-full px-3 py-2 text-xs font-bold text-gray-700 bg-gray-50 border border-transparent hover:border-gray-200 focus:border-blue-400 focus:bg-white rounded-lg outline-none transition-all appearance-none cursor-pointer" value={item.size_range || ''} onChange={e => updateBom(idx, 'size_range', e.target.value)}>
+                                                    <select className="w-full px-3 py-2.5 text-sm font-semibold text-gray-800 bg-gray-50 border border-transparent hover:border-gray-200 focus:border-blue-500 focus:bg-white rounded-lg outline-none transition-all appearance-none cursor-pointer" value={item.size_range || ''} onChange={e => updateBom(idx, 'size_range', e.target.value)}>
                                                         <option value="">Tanlang</option>
                                                         {sizes.map((s, i) => <option key={i} value={s}>{s}</option>)}
                                                     </select>
                                                 </td>
                                                 
                                                 <td className="p-2 border-r border-gray-100">
-                                                    <input type="number" className="w-full px-3 py-2 text-xs font-black text-amber-600 bg-amber-50/50 border border-transparent hover:border-amber-200 focus:border-amber-400 focus:bg-white rounded-lg outline-none transition-all text-right placeholder:text-amber-200" value={item.price || ''} onChange={e => updateBom(idx, 'price', e.target.value)} placeholder="0.00" />
+                                                    <input type="number" className="w-full px-3 py-2.5 text-sm font-bold text-amber-700 bg-amber-50/50 border border-transparent hover:border-amber-300 focus:border-amber-500 focus:bg-white rounded-lg outline-none transition-all text-right placeholder:text-amber-300" value={item.price || ''} onChange={e => updateBom(idx, 'price', e.target.value)} placeholder="0.00" />
                                                 </td>
                                                 
                                                 <td className="p-2 border-r border-gray-100">
-                                                    <div className="w-full px-3 py-2 text-xs font-black text-gray-400 bg-gray-100/50 border border-gray-200/50 rounded-lg text-right">
+                                                    <div className="w-full px-3 py-2.5 text-sm font-bold text-gray-500 bg-gray-100 border border-gray-200/80 rounded-lg text-right">
                                                         {calculateBalance(item.item_name)}
                                                     </div>
                                                 </td>
@@ -487,11 +525,11 @@ const ModelDetailsModal = ({ model, onClose, onRefresh, suggestedSizes = [], sug
                                                 <td className="p-2 text-center">
                                                     <div className="flex items-center justify-center gap-1">
                                                         <button type="button" onClick={() => removeBomRow(idx)} className="w-8 h-8 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all mx-auto shadow-sm opacity-0 group-hover:opacity-100">
-                                                            <Trash2 size={14} />
+                                                            <Trash2 size={16} />
                                                         </button>
                                                         {idx === bomItems.length - 1 && (
                                                             <button type="button" onClick={addBomRow} className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-all shadow-md active:scale-95">
-                                                                <Plus size={16} />
+                                                                <Plus size={18} />
                                                             </button>
                                                         )}
                                                     </div>
@@ -501,15 +539,15 @@ const ModelDetailsModal = ({ model, onClose, onRefresh, suggestedSizes = [], sug
                                         
                                         {/* Umumiy */}
                                         <tr className="bg-gray-100 text-gray-800">
-                                            <td colSpan={4} className="p-4 text-right text-[10px] font-black tracking-widest uppercase">Umumiy</td>
-                                            <td className="p-4 text-center text-sm font-black text-emerald-600">{bomItems.reduce((s, i) => s + (parseFloat(i.consumption) || 0), 0)}</td>
+                                            <td colSpan={4} className="p-5 text-right text-xs font-black tracking-widest uppercase">Umumiy</td>
+                                            <td className="p-5 text-center text-base font-black text-emerald-700">{bomItems.reduce((s, i) => s + (parseFloat(i.consumption) || 0), 0)}</td>
                                             <td colSpan={3} className="border-l border-gray-200"></td>
-                                            <td className="p-4 text-right text-sm font-black text-amber-600 bg-amber-50/50 border-l border-gray-200">{bomItems.reduce((s, i) => s + (parseFloat(i.price) || 0), 0).toLocaleString()}</td>
-                                            <td className="p-4 border-l border-gray-200"></td>
-                                            <td className="p-4 border-l border-gray-200 bg-gray-100">
+                                            <td className="p-5 text-right text-base font-black text-amber-700 bg-amber-50/80 border-l border-gray-200">{bomItems.reduce((s, i) => s + (parseFloat(i.price) || 0), 0).toLocaleString()}</td>
+                                            <td className="p-5 border-l border-gray-200"></td>
+                                            <td className="p-5 border-l border-gray-200 bg-gray-100">
                                                 {bomItems.length > 1 && (
                                                     <button type="button" onClick={addBomRow} className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-all shadow-md active:scale-95">
-                                                        <Plus size={16} />
+                                                        <Plus size={18} />
                                                     </button>
                                                 )}
                                             </td>

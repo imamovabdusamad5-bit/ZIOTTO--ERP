@@ -113,7 +113,7 @@ body {
   @apply bg-slate-50 text-slate-900 transition-colors duration-300;
   background-color: var(--bg-body);
   color: var(--text-primary);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
 }
 
 .glass-card {
