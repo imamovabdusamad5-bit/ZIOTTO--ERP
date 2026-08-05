@@ -14,6 +14,8 @@
   --bg-sidebar: #1a1c2e;
   --bg-sidebar-footer: #141625;
   --border-sidebar: rgba(255, 255, 255, 0.05);
+  --text-sidebar-primary: #f8fafc;
+  --text-sidebar-secondary: #94a3b8;
 
   --color-primary: #3b82f6; /* default brand color */
 }
@@ -28,10 +30,12 @@
   --border-color: rgba(0, 0, 0, 0.05);
   --input-bg: #f4f7fe;
 
-  /* Sidebar Light */
-  --bg-sidebar: #ffffff;
-  --bg-sidebar-footer: #f4f7fe;
-  --border-sidebar: rgba(0, 0, 0, 0.05);
+  /* Sidebar Light (Deep NOVO Indigo) */
+  --bg-sidebar: #111C44;
+  --bg-sidebar-footer: #0B1437;
+  --border-sidebar: rgba(255, 255, 255, 0.05);
+  --text-sidebar-primary: #ffffff;
+  --text-sidebar-secondary: #a3aed1;
   
   --color-primary: #4318FF;
 }
@@ -49,6 +53,8 @@
   --bg-sidebar: #07101d;
   --bg-sidebar-footer: #03060b;
   --border-sidebar: rgba(0, 242, 254, 0.1);
+  --text-sidebar-primary: #e2e8f0;
+  --text-sidebar-secondary: #94a3b8;
   --color-primary: #00f2fe;
 }
 
@@ -64,6 +70,8 @@
   --bg-sidebar: #1f0b26;
   --bg-sidebar-footer: #120517;
   --border-sidebar: rgba(217, 70, 239, 0.15);
+  --text-sidebar-primary: #fdf4ff;
+  --text-sidebar-secondary: #f0abfc;
   --color-primary: #d946ef;
 }
 
@@ -79,6 +87,8 @@
   --bg-sidebar: #03120b;
   --bg-sidebar-footer: #010805;
   --border-sidebar: rgba(16, 185, 129, 0.15);
+  --text-sidebar-primary: #ecfdf5;
+  --text-sidebar-secondary: #6ee7b7;
   --color-primary: #10b981;
 }
 
@@ -94,6 +104,8 @@
   --bg-sidebar: #170726;
   --bg-sidebar-footer: #0a0312;
   --border-sidebar: rgba(168, 85, 247, 0.15);
+  --text-sidebar-primary: #faf5ff;
+  --text-sidebar-secondary: #d8b4fe;
   --color-primary: #a855f7;
 }
 

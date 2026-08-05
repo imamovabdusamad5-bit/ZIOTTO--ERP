@@ -87,7 +87,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     const isMaster = tenant?.domain_slug === 'ziotto' || !tenant;
  
     return (
-        <div className={`fixed left-0 top-0 h-[100dvh] bg-[var(--bg-sidebar)] text-[var(--text-secondary)] flex flex-col shadow-xl z-[70] transition-all duration-300 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 w-64 border-r border-[var(--border-sidebar)]`}>
+        <div className={`fixed left-0 top-0 h-[100dvh] bg-[var(--bg-sidebar)] text-[var(--text-sidebar-secondary)] flex flex-col shadow-xl z-[70] transition-all duration-300 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 w-64 border-r border-[var(--border-sidebar)]`}>
             <div className="p-6 border-b border-[var(--border-sidebar)] flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <svg 
@@ -132,7 +132,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                             <path d="M58 85 L46 92" stroke="#00f2fe" strokeWidth="1.75" opacity="0.9" />
                         </g>
                     </svg>
-                    <h1 className="text-xl font-black text-[var(--text-primary)] tracking-tighter flex items-center leading-none uppercase truncate">
+                    <h1 className="text-xl font-black text-[var(--text-sidebar-primary)] tracking-tighter flex items-center leading-none uppercase truncate">
                         <span className="bg-gradient-to-r from-[#00f2fe] to-[#0062ff] bg-clip-text text-transparent">{companyName}</span>
                     </h1>
                 </div>
@@ -152,7 +152,7 @@ const Sidebar = ({ isOpen, onClose }) => {
 
                         // Dynamic class helpers
                         const activeClass = "bg-indigo-600 text-white shadow-lg shadow-indigo-600/20";
-                        const inactiveClass = "hover:bg-gray-100 dark:hover:bg-white/5 hover:text-[var(--text-primary)]";
+                        const inactiveClass = "hover:bg-white/10 hover:text-[var(--text-sidebar-primary)]";
 
                         return (
                             <li key={item.path || item.name}>
@@ -179,8 +179,8 @@ const Sidebar = ({ isOpen, onClose }) => {
                                                             }}
                                                             className={({ isActive }) =>
                                                                 `flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 ${location.search.includes(sub.path.split('?')[1]) && location.pathname === '/ombor'
-                                                                    ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-500/10'
-                                                                    : 'text-gray-500 hover:text-[var(--text-primary)] hover:bg-gray-100 dark:hover:bg-white/5'
+                                                                    ? 'text-white bg-indigo-500/20'
+                                                                    : 'text-gray-400 hover:text-[var(--text-sidebar-primary)] hover:bg-white/5'
                                                                 }`
                                                             }
                                                         >
@@ -221,7 +221,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                             {profile?.full_name?.charAt(0) || 'A'}
                         </div>
                         <div>
-                            <p className="text-sm font-semibold text-[var(--text-primary)] truncate w-24">{profile?.full_name || 'Admin'}</p>
+                            <p className="text-sm font-semibold text-[var(--text-sidebar-primary)] truncate w-24">{profile?.full_name || 'Admin'}</p>
                             <p className="text-[10px] text-gray-500 uppercase tracking-widest">{profile?.role || 'Direktor'}</p>
                         </div>
                     </div>
