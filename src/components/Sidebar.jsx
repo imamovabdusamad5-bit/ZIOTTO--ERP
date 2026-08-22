@@ -62,8 +62,6 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth = 256, setSidebarWidth }) => {
     const navigate = useNavigate();
     const { profile, logout, tenant } = useAuth();
     const [expandedMenu, setExpandedMenu] = useState('Ombor');
-    const [collapsed, setCollapsed] = useState(false);
-    const [mobileOpen, setMobileOpen] = useState(false);
     const [isResizing, setIsResizing] = useState(false);
 
     useEffect(() => {
@@ -88,27 +86,26 @@ const Sidebar = ({ isOpen, onClose, sidebarWidth = 256, setSidebarWidth }) => {
     }, [isResizing, setSidebarWidth]);
 
     const scale = Math.max(0.7, Math.min(1.5, sidebarWidth / 256));
- 
+
     const filteredMenu = menuItems.filter(item => {
         if (!profile) return false;
         if (profile.role === 'admin') return true;
- 
+
         const permKey = item.permKey || item.path.split('?')[0].replace('/', '');
- 
+
         if (item.path === '/') return true;
- 
+
         if (profile.permissions && profile.permissions[permKey]) return true;
- 
+
         return item.roles?.includes(profile.role);
     });
- 
+
     const handleLogout = async () => {
         await logout();
         navigate('/login');
     };
 
     const companyName = tenant?.name || 'PROERP';
-    const isMaster = tenant?.domain_slug === 'ziotto' || !tenant;
  
     return (
         <div className={`fixed left-0 top-0 h-[100dvh] bg-[var(--bg-sidebar)] text-[var(--text-sidebar-secondary)] flex flex-col shadow-xl z-[70] transition-transform duration-300 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 border-r border-[var(--border-sidebar)]`} style={{ width: `var(--sidebar-width, 256px)` }}>

@@ -3,8 +3,18 @@ import { useLocation, Outlet } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
-import { Activity, Menu, CircleCheck, Eye, EyeOff, History, RotateCcw, Sun, Moon } from 'lucide-react';
+import { Activity, Menu, CircleCheck, EyeOff, History, RotateCcw, Sun, Moon } from 'lucide-react';
 import Sidebar from './Sidebar';
+
+// Department Mapping
+const deptMap = {
+    '/kesim': ['Kesim'],
+    '/tikuv': ['Tikuv'],
+    '/otk': ['OTK'],
+    '/dazmol': ['Dazmol', 'Qadoq'],
+    '/ombor': ['Ombor'],
+    '/moliya': ['Moliya']
+};
 
 const Layout = () => {
     const { theme, toggleTheme } = useTheme();
@@ -20,31 +30,6 @@ const Layout = () => {
     }, [sidebarWidth]);
 
     const companyName = tenant?.name || 'PROERP';
-    const isMaster = tenant?.domain_slug === 'ziotto' || !tenant;
-
-    // Initialize from localStorage safely
-    const [hiddenAlertKeys, setHiddenAlertKeys] = useState(() => {
-        try {
-            const saved = localStorage.getItem('ziyo_hidden_alerts');
-            return saved ? JSON.parse(saved) : [];
-        } catch (e) {
-            console.error("Storage error", e);
-            return [];
-        }
-    });
-
-    const [showHidden, setShowHidden] = useState(false);
-    const location = useLocation();
-
-    // Department Mapping
-    const deptMap = {
-        '/kesim': ['Kesim'],
-        '/tikuv': ['Tikuv'],
-        '/otk': ['OTK'],
-        '/dazmol': ['Dazmol', 'Qadoq'],
-        '/ombor': ['Ombor'],
-        '/moliya': ['Moliya']
-    };
 
     // Fetch Alerts
     useEffect(() => {

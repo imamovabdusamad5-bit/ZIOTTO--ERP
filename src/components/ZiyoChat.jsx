@@ -1,6 +1,5 @@
-/* eslint-disable react-hooks/immutability */
 import React, { useState, useEffect, useRef } from 'react';
-import { Bot, Send, X, Sparkles, MessageSquare, Minimize2, TriangleAlert } from 'lucide-react';
+import { Bot, Send, Minimize2, TriangleAlert } from 'lucide-react';
 import { processUserMessage } from '../lib/ziyoAI';
 
 import { useAuth } from '../context/AuthContext';

@@ -305,7 +305,9 @@ const AttendanceScanner = () => {
                 if (scannerRef.current && mode === 'qr') {
                     try {
                          scannerRef.current.resume();
-                    } catch(e) {}
+                    } catch (e) {
+                         // Ignore scanner resume errors
+                    }
                 }
             }, 4000);
         }

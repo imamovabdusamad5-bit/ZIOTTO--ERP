@@ -73,6 +73,9 @@ export const AuthProvider = ({ children }) => {
                 setProfile(data);
                 if (data.companies) {
                     setCompany(data.companies);
+                    localStorage.setItem('erp_company_id', data.companies.id);
+                } else if (data.company_id) {
+                    localStorage.setItem('erp_company_id', data.company_id);
                 }
             }
         } catch (err) {

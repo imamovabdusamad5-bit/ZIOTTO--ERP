@@ -1,12 +1,10 @@
-/* eslint-disable react-hooks/immutability */
 import React, { useState, useEffect } from 'react';
-import { Banknote, DollarSign, Wallet, Send, Users, Search, RefreshCw, CircleCheck, X } from 'lucide-react';
+import { Banknote, DollarSign, Wallet, Search, RefreshCw, CircleCheck, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 const Moliya = () => {
     const [employees, setEmployees] = useState([]);
     const [attendance, setAttendance] = useState([]);
-    const [productionLogs, setProductionLogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [showPaymentModal, setShowPaymentModal] = useState(false);

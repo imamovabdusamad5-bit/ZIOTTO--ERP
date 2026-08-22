@@ -1,11 +1,10 @@
-/* eslint-disable react-hooks/immutability */
 import React, { useState, useEffect } from 'react';
 import {
-    Scissors, Activity, CircleAlert, CircleCheck,
-    Layers, Package, ChevronRight, ArrowUpRight,
-    Search, Filter, Plus, ClipboardList, Ruler,
-    History, TrendingUp, Printer, X, Trash2,
-    ArrowDownLeft, ArrowRight,
+    Scissors, Activity,
+    Package,
+    Search, ClipboardList,
+    X, ArrowUpRight,
+    ArrowRight,
     Scale
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';

@@ -1,6 +1,5 @@
-/* eslint-disable react-hooks/immutability */
 import React from 'react';
-import { Users, ShoppingBag, Activity, TrendingUp, CircleAlert, CircleCheck, Package, Clock } from 'lucide-react';
+import { ShoppingBag, Activity, TrendingUp, CircleAlert, CircleCheck, Package, Clock } from 'lucide-react';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     BarChart, Bar, Cell

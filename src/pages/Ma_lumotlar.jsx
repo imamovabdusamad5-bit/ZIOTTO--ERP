@@ -1,6 +1,6 @@
-/* eslint-disable react-hooks/immutability */
+ 
 import { useState, useEffect } from 'react';
-import { Plus, Save, Trash2, Layers, Package, Activity, Search, Edit2, X, Grid, List } from 'lucide-react';
+import { Plus, Save, Trash2, Layers, Package, Activity, Search, Edit2, Grid, List } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import ImageCropper from '../components/ImageCropper';
 

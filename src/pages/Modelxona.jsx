@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/immutability */
+ 
 import React, { useState, useEffect } from 'react';
 import { Plus, Save, FileText, Trash2, Layers, Scissors, Ruler, Activity, ChevronRight, ChevronDown, Shirt, X, Calculator, RefreshCw, CircleAlert, Pencil, Search, Image, Package, Clock } from 'lucide-react';
 import { supabase } from '../lib/supabase';

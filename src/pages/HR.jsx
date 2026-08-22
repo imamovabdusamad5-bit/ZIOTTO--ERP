@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/immutability */
+ 
 import React, { useState, useEffect } from 'react';
 import {
     Users,
@@ -11,11 +11,7 @@ import {
     Pencil,
     Trash2,
     CircleCheck,
-    Calendar,
-    Phone,
-    Briefcase,
     X,
-    ArrowUpRight,
     QrCode
 } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
@@ -23,8 +19,6 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 
 const HR = () => {
-    const navigate = useNavigate();
-    const { profile } = useAuth();
     const [employees, setEmployees] = useState([]);
     const [attendance, setAttendance] = useState([]);
     const [loading, setLoading] = useState(true);

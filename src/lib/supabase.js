@@ -33,6 +33,10 @@ client.from = (table) => {
     // Helper to proxy the filter builder methods safely
     const proxyFilter = (queryBuilder) => {
         if (companyId === 'master') return queryBuilder;
+        // Allow rows belonging to this company OR legacy/global rows where company_id IS NULL
+        if (table === 'material_types' || table === 'inventory' || table === 'inventory_logs' || table === 'material_requests') {
+            return queryBuilder.or(`company_id.eq.${companyId},company_id.is.null`);
+        }
         return queryBuilder.eq('company_id', companyId);
     };
 
@@ -45,23 +49,27 @@ client.from = (table) => {
     // Proxy the update method
     const originalUpdate = builder.update.bind(builder);
     builder.update = (values, ...args) => {
-        return proxyFilter(originalUpdate(values, ...args));
+        if (companyId === 'master') return originalUpdate(values, ...args);
+        return originalUpdate(values, ...args).eq('company_id', companyId);
     };
 
     // Proxy the delete method
     const originalDelete = builder.delete.bind(builder);
     builder.delete = (...args) => {
-        return proxyFilter(originalDelete(...args));
+        if (companyId === 'master') return originalDelete(...args);
+        return originalDelete(...args).eq('company_id', companyId);
     };
 
     // Proxy the insert method
     const originalInsert = builder.insert.bind(builder);
     builder.insert = (values, ...args) => {
         let injected = values;
-        if (Array.isArray(values)) {
-            injected = values.map(v => ({ ...v, company_id: companyId }));
-        } else if (typeof values === 'object' && values !== null) {
-            injected = { ...values, company_id: companyId };
+        if (companyId && companyId !== 'master') {
+            if (Array.isArray(values)) {
+                injected = values.map(v => ({ company_id: companyId, ...v }));
+            } else if (typeof values === 'object' && values !== null) {
+                injected = { company_id: companyId, ...values };
+            }
         }
         return originalInsert(injected, ...args);
     };

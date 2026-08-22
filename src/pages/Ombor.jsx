@@ -1,9 +1,9 @@
-/* eslint-disable react-hooks/immutability */
+ 
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
     Warehouse, Package, CircleCheck, TriangleAlert, Layers,
-    History, Plus
+    History
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -63,20 +63,17 @@ const Ombor = () => {
     };
 
     async function fetchInventory() {
-        if (!company?.id) return;
         // First try with the relation
         const { data, error } = await supabase
             .from('inventory')
-            .select(`*, material_types!inventory_reference_id_fkey(thread_type, grammage, code)`)
-            .eq('company_id', company.id);
+            .select(`*, material_types!inventory_reference_id_fkey(thread_type, grammage, code)`);
 
         if (error) {
             console.error("Inventory Fetch Error (Relation):", error);
             // If relation fails (e.g. FK missing), try fetching simple inventory
             const { data: simpleData, error: simpleError } = await supabase
                 .from('inventory')
-                .select('*')
-                .eq('company_id', company.id);
+                .select('*');
 
             if (simpleError) {
                 console.error("Inventory Fetch Error (Simple):", simpleError);
@@ -90,39 +87,32 @@ const Ombor = () => {
     };
 
     async function fetchLogs() {
-        if (!company?.id) return;
         const { data, error } = await supabase
             .from('inventory_logs')
             .select(`*, inventory(item_name, color, category, material_types!inventory_reference_id_fkey(thread_type, grammage))`)
-            .eq('company_id', company.id)
             .order('created_at', { ascending: false })
             .limit(50);
         if (!error) setLogs(data || []);
     };
 
     async function fetchReferences() {
-        if (!company?.id) return;
-        const { data, error } = await supabase.from('material_types').select('*').eq('company_id', company.id).order('name');
+        const { data, error } = await supabase.from('material_types').select('*').order('name');
         if (!error) setReferences(data || []);
     };
 
     async function fetchOrders() {
-        if (!company?.id) return;
         const { data, error } = await supabase
             .from('production_orders')
             .select(`*, models(*, bom_items(*)), production_order_items(*)`)
-            .eq('company_id', company.id)
             .neq('status', 'Finished')
             .order('created_at', { ascending: false });
         if (!error) setOrders(data || []);
     };
 
     async function fetchRequests() {
-        if (!company?.id) return;
         const { data, error } = await supabase
             .from('material_requests')
             .select('*, inventory:inventory_id(item_name, color, unit)')
-            .eq('company_id', company.id)
             .order('created_at', { ascending: false });
         if (!error) setRequests(data || []);
     };

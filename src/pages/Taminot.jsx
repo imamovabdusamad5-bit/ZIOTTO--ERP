@@ -1,24 +1,15 @@
-/* eslint-disable react-hooks/immutability */
 import React, { useState, useEffect } from 'react';
 import {
     Truck,
     Users,
     Search,
     Plus,
-    Filter,
-    Download,
     ShoppingBag,
     History,
     TrendingUp,
-    MoreVertical,
-    CircleCheck,
     Clock,
     TriangleAlert,
-    Mail,
-    Phone,
-    MapPin,
     ArrowUpRight,
-    ArrowDownLeft,
     X,
     CircleAlert,
     Warehouse,
@@ -29,21 +20,16 @@ import { useAuth } from '../context/AuthContext';
 const Taminot = () => {
     const { profile } = useAuth();
     const [activeTab, setActiveTab] = useState('inventory'); // inventory, suppliers, orders, logs
-    const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
-
-    // Mock Data (To be replaced with real Supabase calls)
     const [inventory, setInventory] = useState([
         { id: 1, name: 'Ip (Cotton 30/1)', category: 'Ip', stock: 1250, unit: 'kg', min: 200, price: '3.20$' },
         { id: 2, name: 'Supreme (Oq)', category: 'Mato', stock: 450, unit: 'kg', min: 100, price: '6.50$' },
         { id: 3, name: 'Furnitura (Tugma)', category: 'Furnitura', stock: 15000, unit: 'dona', min: 1000, price: '0.05$' },
     ]);
-
     const [suppliers, setSuppliers] = useState([
         { id: 1, name: 'Gurlan Global Tex', contact: 'Azimjon', phone: '+998 90 123 45 67', items: 'Mato, Ip', rating: 4.8 },
         { id: 2, name: 'Aksessuarlar Markazi', contact: 'Dilshod', phone: '+998 93 777 88 99', items: 'Tugma, Zamok', rating: 4.5 },
     ]);
-
     const [orders, setOrders] = useState([]);
 
     useEffect(() => {

@@ -1,10 +1,9 @@
-/* eslint-disable react-hooks/immutability */
 import React, { useState, useEffect } from 'react';
 import {
-    ClipboardList, Calculator, Plus, Trash2, Save,
-    Layers, ShoppingBag, Package, Palette, Ruler,
-    Activity, ChevronDown, ChevronRight, FileText,
-    History, Shirt, RefreshCw, X, Settings2, Pencil, Clock, Download, CircleCheck
+    ClipboardList, Calculator, Plus, Save,
+    Layers, ShoppingBag, Package,
+    Activity, Download,
+    History, Pencil, Clock, CircleCheck, X
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { exportComplexTable } from '../utils/ExcelExport';

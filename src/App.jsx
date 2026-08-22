@@ -1,36 +1,42 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import Layout from './components/Layout';
 import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import Modelxona from './pages/Modelxona';
-import Rejalashtirish from './pages/Rejalashtirish';
-import Ombor from './pages/Ombor';
-import Kesim from './pages/Kesim';
-import Taminot from './pages/Taminot';
-import Tasnif from './pages/Tasnif';
-import Tikuv from './pages/Tikuv';
-import OTK from './pages/OTK';
-import Dazmol from './pages/Dazmol';
-import HR from './pages/HR';
-import Moliya from './pages/Moliya';
-import Xodimlar from './pages/Xodimlar';
-import Ma_lumotlar from './pages/Ma_lumotlar';
-import Pechat from './pages/Pechat';
-import Vishefka from './pages/Vishefka';
-import Hujjatlar from './pages/Hujjatlar';
-import AttendanceScanner from './pages/AttendanceScanner';
-import Sozlamalar from './pages/Sozlamalar';
-
 import ZiyoChat from './components/ZiyoChat';
-
 import { menuItems } from './components/Sidebar';
+
+// Lazy loading route components for code splitting & fast initial load
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Modelxona = lazy(() => import('./pages/Modelxona'));
+const Rejalashtirish = lazy(() => import('./pages/Rejalashtirish'));
+const Ombor = lazy(() => import('./pages/Ombor'));
+const Kesim = lazy(() => import('./pages/Kesim'));
+const Taminot = lazy(() => import('./pages/Taminot'));
+const Tasnif = lazy(() => import('./pages/Tasnif'));
+const Tikuv = lazy(() => import('./pages/Tikuv'));
+const OTK = lazy(() => import('./pages/OTK'));
+const Dazmol = lazy(() => import('./pages/Dazmol'));
+const HR = lazy(() => import('./pages/HR'));
+const Moliya = lazy(() => import('./pages/Moliya'));
+const Xodimlar = lazy(() => import('./pages/Xodimlar'));
+const Ma_lumotlar = lazy(() => import('./pages/Ma_lumotlar'));
+const Pechat = lazy(() => import('./pages/Pechat'));
+const Vishefka = lazy(() => import('./pages/Vishefka'));
+const Hujjatlar = lazy(() => import('./pages/Hujjatlar'));
+const AttendanceScanner = lazy(() => import('./pages/AttendanceScanner'));
+const Sozlamalar = lazy(() => import('./pages/Sozlamalar'));
+
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-[60vh]">
+    <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+);
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
-  if (loading) return null;
+  if (loading) return <PageLoader />;
   if (!user) return <Navigate to="/login" />;
   return children;
 };
@@ -39,11 +45,9 @@ const ProtectedRoute = ({ children }) => {
 const RoleGuard = ({ children, path }) => {
   const { profile, tenant, loading } = useAuth();
 
-  if (loading) return null;
+  if (loading) return <PageLoader />;
   if (!profile) return <Navigate to="/login" />;
 
-  // Admin always has access to EVERYTHING, regardless of Role (but still subject to Tier if we wanted, though usually Admin overrides or respects tier. Let's make Tier checking explicit below)
-  
   // Find the menu item for this path
   const item = menuItems.find(i => i.path === path || (i.subItems && i.subItems.some(s => s.path.startsWith(path))));
   
@@ -52,7 +56,6 @@ const RoleGuard = ({ children, path }) => {
   }
 
   // --- TIER CHECK (Feature Gating) ---
-  // Define required tiers for specific routes
   const requiredTiers = {
     '/reja': ['pro', 'ultra'],
     '/moliya': ['pro', 'ultra'],
@@ -96,8 +99,6 @@ const RoleGuard = ({ children, path }) => {
   return <div className="p-10 text-center text-red-500 font-bold">Huquqingiz yetmaydi (403 Access Denied)</div>;
 };
 
-
-
 function App() {
   useEffect(() => {
     // Initialize Telegram WebApp
@@ -105,11 +106,7 @@ function App() {
       const tg = window.Telegram.WebApp;
       tg.ready();
       tg.expand();
-
-      // Keep everything in view
       tg.enableClosingConfirmation();
-
-      // Optional: Set header color
       tg.setHeaderColor('secondary_bg_color');
     }
   }, []);
@@ -119,30 +116,32 @@ function App() {
       <AuthProvider>
         <BrowserRouter>
           <ZiyoChat />
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-              <Route index element={<Dashboard />} />
-              <Route path="modelxona" element={<RoleGuard path="/modelxona"><Modelxona /></RoleGuard>} />
-              <Route path="reja" element={<RoleGuard path="/reja"><Rejalashtirish /></RoleGuard>} />
-              <Route path="ombor" element={<Ombor />} />
-              <Route path="kesim" element={<RoleGuard path="/kesim"><Kesim /></RoleGuard>} />
-              <Route path="taminot" element={<RoleGuard path="/taminot"><Taminot /></RoleGuard>} />
-              <Route path="tasnif" element={<RoleGuard path="/tasnif"><Tasnif /></RoleGuard>} />
-              <Route path="tikuv" element={<RoleGuard path="/tikuv"><Tikuv /></RoleGuard>} />
-              <Route path="otk" element={<RoleGuard path="/otk"><OTK /></RoleGuard>} />
-              <Route path="dazmol" element={<RoleGuard path="/dazmol"><Dazmol /></RoleGuard>} />
-              <Route path="hr" element={<RoleGuard path="/hr"><HR /></RoleGuard>} />
-              <Route path="moliya" element={<RoleGuard path="/moliya"><Moliya /></RoleGuard>} />
-              <Route path="xodimlar" element={<RoleGuard path="/xodimlar"><Xodimlar /></RoleGuard>} />
-              <Route path="pechat" element={<RoleGuard path="/pechat"><Pechat /></RoleGuard>} />
-              <Route path="vishefka" element={<RoleGuard path="/vishefka"><Vishefka /></RoleGuard>} />
-              <Route path="malumotlar" element={<RoleGuard path="/malumotlar"><Ma_lumotlar /></RoleGuard>} />
-              <Route path="hujjatlar" element={<RoleGuard path="/hujjatlar"><Hujjatlar /></RoleGuard>} />
-              <Route path="scanner" element={<RoleGuard path="/scanner"><AttendanceScanner /></RoleGuard>} />
-              <Route path="sozlamalar" element={<RoleGuard path="/sozlamalar"><Sozlamalar /></RoleGuard>} />
-            </Route>
-          </Routes>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+                <Route index element={<Dashboard />} />
+                <Route path="modelxona" element={<RoleGuard path="/modelxona"><Modelxona /></RoleGuard>} />
+                <Route path="reja" element={<RoleGuard path="/reja"><Rejalashtirish /></RoleGuard>} />
+                <Route path="ombor" element={<Ombor />} />
+                <Route path="kesim" element={<RoleGuard path="/kesim"><Kesim /></RoleGuard>} />
+                <Route path="taminot" element={<RoleGuard path="/taminot"><Taminot /></RoleGuard>} />
+                <Route path="tasnif" element={<RoleGuard path="/tasnif"><Tasnif /></RoleGuard>} />
+                <Route path="tikuv" element={<RoleGuard path="/tikuv"><Tikuv /></RoleGuard>} />
+                <Route path="otk" element={<RoleGuard path="/otk"><OTK /></RoleGuard>} />
+                <Route path="dazmol" element={<RoleGuard path="/dazmol"><Dazmol /></RoleGuard>} />
+                <Route path="hr" element={<RoleGuard path="/hr"><HR /></RoleGuard>} />
+                <Route path="moliya" element={<RoleGuard path="/moliya"><Moliya /></RoleGuard>} />
+                <Route path="xodimlar" element={<RoleGuard path="/xodimlar"><Xodimlar /></RoleGuard>} />
+                <Route path="pechat" element={<RoleGuard path="/pechat"><Pechat /></RoleGuard>} />
+                <Route path="vishefka" element={<RoleGuard path="/vishefka"><Vishefka /></RoleGuard>} />
+                <Route path="malumotlar" element={<RoleGuard path="/malumotlar"><Ma_lumotlar /></RoleGuard>} />
+                <Route path="hujjatlar" element={<RoleGuard path="/hujjatlar"><Hujjatlar /></RoleGuard>} />
+                <Route path="scanner" element={<RoleGuard path="/scanner"><AttendanceScanner /></RoleGuard>} />
+                <Route path="sozlamalar" element={<RoleGuard path="/sozlamalar"><Sozlamalar /></RoleGuard>} />
+              </Route>
+            </Routes>
+          </Suspense>
         </BrowserRouter>
       </AuthProvider>
     </ThemeProvider>
@@ -150,5 +149,6 @@ function App() {
 }
 
 export default App;
+
 
 // Force redeploy - v1.3 (Telegram Mini App Integration Ready)

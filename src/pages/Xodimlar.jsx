@@ -4,14 +4,10 @@ import { QRCodeCanvas } from "qrcode.react";
 import { supabase } from '../lib/supabase';
 import {
     Users,
-    ShieldAlert,
-    Key,
     Pencil,
     Save,
     X,
-    Check,
     CircleCheck,
-    CircleMinus,
     Copy,
     RefreshCw,
     Plus,
