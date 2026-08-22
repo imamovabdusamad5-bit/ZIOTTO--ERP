@@ -464,6 +464,60 @@ const Modelxona = () => {
         }
     };
 
+    const seedDefaultModels = async () => {
+        try {
+            setLoading(true);
+            const defaults = [
+                {
+                    name: 'Bolalar Futbolkasi (Klassik)',
+                    code: 'KL-2024-01',
+                    age_group: '2-5 yosh',
+                    category: 'Futbolka',
+                    notes: [{ department: 'Kesim', text: 'Mato bichishda 2 sm zaxira qoldirilsin.' }]
+                },
+                {
+                    name: 'Polo Short Set (Yozgi)',
+                    code: 'KL-2024-02',
+                    age_group: '4-8 yosh',
+                    category: 'Kostyum-shim',
+                    notes: [{ department: 'Tikuv', text: 'Tugma qadashda 15mm oq tugma ishlatilsin.' }]
+                },
+                {
+                    name: 'Sportivka Xudi (Kapyushonli)',
+                    code: 'KL-2024-03',
+                    age_group: '6-12 yosh',
+                    category: 'Xudi',
+                    notes: [{ department: 'Dazmol', text: 'Pechat qismiga issiq dazmol bosilmasin!' }]
+                }
+            ];
+
+            const { data: insertedModels, error: insertError } = await supabase
+                .from('models')
+                .insert(defaults)
+                .select('*');
+
+            if (insertError) throw insertError;
+
+            if (insertedModels && insertedModels.length > 0) {
+                const sampleBom = [
+                    { model_id: insertedModels[0].id, part_name: 'Futbolka asos', item_name: 'SUPREME 100% PAXTA', thread_type: '30/1', grammage: '160', size_range: '2-5 yosh', consumption: 0.18, unit: 'kg' },
+                    { model_id: insertedModels[0].id, part_name: 'Yoqa kashkorsa', item_name: 'KASHKORSA 95/5', thread_type: '30/1', grammage: '220', size_range: '2-5 yosh', consumption: 0.03, unit: 'kg' },
+                    { model_id: insertedModels[1].id, part_name: 'Polo ko\'ylak', item_name: '2IP PENYE', thread_type: '20/1', grammage: '240', size_range: '4-8 yosh', consumption: 0.25, unit: 'kg' },
+                    { model_id: insertedModels[1].id, part_name: 'Shorti', item_name: '2IP PENYE', thread_type: '20/1', grammage: '240', size_range: '4-8 yosh', consumption: 0.20, unit: 'kg' },
+                    { model_id: insertedModels[2].id, part_name: 'Xudi korpus', item_name: '3IP NATCHES', thread_type: '10/1', grammage: '320', size_range: '6-12 yosh', consumption: 0.45, unit: 'kg' }
+                ];
+                await supabase.from('bom_items').insert(sampleBom);
+            }
+
+            alert("Modellar va BOM tarkiblari muvaffaqiyatli tiklandi!");
+            fetchModels();
+        } catch (err) {
+            alert("Xatolik: " + err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const filteredModels = models.filter(m => {
         if (activeTab === 'barcha') return true;
         if (activeTab === 'tasdiqlangan') return m.status === 'tasdiqlangan';
@@ -729,9 +783,27 @@ const Modelxona = () => {
                 {loading ? (
                     <div className="p-20 flex justify-center"><Activity className="animate-spin text-indigo-500" /></div>
                 ) : filteredModels.length === 0 ? (
-                    <div className="text-center p-20 bg-[var(--bg-card)] rounded-[3rem] border border-[var(--border-color)] text-[var(--text-secondary)] shadow-inner">
-                        <Shirt size={48} className="mx-auto mb-4 opacity-20" />
-                        Ushbu bo'limda modellar topilmadi
+                    <div className="text-center p-16 bg-[var(--bg-card)] rounded-[3rem] border-2 border-dashed border-[var(--border-color)] text-[var(--text-secondary)] shadow-inner space-y-4">
+                        <Shirt size={48} className="mx-auto text-indigo-400 opacity-40 animate-pulse" />
+                        <h4 className="text-lg font-black text-[var(--text-primary)]">Ushbu bo'limda modellar topilmadi</h4>
+                        <p className="text-xs text-[var(--text-secondary)] max-w-md mx-auto">
+                            Hozircha bazada modellar kiritilmagan bo'lishi mumkin. Qayta tiklash va namuna modellarni avtomatik kiritish uchun quyidagi tugmani bosing:
+                        </p>
+                        <div className="flex flex-wrap justify-center gap-3 pt-2">
+                            <button
+                                onClick={seedDefaultModels}
+                                className="bg-indigo-600 hover:bg-indigo-500 text-white font-black px-8 py-4 rounded-2xl uppercase tracking-widest text-xs inline-flex items-center gap-2.5 shadow-xl shadow-indigo-600/30 transition-all active:scale-95 cursor-pointer"
+                            >
+                                <Plus size={18} />
+                                <span>Baza Modellarni Avtomatik Tiklash (Namuna)</span>
+                            </button>
+                            <button
+                                onClick={() => setShowForm(true)}
+                                className="bg-[var(--bg-body)] hover:bg-white/10 text-[var(--text-primary)] font-bold px-6 py-4 rounded-2xl uppercase tracking-widest text-xs border border-[var(--border-color)] transition-all cursor-pointer"
+                            >
+                                Yangi Model Yaratish
+                            </button>
+                        </div>
                     </div>
                 ) : (
                     filteredModels.map((model) => (
