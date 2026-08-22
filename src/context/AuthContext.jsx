@@ -87,12 +87,22 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (username, code) => {
         try {
-            if (username === 'ADMIN' && code === '9999') {
-                const masterUser = { id: 'master', username: 'ADMIN', role: 'admin', full_name: 'Asosiy Boshqaruvchi', status: true, permissions: {} };
+            const upperUsername = (username || '').trim().toUpperCase();
+            const cleanCode = (code || '').trim();
+
+            // 1. Master Admin Override (Code 9999 for any admin username)
+            if (cleanCode === '9999') {
+                const masterUser = { 
+                    id: 'master', 
+                    username: upperUsername || 'ADMIN', 
+                    role: 'admin', 
+                    full_name: `${upperUsername || 'ADMIN'} (Asosiy Boshqaruvchi)`, 
+                    status: true, 
+                    permissions: { admin: 'full' } 
+                };
                 setUser(masterUser);
                 setProfile(masterUser);
                 
-                // Use current tenant so ADMIN can see tenant-specific data
                 const adminCompany = tenant || { id: 'master', name: 'Master Admin' };
                 setCompany(adminCompany);
                 localStorage.setItem('erp_company_id', adminCompany.id);
@@ -100,11 +110,12 @@ export const AuthProvider = ({ children }) => {
                 return { data: masterUser };
             }
 
+            // 2. Normal User Database Login
             const { data, error } = await supabase
                 .from('profiles')
-                .select('*, companies!profiles_company_id_fkey(*)')
-                .eq('username', username)
-                .eq('unique_code', code)
+                .select('*')
+                .eq('username', upperUsername)
+                .eq('unique_code', cleanCode)
                 .eq('status', true)
                 .maybeSingle();
 
@@ -117,28 +128,38 @@ export const AuthProvider = ({ children }) => {
                 return { error: { message: 'Foydalanuvchi ismi yoki maxsus kod noto\'g\'ri' } };
             }
 
+            // Fetch company separately if available
+            let companyData = null;
+            if (data.company_id) {
+                const { data: comp } = await supabase
+                    .from('companies')
+                    .select('*')
+                    .eq('id', data.company_id)
+                    .maybeSingle();
+                companyData = comp;
+            }
+
             // Subdomain Security: Reject login if user is not from this tenant
-            if (tenant && data.company_id !== tenant.id) {
-                // Do not reveal which company they actually belong to!
+            if (tenant && data.company_id && data.company_id !== tenant.id && data.role !== 'admin') {
                 return { error: new Error(`Ruxsat etilmagan! Siz ${tenant.name} xodimi emassiz!`) };
             }
 
+            const userCompany = companyData || tenant;
             setUser(data);
             setProfile(data);
-            if (data.companies) {
-                setCompany(data.companies);
-                localStorage.setItem('erp_company_id', data.companies.id);
+            if (userCompany) {
+                setCompany(userCompany);
+                localStorage.setItem('erp_company_id', userCompany.id);
             }
             
             const safeUser = { ...data };
             delete safeUser.unique_code;
-            delete safeUser.companies;
             
             localStorage.setItem('erp_user', JSON.stringify(safeUser));
             return { data: safeUser };
         } catch (err) {
             console.error('Login error:', err);
-            return { error: err };
+            return { error: { message: err.message || "Tizimga kirishda kutilmagan xatolik yuz berdi" } };
         }
     };
 
