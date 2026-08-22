@@ -165,9 +165,37 @@ const Ma_lumotlar = () => {
         }
     };
 
+    const seedDefaultMaterials = async () => {
+        try {
+            setLoading(true);
+            const defaults = [
+                { type: 'Mato', name: 'SUPREME 100% PAXTA', code: 'MAT-001', thread_type: '30/1', grammage: '160', unit: 'kg' },
+                { type: 'Mato', name: '2IP PENYE', code: 'MAT-002', thread_type: '20/1', grammage: '240', unit: 'kg' },
+                { type: 'Mato', name: 'KASHKORSA 95/5', code: 'MAT-003', thread_type: '30/1', grammage: '220', unit: 'kg' },
+                { type: 'Mato', name: '3IP NATCHES', code: 'MAT-004', thread_type: '10/1', grammage: '320', unit: 'kg' },
+                { type: 'Aksessuar', name: 'FURNITURA TUGMA 15MM', code: 'AKS-001', thread_type: 'Plastik', grammage: '2', unit: 'dona' },
+                { type: 'Aksessuar', name: 'ZAMOK 20CM METALL', code: 'AKS-002', thread_type: 'Metall', grammage: '15', unit: 'dona' },
+                { type: 'Aksessuar', name: 'SHEVRON LOGOTIP', code: 'AKS-003', thread_type: 'Pechat', grammage: '5', unit: 'dona' },
+                { type: 'Aksessuar', name: 'REZINKA 3CM ENLI', code: 'AKS-004', thread_type: 'Eskiz', grammage: '10', unit: 'metr' },
+            ];
+
+            const { error } = await supabase.from('material_types').insert(defaults);
+            if (error) throw error;
+            alert("Baza muvaffaqiyatli tiklandi va namuna ma'lumotlar kiritildi!");
+            fetchItems();
+        } catch (err) {
+            alert("Xatolik: " + err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const filteredItems = items.filter(item => {
-        const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (item.code && item.code.toLowerCase().includes(searchTerm.toLowerCase()));
+        if (!item) return false;
+        const name = (item.name || '').toLowerCase();
+        const code = (item.code || '').toLowerCase();
+        const search = (searchTerm || '').toLowerCase();
+        const matchesSearch = name.includes(search) || code.includes(search);
         const matchesType = filterType === 'All' || item.type === filterType;
         return matchesSearch && matchesType;
     });
@@ -397,7 +425,19 @@ const Ma_lumotlar = () => {
                 {loading ? (
                     <div className="py-20 text-center"><Activity className="animate-spin mx-auto text-indigo-500" /></div>
                 ) : filteredItems.length === 0 ? (
-                    <div className="py-20 text-center bg-black/20 rounded-[3rem] border-2 border-dashed border-white/5 text-gray-500 font-bold uppercase tracking-widest text-[10px] italic">Ma'lumot topilmadi...</div>
+                    <div className="py-16 px-8 text-center bg-black/40 rounded-[3rem] border-2 border-dashed border-indigo-500/20 text-gray-400 space-y-4">
+                        <p className="font-black text-sm uppercase tracking-widest text-gray-300">Ma'lumot topilmadi</p>
+                        <p className="text-xs text-gray-400 max-w-md mx-auto">
+                            Bazada hali mato va aksessuarlar kiritilmagan bo'lishi mumkin. Ma'lumotlar bazasini avtomatik namuna bilan tiklash uchun tugmani bosing:
+                        </p>
+                        <button
+                            onClick={seedDefaultMaterials}
+                            className="bg-indigo-600 hover:bg-indigo-500 text-white font-black px-8 py-4 rounded-2xl uppercase tracking-widest text-xs inline-flex items-center gap-2.5 shadow-xl shadow-indigo-600/30 transition-all active:scale-95 cursor-pointer"
+                        >
+                            <Plus size={18} />
+                            <span>Baza Ma'lumotlarini Avtomatik Tiklash (Namuna)</span>
+                        </button>
+                    </div>
                 ) : viewMode === 'grid' ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-in fade-in zoom-in-95 duration-300 relative z-0">
                         {filteredItems.map(item => (
