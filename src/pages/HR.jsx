@@ -29,7 +29,6 @@ const HR = () => {
 
     const [newEmployee, setNewEmployee] = useState({
         username: '',
-        unique_code: '',
         full_name: '',
         role: 'Xodim',
         phone: '',
@@ -618,14 +617,8 @@ const HR = () => {
                                 />
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Unikal Kod (Maxsus)</label>
-                                <input
-                                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-emerald-500 transition-all font-mono font-bold"
-                                    placeholder="9999"
-                                    value={newEmployee.unique_code}
-                                    onChange={(e) => setNewEmployee({ ...newEmployee, unique_code: e.target.value })}
-                                />
+                            <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4 text-sm leading-relaxed text-emerald-400">
+                                Xodim saqlangach, davomat uchun QR badge avtomatik beriladi. Dashboard kirishi kerak bo'lgan xodimlar uchun esa administrator alohida Supabase Auth akkaunti yaratadi.
                             </div>
 
                             <div className="space-y-2 md:col-span-2">

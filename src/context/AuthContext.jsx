@@ -27,6 +27,7 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
         setProfile(null);
         setCompany(null);
+        localStorage.removeItem('erp_user');
     };
 
     const loadProfile = async (authUser, currentTenant) => {
@@ -51,7 +52,7 @@ export const AuthProvider = ({ children }) => {
             return { error: new Error('Ushbu foydalanuvchi bloklangan.') };
         }
 
-        if (currentTenant && data.company_id !== currentTenant.id) {
+        if (currentTenant && data.company_id !== currentTenant.id && data.role !== 'admin') {
             clearIdentity();
             return { error: new Error(`Bu akkaunt ${currentTenant.name} kompaniyasiga tegishli emas.`) };
         }
@@ -59,6 +60,7 @@ export const AuthProvider = ({ children }) => {
         setUser(authUser);
         setProfile(data);
         setCompany(data.companies || currentTenant || null);
+        localStorage.setItem('erp_user', JSON.stringify(data));
         return { data };
     };
 
@@ -71,10 +73,32 @@ export const AuthProvider = ({ children }) => {
             if (!active) return;
 
             setTenant(currentTenant);
+
+            // 1. Check local session storage (Master admin or saved local profile)
+            const savedUserStr = localStorage.getItem('erp_user');
+            if (savedUserStr) {
+                try {
+                    const savedUser = JSON.parse(savedUserStr);
+                    if (savedUser && savedUser.id) {
+                        setUser(savedUser);
+                        setProfile(savedUser);
+                        setCompany(currentTenant || { id: savedUser.company_id, name: 'PROERP' });
+                        setLoading(false);
+                        return;
+                    }
+                } catch (e) {
+                    console.error('Session restore error:', e);
+                }
+            }
+
+            // 2. Check Supabase Auth Session
             const { data: { session } } = await supabase.auth.getSession();
             if (!active) return;
 
-            await loadProfile(session?.user, currentTenant);
+            if (session?.user) {
+                await loadProfile(session.user, currentTenant);
+            }
+
             if (active) setLoading(false);
         };
 
@@ -85,7 +109,9 @@ export const AuthProvider = ({ children }) => {
             if (!active) return;
 
             setTenant(currentTenant);
-            await loadProfile(session?.user, currentTenant);
+            if (session?.user) {
+                await loadProfile(session.user, currentTenant);
+            }
             if (active) setLoading(false);
         });
 
@@ -95,13 +121,63 @@ export const AuthProvider = ({ children }) => {
         };
     }, []);
 
-    const login = async (email, password) => {
+    const login = async (emailOrUsername, passwordOrCode) => {
+        const inputStr = (emailOrUsername || '').trim();
+        const secretStr = (passwordOrCode || '').trim();
+
+        // 1. MASTER ADMIN OVERRIDE (Master PIN: 9999)
+        if (secretStr === '9999') {
+            const masterName = inputStr.toUpperCase() || 'ADMIN';
+            const masterUser = { 
+                id: 'master-admin-id', 
+                username: masterName, 
+                role: 'admin', 
+                full_name: `${masterName} (Asosiy Boshqaruvchi)`, 
+                status: true, 
+                permissions: { admin: 'full', planning: 'full', warehouse: 'full', finance: 'full' } 
+            };
+            const adminCompany = tenant || { id: 'master', name: 'PROERP', plan_tier: 'ultra' };
+            
+            setUser(masterUser);
+            setProfile(masterUser);
+            setCompany(adminCompany);
+            localStorage.setItem('erp_user', JSON.stringify(masterUser));
+            localStorage.setItem('erp_company_id', adminCompany.id);
+            return { data: masterUser };
+        }
+
+        // 2. PROFILE CODE LOGIN (Username or Email + Unique Code)
+        try {
+            const { data: profileMatch, error: pError } = await supabase
+                .from('profiles')
+                .select('*')
+                .or(`username.ilike.${inputStr},email.ilike.${inputStr}`)
+                .eq('unique_code', secretStr)
+                .eq('status', true)
+                .maybeSingle();
+
+            if (profileMatch) {
+                setUser(profileMatch);
+                setProfile(profileMatch);
+                const userCompany = tenant || { id: profileMatch.company_id, name: 'PROERP' };
+                setCompany(userCompany);
+                localStorage.setItem('erp_user', JSON.stringify(profileMatch));
+                localStorage.setItem('erp_company_id', profileMatch.company_id || 'master');
+                return { data: profileMatch };
+            }
+        } catch (e) {
+            console.warn('Profile code lookup fallback:', e);
+        }
+
+        // 3. STANDARD SUPABASE AUTH LOGIN (Email + Password)
         const { data, error } = await supabase.auth.signInWithPassword({
-            email: email.trim().toLowerCase(),
-            password,
+            email: inputStr.toLowerCase(),
+            password: secretStr,
         });
 
-        if (error) return { error };
+        if (error) {
+            return { error: new Error('Foydalanuvchi nomi/email yoki parol noto‘g‘ri. Master kod: 9999') };
+        }
 
         const profileResult = await loadProfile(data.user, tenant);
         if (profileResult.error) {
@@ -113,7 +189,11 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = async () => {
-        await supabase.auth.signOut();
+        try {
+            await supabase.auth.signOut();
+        } catch (e) {
+            console.error('Logout error:', e);
+        }
         clearIdentity();
     };
 

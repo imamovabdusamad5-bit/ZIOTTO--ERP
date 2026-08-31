@@ -14,7 +14,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import * as faceapi from '@vladmandic/face-api';
 
-const AttendanceScanner = () => {
+const AttendanceScanner = ({ publicMode = false }) => {
     const { tenant } = useAuth();
     const navigate = useNavigate();
     const [mode, setMode] = useState('qr'); // 'qr' or 'face'
@@ -165,7 +165,7 @@ const AttendanceScanner = () => {
 
                 if (bestMatch) {
                     isScanningFace.current = false; // Pause
-                    await handleScanSuccess(JSON.stringify({ id: bestMatch.id, code: bestMatch.unique_code }), null, bestMatch);
+                    await handleScanSuccess(JSON.stringify({ id: bestMatch.id, token: bestMatch.attendance_token }), null, bestMatch);
                     setTimeout(() => {
                         isScanningFace.current = true;
                         scanFaceLoop();
@@ -227,7 +227,7 @@ const AttendanceScanner = () => {
 
             const data = JSON.parse(decodedText);
             
-            if (!data.id || !data.code) {
+            if (!data.id || !data.token) {
                 throw new Error("Noto'g'ri QR Kod");
             }
 
@@ -236,7 +236,7 @@ const AttendanceScanner = () => {
                 .from('profiles')
                 .select('*')
                 .eq('id', data.id)
-                .eq('unique_code', data.code)
+                .eq('attendance_token', data.token)
                 .single();
 
             if (userError || !profile) {
@@ -343,7 +343,7 @@ const AttendanceScanner = () => {
                     )}
                 </div>
                 <button 
-                    onClick={() => navigate('/')}
+                    onClick={() => navigate(publicMode ? '/login' : '/')}
                     className="p-4 bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white rounded-2xl transition-all border border-red-500/30"
                 >
                     <LogOut size={24} />

@@ -64,7 +64,7 @@ const Taminot = () => {
         e.preventDefault();
         // Here we would save to Supabase and record an activity log
         const logEntry = {
-            user: profile?.username || 'ADMIN',
+            user: profile?.username || 'Tizim',
             action: 'Yangi kirim qo\'shdi',
             item: newOrder.item,
             date: new Date().toLocaleString()

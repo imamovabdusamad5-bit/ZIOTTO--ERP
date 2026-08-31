@@ -1,440 +1,189 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { 
-    LogIn, 
-    Lock, 
-    User, 
-    Eye, 
-    EyeOff, 
-    Activity, 
-    ShieldCheck, 
-    BarChart3, 
-    X, 
-    CircleAlert,
-    Boxes,
-    Gauge,
-    Cloud,
+import {
+    Activity,
     ArrowRight,
-    Key
+    Eye,
+    EyeOff,
+    Lock,
+    LogIn,
+    QrCode,
+    ShieldCheck,
+    User,
+    UsersRound,
+    Zap,
 } from 'lucide-react';
 
-const ProErpLogo = ({ className = "w-20 h-20" }) => (
-    <svg 
-        className={`${className} filter drop-shadow-[0_0_25px_rgba(56,189,248,0.85)] shrink-0`} 
-        viewBox="0 0 100 100" 
-        fill="none" 
-        width="85" 
-        height="85" 
-        xmlns="http://www.w3.org/2000/svg"
-    >
+const ProErpLogo = ({ className = 'w-20 h-20' }) => (
+    <svg className={`${className} shrink-0 drop-shadow-[0_0_24px_rgba(0,198,255,0.72)]`} viewBox="0 0 100 100" fill="none" aria-hidden="true">
         <defs>
-            <linearGradient id="glowBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id="proerp-logo-blue" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#00f2fe" />
-                <stop offset="100%" stopColor="#0072ff" />
+                <stop offset="100%" stopColor="#0062ff" />
             </linearGradient>
-            <linearGradient id="glowCyan" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#38bdf8" />
-                <stop offset="100%" stopColor="#0369a1" />
-            </linearGradient>
-            <linearGradient id="glowDarkBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id="proerp-logo-deep" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#0052d4" />
-                <stop offset="50%" stopColor="#4364f7" />
                 <stop offset="100%" stopColor="#6fb1fc" />
             </linearGradient>
         </defs>
         <g strokeLinejoin="round" strokeLinecap="round">
-            {/* Left Stem Face 1 */}
-            <path d="M20 30 L32 23 L32 77 L20 70 Z" fill="#0b2545" opacity="0.95" />
-            {/* Left Stem Face 2 */}
-            <path d="M32 23 L44 30 L44 70 L32 77 Z" fill="url(#glowDarkBlue)" />
-            
-            {/* Top Chevron loop */}
-            <path d="M44 30 L80 44 L68 53 L44 40 Z" fill="url(#glowBlue)" />
-            <path d="M80 44 L80 56 L68 65 L68 53 Z" fill="url(#glowCyan)" />
-            <path d="M44 40 L68 53 L56 61 L32 47 Z" fill="url(#glowDarkBlue)" />
-            
-            {/* Bottom loop */}
-            <path d="M32 60 L56 74 L80 60 L68 53 L56 61 L32 47 Z" fill="url(#glowBlue)" opacity="0.8" />
-            <path d="M32 77 L56 90 L80 76 L80 60 L56 74 L32 60 Z" fill="url(#glowDarkBlue)" />
-
-            {/* Highlights */}
-            <path d="M32 23 L44 30" stroke="#ffffff" strokeWidth="1.5" opacity="0.6" />
-            <path d="M44 30 L80 44" stroke="#ffffff" strokeWidth="1.5" opacity="0.7" />
-            <path d="M32 23 L32 77" stroke="#ffffff" strokeWidth="1" opacity="0.5" />
-            <path d="M56 90 L80 76" stroke="#00f2fe" strokeWidth="1.5" opacity="0.8" />
+            <path d="M20 30 32 23v54L20 70Z" fill="#0b2545" />
+            <path d="m32 23 12 7v40L32 77Z" fill="url(#proerp-logo-deep)" />
+            <path d="m44 30 36 14-12 9-24-13Z" fill="url(#proerp-logo-blue)" />
+            <path d="M80 44v12L68 65V53Z" fill="#0385db" />
+            <path d="m44 40 24 13-12 8-24-14Z" fill="url(#proerp-logo-deep)" />
+            <path d="m32 60 24 14 24-14-12-7-12 8-24-14Z" fill="url(#proerp-logo-blue)" opacity=".85" />
+            <path d="m32 77 24 13 24-14V60L56 74 32 60Z" fill="url(#proerp-logo-deep)" />
+            <path d="m32 23 12 7m0 0 36 14M32 23v54" stroke="white" strokeOpacity=".65" strokeWidth="1.5" />
         </g>
     </svg>
 );
 
-const HexagonFeature = ({ icon: Icon, label }) => (
-    <div className="flex flex-col items-center gap-3.5 group select-none flex-1">
-        <div className="relative w-16 h-16 flex items-center justify-center">
-            {/* Hexagon Border and Background */}
-            <svg 
-                className="absolute inset-0 w-full h-full text-slate-900/60 group-hover:text-blue-950/40 filter drop-shadow-[0_0_10px_rgba(56,189,248,0.15)] transition-all duration-300" 
-                viewBox="0 0 100 100" 
-                fill="currentColor" 
-                stroke="currentColor" 
-                strokeWidth="2.5"
-            >
-                <path d="M50 5 L90 28 L90 72 L50 95 L10 72 L10 28 Z" stroke="#1e293b" className="group-hover:stroke-[#38bdf8] transition-colors duration-300" />
-            </svg>
-            {/* Icon inside */}
-            <div className="relative z-10 text-slate-400 group-hover:text-[#00f2fe] group-hover:scale-110 transition-all duration-300">
-                <Icon size={22} strokeWidth={2} />
-            </div>
+const Feature = ({ icon: Icon, title, description, tone }) => (
+    <div className="flex items-center gap-4">
+        <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border ${tone}`}>
+            <Icon size={22} strokeWidth={2.2} />
         </div>
-        <span className="text-xs text-slate-400 font-semibold tracking-wider group-hover:text-white transition-colors duration-300 text-center">{label}</span>
+        <p className="max-w-[155px] text-[14px] font-medium leading-5 text-slate-100">{title}<br />{description}</p>
     </div>
 );
 
+const WorldMap = () => (
+    <svg className="absolute inset-x-0 top-8 h-[330px] w-full opacity-45" viewBox="0 0 800 330" fill="none" aria-hidden="true">
+        <defs>
+            <pattern id="map-dots" width="7" height="7" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.1" fill="#159bff" /></pattern>
+            <filter id="map-glow"><feGaussianBlur stdDeviation="2" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
+        </defs>
+        <path d="M28 118 74 79l73-19 61 25 47-19 31 28-23 21 3 39-35 16-10 42-35-12-33-61-59 12-33-18-4-35Zm283-63 70-20 63 25 67-7 58 40-15 26 26 32-49 31-62-15-34 27-65-12-30-49-34-22Zm257 145 42-9 45 25 12 43-26 35-49-4-38-42Z" fill="url(#map-dots)" filter="url(#map-glow)" />
+        <path d="M16 205C142 135 234 237 351 164c113-70 216 38 428-65" stroke="#0878ec" strokeOpacity=".42" strokeWidth="1" />
+        <g fill="#38bdf8"><circle cx="76" cy="169" r="4" /><circle cx="288" cy="123" r="3" /><circle cx="480" cy="112" r="4" /><circle cx="653" cy="221" r="3" /></g>
+    </svg>
+);
+
 const Login = () => {
-    const [username, setUsername] = useState('');
-    const [code, setCode] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const [showForgotModal, setShowForgotModal] = useState(false);
+    const [showRecovery, setShowRecovery] = useState(false);
     const { login, tenant } = useAuth();
     const navigate = useNavigate();
+    const companyName = tenant?.name || 'PROERP';
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleSubmit = async (event) => {
+        event.preventDefault();
         setError('');
         setLoading(true);
 
         try {
-            const { error: loginError } = await login(username.toUpperCase(), code);
+            const { error: loginError } = await login(email, password);
             if (loginError) throw loginError;
             navigate('/');
-        } catch (err) {
-            setError(err.message || 'Ism yoki kod noto\'g\'ri');
+        } catch (loginFailure) {
+            setError(loginFailure.message || 'Email yoki parol noto‘g‘ri.');
         } finally {
             setLoading(false);
         }
     };
 
-    const handleCloseClick = () => {
-        // Go back or reset inputs as cosmetic close action
-        setUsername('');
-        setCode('');
-        setError('');
-    };
-
-    const companyName = tenant?.name || 'PROERP';
-    const isMaster = tenant?.domain_slug === 'ziotto' || !tenant;
-
     return (
-        <div className="relative w-full min-h-screen bg-[#020617] flex font-sans overflow-hidden text-white select-none">
-            {/* Custom Background Gradients */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,#0b1528_0%,#020617_60%)] z-0 pointer-events-none" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_75%,#080e1e_0%,#020617_65%)] z-0 pointer-events-none" />
-            
-            {/* Glowing spot behind Login Card */}
-            <div className="absolute top-1/2 right-[10%] -translate-y-1/2 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none z-0" />
+        <main className="box-border min-h-screen overflow-x-hidden bg-[#020817] p-3 text-white sm:p-5 lg:p-7">
+            <section className="relative isolate mx-auto grid min-h-[calc(100vh-24px)] max-w-[1800px] overflow-hidden rounded-[30px] border border-[#1d4c92]/50 bg-[#04112a] shadow-[0_30px_100px_rgba(0,0,0,0.55)] lg:h-[calc(100vh-56px)] xl:grid-cols-[1.35fr_0.95fr]">
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_72%,rgba(0,128,255,.23),transparent_27%),radial-gradient(circle_at_67%_8%,rgba(0,102,255,.18),transparent_22%),linear-gradient(120deg,rgba(3,15,42,.3),rgba(2,8,24,.82))]" />
+                <div className="pointer-events-none absolute inset-0 opacity-60 [background-image:linear-gradient(rgba(35,117,218,.09)_1px,transparent_1px),linear-gradient(90deg,rgba(35,117,218,.07)_1px,transparent_1px)] [background-size:48px_48px]" />
 
-            {/* Glowing spot behind left side */}
-            <div className="absolute top-[20%] left-[10%] w-[450px] h-[450px] bg-cyan-600/5 rounded-full blur-[130px] pointer-events-none z-0" />
+                <div className="relative hidden min-h-full flex-col justify-between overflow-hidden p-10 xl:flex xl:p-14">
+                    <WorldMap />
+                    <header className="relative z-10 flex items-center gap-4">
+                        {tenant?.logo_url ? <img src={tenant.logo_url} alt={companyName} className="h-24 w-24 object-contain" /> : <ProErpLogo className="h-24 w-24" />}
+                        <div>
+                            <h1 className="text-5xl font-black leading-none tracking-tight"><span className="text-white">PRO</span><span className="text-[#087dff]">ERP</span></h1>
+                            <div className="mt-3 flex items-center gap-3 text-[11px] font-bold tracking-[.15em] text-slate-200"><span className="h-px w-9 bg-slate-400" />BIZNESINGIZ UCHUN OSON BOSHQARUV<span className="h-px w-9 bg-slate-400" /></div>
+                        </div>
+                    </header>
 
-            {/* Top Right Close Button */}
-            <button 
-                onClick={handleCloseClick}
-                className="absolute top-8 right-8 w-12 h-12 rounded-full bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 flex items-center justify-center text-slate-300 hover:text-white transition-all cursor-pointer z-50 hover:scale-105 active:scale-95 shadow-lg shadow-black/30"
-                aria-label="Close"
-            >
-                <X size={20} strokeWidth={2.5} />
-            </button>
-
-            {/* Centered Holographic Wireframe Globe */}
-            <div className="absolute top-1/2 left-[48%] -translate-y-1/2 -translate-x-1/2 w-[600px] h-[600px] opacity-[0.22] z-0 pointer-events-none select-none hidden lg:block">
-                <svg className="w-full h-full text-cyan-500/80 animate-[spin_100s_linear_infinite]" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <radialGradient id="globeGlow" cx="50%" cy="50%" r="50%">
-                            <stop offset="0%" stopColor="#0062ff" stopOpacity="0.25" />
-                            <stop offset="60%" stopColor="#00f2fe" stopOpacity="0.08" />
-                            <stop offset="100%" stopColor="transparent" stopOpacity="0" />
-                        </radialGradient>
-                    </defs>
-                    
-                    {/* Radial Glow Base */}
-                    <circle cx="100" cy="100" r="85" fill="url(#globeGlow)" />
-                    
-                    {/* Ring Outlines */}
-                    <circle cx="100" cy="100" r="75" stroke="#00f2fe" strokeWidth="0.35" strokeDasharray="3 6" opacity="0.8" />
-                    <circle cx="100" cy="100" r="78" stroke="#0062ff" strokeWidth="0.2" opacity="0.5" />
-                    
-                    {/* Latitude Grid lines */}
-                    <ellipse cx="100" cy="100" rx="75" ry="22" stroke="#00d2c4" strokeWidth="0.3" opacity="0.6" />
-                    <ellipse cx="100" cy="100" rx="75" ry="42" stroke="#0062ff" strokeWidth="0.3" opacity="0.5" />
-                    <ellipse cx="100" cy="100" rx="75" ry="6" stroke="#00d2c4" strokeWidth="0.3" opacity="0.6" />
-                    
-                    {/* Longitude Grid lines */}
-                    <ellipse cx="100" cy="100" rx="22" ry="75" stroke="#00d2c4" strokeWidth="0.3" opacity="0.6" />
-                    <ellipse cx="100" cy="100" rx="42" ry="75" stroke="#0062ff" strokeWidth="0.3" opacity="0.5" />
-                    <ellipse cx="100" cy="100" rx="6" ry="75" stroke="#00d2c4" strokeWidth="0.3" opacity="0.6" />
-
-                    {/* Dotted Nodes on Intersection */}
-                    <g fill="#00f2fe" className="animate-pulse">
-                        <circle cx="65" cy="70" r="1.3" />
-                        <circle cx="70" cy="68" r="0.9" />
-                        <circle cx="72" cy="74" r="1.1" />
-                        <circle cx="60" cy="75" r="1.6" />
-                        <circle cx="78" cy="115" r="1.6" />
-                        <circle cx="82" cy="125" r="1.3" />
-                        <circle cx="80" cy="135" r="0.9" />
-                        <circle cx="110" cy="110" r="1.8" />
-                        <circle cx="115" cy="118" r="1.3" />
-                        <circle cx="120" cy="128" r="1.1" />
-                        <circle cx="115" cy="70" r="1.6" />
-                        <circle cx="125" cy="65" r="2.0" />
-                        <circle cx="135" cy="72" r="1.3" />
-                        <circle cx="140" cy="80" r="1.6" />
-                        <circle cx="120" cy="85" r="1.1" />
-                        <circle cx="145" cy="135" r="1.6" />
-                        <circle cx="150" cy="138" r="1.0" />
-                    </g>
-                </svg>
-            </div>
-
-            <div className="w-full min-h-screen flex flex-col lg:flex-row relative z-10">
-                {/* Left Side: Branding & Features */}
-                <div className="hidden lg:flex lg:w-[56%] flex-col justify-between p-16 xl:p-24 select-none relative">
-                    {/* Header: Logo and Title */}
-                    <div className="flex items-center gap-4.5 animate-in fade-in slide-in-from-left-6 duration-700">
-                        {tenant?.logo_url ? (
-                            <img src={tenant.logo_url} alt="Logo" className="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.2)] shrink-0" />
-                        ) : (
-                            <ProErpLogo className="w-20 h-20 shrink-0" />
-                        )}
-                        <div className="flex flex-col">
-                            <h1 className="text-4xl font-extrabold tracking-tight flex items-center gap-0.5 leading-none">
-                                <span className="text-white font-extrabold">PRO</span>
-                                <span className="text-[#0062ff] font-extrabold">ERP</span>
-                            </h1>
-                            <div className="flex items-center gap-1.5 mt-2">
-                                <span className="h-[1px] w-3 bg-slate-600" />
-                                <p className="text-[#94a3b8] uppercase tracking-[0.25em] text-[10px] font-semibold leading-none">
-                                    Biznesni oson boshqaruv
-                                </p>
-                                <span className="h-[1px] w-3 bg-slate-600" />
-                            </div>
+                    <div className="relative z-10 mt-16 max-w-[690px]">
+                        <h2 className="text-[clamp(42px,4.2vw,68px)] font-black leading-[1.06] tracking-[-.04em]">Korxonangizni raqamli kelajakka <span className="text-[#00d8ff]">biz bilan</span> olib boring.</h2>
+                        <div className="mt-9 grid max-w-[620px] grid-cols-2 gap-x-11 gap-y-7 border-l border-cyan-300/30 pl-7">
+                            <Feature icon={ShieldCheck} title="Xavfsiz va ishonchli" description="ma'lumotlar" tone="border-violet-400/45 bg-violet-500/20 text-violet-200" />
+                            <Feature icon={Zap} title="Tezkor va samarali" description="ishlash" tone="border-emerald-400/45 bg-emerald-500/20 text-emerald-200" />
+                            <Feature icon={LogIn} title="Barcha jarayonlar" description="bir platformada" tone="border-blue-400/45 bg-blue-500/20 text-blue-200" />
+                            <Feature icon={UsersRound} title="Jamoa bilan qulay" description="hamkorlik" tone="border-orange-300/45 bg-orange-500/20 text-orange-100" />
                         </div>
                     </div>
 
-                    {/* Content Section: Taglines and Grid */}
-                    <div className="my-auto py-10 space-y-11">
-                        {/* Heading */}
-                        <div className="space-y-4">
-                            <h2 className="text-[52px] xl:text-[62px] font-extrabold leading-[1.12] text-white tracking-tight animate-in fade-in slide-in-from-left-6 duration-1000 delay-150">
-                                Korxonangizni <br />
-                                raqamli <span className="text-[#00f2fe] font-extrabold drop-shadow-[0_0_15px_rgba(0,242,254,0.35)]">kelajakka</span> biz <br />
-                                bilan olib chiqing
-                            </h2>
-                            {/* Subtitle Description */}
-                            <p className="text-[#94a3b8] text-lg leading-[1.75] max-w-xl font-medium animate-in fade-in slide-in-from-left-6 duration-1000 delay-250">
-                                PROERP – korxonani yagona platformada boshqarish, jarayonlarni avtomatlashtirish va samaradorlikni oshirish uchun zamonaviy ERP yechimi.
-                            </p>
-                        </div>
-
-                        {/* 5 Horizontal Feature Row */}
-                        <div className="flex items-center justify-between gap-4 max-w-2xl pt-2 animate-in fade-in slide-in-from-left-6 duration-1000 delay-350">
-                            <HexagonFeature icon={Boxes} label="Integratsiya" />
-                            <HexagonFeature icon={BarChart3} label="Analitika" />
-                            <HexagonFeature icon={ShieldCheck} label="Xavfsizlik" />
-                            <HexagonFeature icon={Gauge} label="Samaradorlik" />
-                            <HexagonFeature icon={Cloud} label="Bulutli yechim" />
-                        </div>
-                    </div>
-
-                    {/* Bottom: Security Badge Card */}
-                    <div className="bg-[#040815]/60 border border-blue-900/35 hover:border-blue-500/20 rounded-[22px] p-5 flex items-center gap-4.5 max-w-md shadow-2xl backdrop-blur-md transition-all duration-300 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-500">
-                        <div className="p-3 bg-blue-500/10 rounded-2xl text-[#38bdf8] shrink-0 shadow-[0_0_15px_rgba(56,189,248,0.1)]">
-                            <ShieldCheck size={26} strokeWidth={2.2} />
-                        </div>
-                        <div className="flex flex-col gap-0.5">
-                            <h4 className="text-sm font-bold text-white tracking-wide">Ma'lumotlaringiz biz uchun muhim</h4>
-                            <p className="text-[11.5px] text-[#94a3b8] leading-relaxed font-semibold">Yuqori darajadagi xavfsizlik va ishonchlilik kafolatlanadi.</p>
-                        </div>
+                    <div className="relative z-10 mt-8 max-w-[760px]">
+                        <img src="/dashboard_mockup.png" alt="ProERP boshqaruv paneli" className="mx-auto max-h-[340px] w-full object-contain object-bottom drop-shadow-[0_22px_34px_rgba(0,93,255,.36)]" />
                     </div>
                 </div>
 
-                {/* Right Side: Login Form */}
-                <div className="w-full lg:w-[44%] flex items-center justify-center p-6 sm:p-12 z-10 relative">
-                    {/* Mobile Header Logo */}
-                    <div className="absolute top-8 left-8 lg:hidden flex items-center gap-3">
-                        {tenant?.logo_url ? (
-                            <img src={tenant.logo_url} alt="Logo" className="w-11 h-11 object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.2)] shrink-0" />
-                        ) : (
-                            <ProErpLogo className="w-11 h-11 shrink-0" />
-                        )}
-                        <h1 className="text-2xl font-black tracking-tighter flex items-center">
-                            {isMaster ? (
-                                <>PRO<span className="text-[#0062ff]">ERP</span></>
-                            ) : (
-                                <span className="uppercase">{companyName}</span>
-                            )}
-                        </h1>
-                    </div>
-
-                    <div className="w-full max-w-[460px] relative">
-                        {/* Premium Glassmorphic Login Card */}
-                        <div className="bg-[#040814]/75 backdrop-blur-[35px] border border-white/[0.06] rounded-[32px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)] p-8 sm:p-11 animate-in zoom-in-95 duration-500 relative z-10">
-                            
-                            <div className="mb-9">
-                                <h3 className="text-[40px] font-black text-white tracking-tight leading-none mb-3">Tizimga kirish</h3>
-                                <p className="text-sm text-[#94a3b8] font-medium leading-relaxed">{companyName} xodimlari uchun yopiq portal</p>
+                <div className="relative flex items-center justify-center bg-[linear-gradient(135deg,rgba(7,28,73,.9),rgba(2,12,37,.94))] p-5 sm:p-8 lg:p-10 xl:p-14">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_14%,rgba(0,183,255,.22),transparent_25%),radial-gradient(circle_at_14%_80%,rgba(28,72,190,.24),transparent_35%)]" />
+                    <div className="relative w-full max-w-[610px] overflow-hidden rounded-[30px] border border-cyan-200/70 bg-[#071a45]/70 shadow-[0_0_0_1px_rgba(0,132,255,.23),0_30px_80px_rgba(0,0,0,.48),inset_0_1px_0_rgba(255,255,255,.3)] backdrop-blur-xl">
+                        <div className="relative h-40 overflow-hidden border-b border-cyan-300/25 sm:h-48">
+                            <img src="/login_arch_team.png" alt="ProERP boshqaruv markazi" className="h-full w-full object-cover object-center opacity-80" />
+                            <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(4,21,68,.04),rgba(4,20,61,.93))]" />
+                            <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-cyan-200 to-transparent" />
+                        </div>
+                        <div className="relative px-7 pb-8 pt-7 sm:px-12 sm:pb-10 sm:pt-8">
+                            <div className="mb-7 text-center">
+                                <h3 className="text-3xl font-black tracking-tight sm:text-[40px]">Xush kelibsiz!</h3>
+                                <p className="mt-2 text-sm text-blue-100/75 sm:text-base">Boshqaruv paneliga kirish uchun ma'lumotlaringizni kiriting</p>
                             </div>
 
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                {/* Username field */}
-                                <div className="space-y-2">
-                                    <label className="text-[12.5px] text-[#cbd5e1] font-bold tracking-wide block uppercase">Foydalanuvchi nomi yoki email</label>
-                                    <div className="relative group">
-                                        <div className="absolute inset-y-0 left-0 pl-4.5 flex items-center pointer-events-none text-slate-500 group-focus-within:text-[#38bdf8] transition-colors">
-                                            <User size={18} strokeWidth={2.2} />
-                                        </div>
-                                        <input
-                                            required
-                                            type="text"
-                                            placeholder="Foydalanuvchi nomi yoki email"
-                                            className="w-full h-[58px] bg-[#070b13] border border-white/[0.04] rounded-2xl py-3 pl-12.5 pr-4 text-white placeholder:text-slate-600 outline-none focus:border-[#38bdf8]/70 focus:ring-1 focus:ring-[#38bdf8]/15 transition-all font-semibold text-sm shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)]"
-                                            value={username}
-                                            onChange={(e) => setUsername(e.target.value)}
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Password field */}
-                                <div className="space-y-2">
-                                    <label className="text-[12.5px] text-[#cbd5e1] font-bold tracking-wide block uppercase">Parol</label>
-                                    <div className="relative group">
-                                        <div className="absolute inset-y-0 left-0 pl-4.5 flex items-center pointer-events-none text-slate-500 group-focus-within:text-[#38bdf8] transition-colors">
-                                            <Lock size={18} strokeWidth={2.2} />
-                                        </div>
-                                        <input
-                                            required
-                                            type={showPassword ? "text" : "password"}
-                                            placeholder="Parolni kiriting"
-                                            className="w-full h-[58px] bg-[#070b13] border border-white/[0.04] rounded-2xl py-3 pl-12.5 pr-11.5 text-white placeholder:text-slate-600 outline-none focus:border-[#38bdf8]/70 focus:ring-1 focus:ring-[#38bdf8]/15 transition-all font-semibold text-sm shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)]"
-                                            value={code}
-                                            onChange={(e) => setCode(e.target.value)}
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute inset-y-0 right-0 pr-4.5 flex items-center text-slate-500 hover:text-white transition-colors cursor-pointer"
-                                        >
-                                            {showPassword ? <EyeOff size={18} strokeWidth={2.2} /> : <Eye size={18} strokeWidth={2.2} />}
+                            <form onSubmit={handleSubmit} className="space-y-4">
+                                <label className="block">
+                                    <span className="sr-only">Email yoki Login</span>
+                                    <span className="flex h-16 overflow-hidden rounded-2xl border border-cyan-100/35 bg-[#081b45]/90 shadow-inner transition focus-within:border-cyan-200 focus-within:ring-2 focus-within:ring-cyan-400/20">
+                                        <span className="flex w-16 items-center justify-center border-r border-cyan-100/20 bg-[#0c2d67] text-cyan-100"><User size={23} /></span>
+                                        <input required type="text" autoComplete="username" placeholder="Email yoki Login (masalan: ADMIN)" value={email} onChange={(event) => setEmail(event.target.value)} className="min-w-0 flex-1 bg-transparent px-4 text-sm font-medium text-white outline-none placeholder:text-blue-200/55" />
+                                    </span>
+                                </label>
+                                <label className="block">
+                                    <span className="sr-only">Parol yoki Kod</span>
+                                    <span className="flex h-16 overflow-hidden rounded-2xl border border-cyan-100/35 bg-[#081b45]/90 shadow-inner transition focus-within:border-cyan-200 focus-within:ring-2 focus-within:ring-cyan-400/20">
+                                        <span className="flex w-16 items-center justify-center border-r border-cyan-100/20 bg-[#0c2d67] text-cyan-100"><Lock size={23} /></span>
+                                        <input required type={showPassword ? 'text' : 'password'} autoComplete="current-password" placeholder="Parol yoki Kod (Master PIN: 9999)" value={password} onChange={(event) => setPassword(event.target.value)} className="min-w-0 flex-1 bg-transparent px-4 text-sm font-medium text-white outline-none placeholder:text-blue-200/55" />
+                                        <button type="button" onClick={() => setShowPassword((visible) => !visible)} className="w-14 text-blue-100/75 transition hover:text-white" aria-label="Parolni ko‘rsatish">
+                                            {showPassword ? <EyeOff size={22} /> : <Eye size={22} />}
                                         </button>
-                                    </div>
+                                    </span>
+                                </label>
+
+                                {error && <div className="rounded-xl border border-rose-300/35 bg-rose-500/15 px-4 py-3 text-sm text-rose-100">{error}</div>}
+
+                                <div className="flex items-center justify-between gap-4 pt-1 text-sm">
+                                    <span className="flex items-center gap-2 text-blue-100/70"><ShieldCheck size={16} className="text-cyan-300" />Himoyalangan ulanish</span>
+                                    <button type="button" onClick={() => setShowRecovery(true)} className="font-semibold text-cyan-300 transition hover:text-cyan-100">Parolni unutdingizmi?</button>
                                 </div>
 
-                                {error && (
-                                    <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-xs p-4 rounded-xl flex items-center gap-3 animate-shake font-semibold shadow-inner">
-                                        <CircleAlert size={16} className="shrink-0" />
-                                        <span>{error}</span>
-                                    </div>
-                                )}
-
-                                {/* Remember me & Forgot Password */}
-                                <div className="flex items-center justify-between pt-1 font-semibold text-xs">
-                                    <label className="flex items-center gap-2.5 cursor-pointer group">
-                                        <div className="relative flex items-center justify-center">
-                                            <input type="checkbox" className="peer sr-only" />
-                                            <div className="w-5 h-5 bg-[#070b13] border border-slate-800 rounded-[6px] group-hover:border-[#38bdf8] transition-all peer-checked:bg-[#0062ff] peer-checked:border-[#0062ff]" />
-                                            <svg className="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
-                                                <polyline points="20 6 9 17 4 12" />
-                                            </svg>
-                                        </div>
-                                        <span className="text-[#94a3b8] group-hover:text-gray-300 transition-colors select-none">Meni eslab qolish</span>
-                                    </label>
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowForgotModal(true)}
-                                        className="text-[#38bdf8] hover:text-[#00f2fe] hover:underline transition-colors font-bold cursor-pointer"
-                                    >
-                                        Parolni unutdingizmi?
-                                    </button>
-                                </div>
-
-                                {/* Kirish Button */}
-                                <button
-                                    disabled={loading}
-                                    type="submit"
-                                    className="w-full h-[58px] bg-[#0062ff] hover:bg-[#0052d4] text-white font-extrabold text-[16px] rounded-2xl transition-all flex items-center justify-center gap-2.5 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-2 shadow-[0_8px_20px_-6px_rgba(0,98,255,0.4)] cursor-pointer tracking-wider"
-                                >
-                                    {loading ? (
-                                        <>
-                                            <Activity size={20} className="animate-spin text-white/70" />
-                                            <span>Kirilmoqda...</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <span>Kirish</span>
-                                            <ArrowRight size={18} strokeWidth={2.5} />
-                                        </>
-                                    )}
+                                <button disabled={loading} type="submit" className="mt-2 flex h-16 w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-[#1559ff] via-[#087dff] to-[#00c9ef] text-lg font-black shadow-[0_15px_30px_rgba(0,111,255,.3)] transition hover:brightness-110 active:scale-[.99] disabled:cursor-not-allowed disabled:opacity-60">
+                                    {loading ? <><Activity className="animate-spin" size={22} />Kirilmoqda...</> : <><LogIn size={24} />Kirish</>}
                                 </button>
-                                
-                                {/* "yoki" divider */}
-                                <div className="flex items-center gap-4 py-2">
-                                    <div className="h-[1px] bg-slate-900 flex-1 opacity-60"></div>
-                                    <span className="text-[10px] text-slate-500 uppercase tracking-widest font-black">yoki</span>
-                                    <div className="h-[1px] bg-slate-900 flex-1 opacity-60"></div>
-                                </div>
 
-                                {/* SSO button */}
-                                <button
-                                    type="button"
-                                    className="w-full h-[54px] bg-transparent hover:bg-white/[0.02] border border-[#0062ff]/30 hover:border-[#0062ff]/65 text-[#38bdf8] hover:text-[#00f2fe] font-bold py-3 rounded-2xl transition-all flex items-center justify-center gap-2.5 text-xs tracking-wider cursor-pointer"
-                                >
-                                    <Key size={15} strokeWidth={2.5} />
-                                    <span>SSO orqali kirish</span>
-                                </button>
+                                <div className="flex items-center gap-4 py-2"><span className="h-px flex-1 bg-cyan-100/20" /><span className="text-xs text-blue-100/60">yoki</span><span className="h-px flex-1 bg-cyan-100/20" /></div>
+                                <button type="button" onClick={() => navigate('/attendance')} className="flex h-14 w-full items-center justify-center gap-3 rounded-2xl border border-cyan-200/55 bg-[#06163b]/70 font-bold text-cyan-100 transition hover:border-cyan-100 hover:bg-cyan-400/10"><QrCode size={20} />Davomat uchun QR skaner</button>
                             </form>
 
-                            {/* Prompt for non-user */}
-                            <p className="text-center text-xs text-slate-500 mt-8 font-semibold">
-                                PROERP foydalanuvchisi emasmisiz?{" "}
-                                <a href="mailto:info@proerp.uz" className="text-[#0062ff] hover:text-[#38bdf8] hover:underline font-bold ml-1 transition-colors">
-                                    Administrator bilan bog'laning
-                                </a>
-                            </p>
+                            <p className="mt-6 text-center text-xs text-blue-100/60">Akkaunt kerakmi? <a href="mailto:info@proerp.uz" className="font-bold text-cyan-300 hover:text-cyan-100">Administrator bilan bog'laning</a></p>
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            {/* Forgot Password Modal */}
-            {showForgotModal && (
-                <div className="fixed inset-0 z-[999] flex items-center justify-center p-6 bg-black/80 backdrop-blur-xl animate-in fade-in duration-300">
-                    <div className="bg-[#0f172a] border border-slate-800 w-full max-w-sm rounded-[28px] p-8 shadow-2xl relative">
-                        <button 
-                            onClick={() => setShowForgotModal(false)} 
-                            className="absolute top-6 right-6 text-gray-500 hover:text-white transition-colors cursor-pointer"
-                        >
-                            <X size={20} strokeWidth={2.5} />
-                        </button>
-                        <div className="w-16 h-16 bg-amber-500/10 rounded-2xl flex items-center justify-center text-amber-400 mx-auto mb-6 shadow-[0_0_15px_rgba(245,158,11,0.1)]">
-                            <CircleAlert size={32} strokeWidth={2.2} />
-                        </div>
-                        <h3 className="text-xl font-bold text-white text-center mb-3">Parolni tiklash</h3>
-                        <p className="text-slate-400 text-center text-sm leading-relaxed mb-8 font-medium">
-                            Parolni tiklash yoki o'zgartirish uchun <br />
-                            <span className="text-[#38bdf8] font-bold mt-1.5 inline-block">Plan (Rejalashtirish)</span> <br />
-                            bo'limiga murojaat qiling.
-                        </p>
-                        <button
-                            onClick={() => setShowForgotModal(false)}
-                            className="w-full bg-[#1e293b] hover:bg-slate-800 text-white border border-slate-700 font-bold py-3.5 rounded-xl transition-all cursor-pointer"
-                        >
-                            Tushunarli
-                        </button>
+            {showRecovery && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#020817]/80 p-5 backdrop-blur-md">
+                    <div className="w-full max-w-sm rounded-3xl border border-cyan-100/30 bg-[#071a45] p-7 text-center shadow-2xl">
+                        <ShieldCheck className="mx-auto text-cyan-300" size={38} />
+                        <h4 className="mt-4 text-xl font-black">Kirishni tiklash</h4>
+                        <p className="mt-3 text-sm leading-6 text-blue-100/70">Parolni yangilash uchun kompaniyangiz administratori bilan bog'laning.</p>
+                        <button type="button" onClick={() => setShowRecovery(false)} className="mt-6 w-full rounded-xl bg-blue-600 py-3 font-bold transition hover:bg-blue-500">Tushunarli</button>
                     </div>
                 </div>
             )}
-        </div>
+        </main>
     );
 };
 

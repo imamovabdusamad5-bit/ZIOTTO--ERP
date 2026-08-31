@@ -49,7 +49,6 @@ const Xodimlar = () => {
 
     const [editForm, setEditForm] = useState({
         username: '',
-        unique_code: '',
         department: '',
         status: true,
         permissions: { managed_depts: [] }
@@ -57,7 +56,6 @@ const Xodimlar = () => {
 
     const [newUserData, setNewUserData] = useState({
         username: '',
-        unique_code: '',
         full_name: '',
         department: '',
         status: true,
@@ -103,7 +101,6 @@ const Xodimlar = () => {
             const payload = {
                 id: crypto.randomUUID(),
                 username: newUserData.username.toUpperCase(),
-                unique_code: newUserData.unique_code,
                 full_name: newUserData.full_name || newUserData.username,
                 department: newUserData.department,
                 status: newUserData.status,
@@ -115,7 +112,7 @@ const Xodimlar = () => {
 
             if (!error) {
                 setShowAddModal(false);
-                setNewUserData({ username: '', unique_code: '', full_name: '', status: true, permissions: {} });
+                setNewUserData({ username: '', full_name: '', status: true, permissions: {} });
                 fetchUsers();
             } else {
                 alert('Xatolik: ' + error.message);
@@ -131,7 +128,6 @@ const Xodimlar = () => {
         setEditingId(user.id);
         setEditForm({
             username: user.username,
-            unique_code: user.unique_code,
             department: user.department || '',
             status: user.status,
             permissions: user.permissions || {}
@@ -171,7 +167,6 @@ const Xodimlar = () => {
             .from('profiles')
             .update({
                 username: editForm.username.toUpperCase(),
-                unique_code: editForm.unique_code,
                 department: editForm.department,
                 status: editForm.status,
                 permissions: editForm.permissions
@@ -259,7 +254,7 @@ const Xodimlar = () => {
                     </div>
                     <div>
                         <h2 className="text-3xl font-black text-[var(--text-primary)] tracking-tight">Xodimlar va Ruxsatlar</h2>
-                        <p className="text-[var(--text-secondary)] font-bold uppercase tracking-[0.2em] text-[10px] mt-1">Kirish kodlari va huquqlar matritsasi</p>
+                        <p className="text-[var(--text-secondary)] font-bold uppercase tracking-[0.2em] text-[10px] mt-1">QR badge va huquqlar matritsasi</p>
                     </div>
                 </div>
                 <button
@@ -278,7 +273,7 @@ const Xodimlar = () => {
                         <thead className="bg-[var(--bg-header)] uppercase tracking-[0.2em] text-[10px] font-black text-[var(--text-secondary)]">
                             <tr>
                                 <th className="px-8 py-6 border-b border-white/5">Foydalanuvchi / Bo'lim</th>
-                                <th className="px-8 py-6 border-b border-white/5">Unikal Kod</th>
+                                <th className="px-8 py-6 border-b border-white/5">Davomat QR</th>
                                 <th className="px-8 py-6 border-b border-white/5">Ruxsatlar Matritsasi (Matrix)</th>
                                 <th className="px-6 py-6 border-b border-white/5 text-right">Amal</th>
                             </tr>
@@ -328,26 +323,7 @@ const Xodimlar = () => {
                                     </td>
 
                                     <td className="px-8 py-6 align-top">
-                                        {editingId === user.id ? (
-                                            <div className="flex items-center gap-2">
-                                                <input
-                                                    type="text"
-                                                    className="bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-mono focus:border-indigo-500 outline-none w-32 shadow-inner"
-                                                    value={editForm.unique_code}
-                                                    onChange={(e) => setEditForm({ ...editForm, unique_code: e.target.value })}
-                                                />
-                                                <button
-                                                    onClick={() => setEditForm({ ...editForm, unique_code: Math.random().toString(36).slice(-6).toUpperCase() })}
-                                                    className="p-3 bg-indigo-600/20 text-indigo-400 rounded-xl hover:bg-indigo-600 hover:text-white transition-all shadow-lg"
-                                                >
-                                                    <RefreshCw size={18} />
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <code className="bg-indigo-600/10 px-4 py-2 rounded-xl text-sm font-mono text-indigo-400 font-bold border border-indigo-600/20 shadow-inner">
-                                                {user.unique_code}
-                                            </code>
-                                        )}
+                                        <span className="text-xs font-bold text-[var(--text-secondary)]">QR badge orqali</span>
                                     </td>
 
                                     <td className="px-8 py-6">
@@ -492,24 +468,9 @@ const Xodimlar = () => {
                                     onChange={(e) => setNewUserData({ ...newUserData, username: e.target.value })}
                                 />
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Unikal Kod (Maxsus)</label>
-                                <div className="relative">
-                                    <input
-                                        required
-                                        className="w-full bg-[var(--bg-header)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] outline-none focus:border-indigo-500 transition-all font-mono"
-                                        value={newUserData.unique_code}
-                                        onChange={(e) => setNewUserData({ ...newUserData, unique_code: e.target.value })}
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setNewUserData({ ...newUserData, unique_code: Math.random().toString(36).slice(-6).toUpperCase() })}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-indigo-500 hover:text-white"
-                                    >
-                                        <RefreshCw size={20} />
-                                    </button>
-                                </div>
-                            </div>
+                            <p className="rounded-2xl border border-indigo-500/20 bg-indigo-500/5 p-4 text-xs leading-relaxed text-indigo-300">
+                                Xodim saqlangach, tizim davomat uchun alohida QR badge tokenini avtomatik yaratadi.
+                            </p>
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Foydalanuvchi To'liq Ismi</label>
                                 <input
@@ -549,7 +510,7 @@ const Xodimlar = () => {
                         
                         <div className="bg-gray-50 p-6 rounded-3xl border-2 border-gray-100 shadow-inner mb-8">
                             <QRCodeCanvas 
-                                value={JSON.stringify({ id: showQrModal.id, code: showQrModal.unique_code })} 
+                                value={JSON.stringify({ id: showQrModal.id, token: showQrModal.attendance_token })}
                                 size={200}
                                 level={"H"}
                                 fgColor={"#000000"}
@@ -558,8 +519,8 @@ const Xodimlar = () => {
                         </div>
                         
                         <div className="text-center space-y-1 mb-8">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">ID KOD</p>
-                            <p className="text-lg font-mono font-bold">{showQrModal.unique_code}</p>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Davomat badge</p>
+                            <p className="text-sm font-bold">QR kodni skanerga ko'rsating</p>
                         </div>
 
                         <button 
