@@ -1,9 +1,11 @@
  
 import React, { useState, useEffect } from 'react';
-import { Plus, Save, FileText, Trash2, Layers, Scissors, Ruler, Activity, ChevronRight, ChevronDown, Shirt, X, Calculator, RefreshCw, CircleAlert, Pencil, Search, Image, Package, Clock } from 'lucide-react';
+import { Plus, Save, FileText, Trash2, Layers, Scissors, Ruler, Activity, ChevronRight, ChevronDown, Shirt, X, Calculator, RefreshCw, CircleAlert, Pencil, Search, Image, Package, Clock, Download, Archive, CheckSquare, Square, SlidersHorizontal, FileSpreadsheet } from 'lucide-react';
+import * as XLSX from 'xlsx';
 import { supabase } from '../lib/supabase';
 import ImageCropper from '../components/ImageCropper';
 import ModelDetailsModal from '../components/ModelDetailsModal';
+
 const Modelxona = () => {
     const [models, setModels] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -11,6 +13,11 @@ const Modelxona = () => {
     const [activeTab, setActiveTab] = useState('barcha');
     const [expandedModel, setExpandedModel] = useState(null);
     const [references, setReferences] = useState([]);
+
+    // --- SEARCH, FILTER & SELECTION STATES ---
+    const [searchQuery, setSearchQuery] = useState('');
+    const [categoryFilter, setCategoryFilter] = useState('all');
+    const [selectedModelIds, setSelectedModelIds] = useState([]);
 
     const ALLOWED_UNITS = ['kg', 'metr', 'dona', 'pachka'];
 
@@ -517,32 +524,130 @@ const Modelxona = () => {
             setLoading(false);
         }
     };
+    // --- SELECTION & ARCHIVE HELPERS ---
+    const toggleSelectModel = (id) => {
+        setSelectedModelIds(prev => 
+            prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+        );
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedModelIds.length === filteredModels.length && filteredModels.length > 0) {
+            setSelectedModelIds([]);
+        } else {
+            setSelectedModelIds(filteredModels.map(m => m.id));
+        }
+    };
+
+    const handleArchiveModel = async (id, currentStatus) => {
+        const newStatus = currentStatus === 'arxiv' ? 'tasdiqlangan' : 'arxiv';
+        try {
+            const { error } = await supabase
+                .from('models')
+                .update({ status: newStatus })
+                .eq('id', id);
+            if (error) throw error;
+            fetchModels();
+        } catch (err) {
+            alert("Arxivlashda xatolik: " + err.message);
+        }
+    };
+
+    // --- EXCEL EXPORT HELPER ---
+    const handleExportExcel = (targetModels) => {
+        const list = Array.isArray(targetModels) ? targetModels : [targetModels];
+        if (!list || list.length === 0) {
+            alert("Yuklash uchun model tanlanmagan.");
+            return;
+        }
+
+        const excelData = [];
+        list.forEach(m => {
+            if (m.bom_items && m.bom_items.length > 0) {
+                m.bom_items.forEach(item => {
+                    excelData.push({
+                        'Artikul': m.code || '',
+                        'Model Nomi': m.name || '',
+                        'Kategoriya': m.category || '',
+                        'Yosh oralig\'i': m.age_group || '',
+                        'Holati': m.status || 'Jarayonda',
+                        'BOM Qismlari': item.part_name || '',
+                        'Material Nomi': item.item_name || '',
+                        'Ip turi': item.thread_type || '',
+                        'Grammaj (g/m2)': item.grammage || '',
+                        'Sarf': item.consumption || '',
+                        'Birlik': item.unit || '',
+                        'Yaratilgan sana': m.created_at ? new Date(m.created_at).toLocaleString('uz-UZ') : ''
+                    });
+                });
+            } else {
+                excelData.push({
+                    'Artikul': m.code || '',
+                    'Model Nomi': m.name || '',
+                    'Kategoriya': m.category || '',
+                    'Yosh oralig\'i': m.age_group || '',
+                    'Holati': m.status || 'Jarayonda',
+                    'BOM Qismlari': '-',
+                    'Material Nomi': '-',
+                    'Ip turi': '-',
+                    'Grammaj (g/m2)': '-',
+                    'Sarf': '-',
+                    'Birlik': '-',
+                    'Yaratilgan sana': m.created_at ? new Date(m.created_at).toLocaleString('uz-UZ') : ''
+                });
+            }
+        });
+
+        const worksheet = XLSX.utils.json_to_sheet(excelData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Modellar");
+        
+        const fileName = list.length === 1 
+            ? `Model_${list[0].code || 'export'}.xlsx` 
+            : `Modellar_${Date.now()}.xlsx`;
+
+        XLSX.writeFile(workbook, fileName);
+    };
+
+    // Filter & Search Logic
+    const categoriesList = [...new Set(models.map(m => m.category).filter(Boolean))];
 
     const filteredModels = models.filter(m => {
-        if (activeTab === 'barcha') return true;
-        if (activeTab === 'tasdiqlangan') return m.status === 'tasdiqlangan';
-        if (activeTab === 'shablonlar') return m.status === 'shablon';
-        if (activeTab === 'arxivlar') return m.status === 'arxiv';
+        if (activeTab === 'tasdiqlangan' && m.status !== 'tasdiqlangan') return false;
+        if (activeTab === 'shablonlar' && m.status !== 'shablon') return false;
+        if (activeTab === 'arxivlar' && m.status !== 'arxiv') return false;
+        if (activeTab === 'barcha' && m.status === 'arxiv') return false;
+
+        if (categoryFilter !== 'all' && m.category !== categoryFilter) return false;
+
+        if (searchQuery.trim() !== '') {
+            const query = searchQuery.toLowerCase();
+            const nameMatch = m.name?.toLowerCase().includes(query);
+            const codeMatch = m.code?.toLowerCase().includes(query);
+            const categoryMatch = m.category?.toLowerCase().includes(query);
+            const ageMatch = m.age_group?.toLowerCase().includes(query);
+            return nameMatch || codeMatch || categoryMatch || ageMatch;
+        }
+
         return true;
     });
 
+    const formatDate = (dateStr) => {
+        if (!dateStr) return '-';
+        const d = new Date(dateStr);
+        const date = d.toLocaleDateString('uz-UZ', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        const time = d.toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' });
+        return `${date} | ${time}`;
+    };
+
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="space-y-6 animate-in fade-in duration-500">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-2xl font-black text-[var(--text-primary)] tracking-tight">Modelxona va BOM</h2>
-                    <p className="text-[var(--text-secondary)] font-bold uppercase tracking-widest text-[10px] mt-1">Yangi modellar yaratish va mato sarfini hisoblash</p>
+                    <h2 className="text-2xl font-black text-[var(--text-primary)] tracking-tight">Modellashtirish</h2>
+                    <p className="text-[var(--text-secondary)] font-bold uppercase tracking-widest text-[10px] mt-1">Yangi modellar yaratish, BOM va jarayonlarni boshqarish</p>
                 </div>
-                {!showForm && (
-                    <button
-                        onClick={() => setShowForm(true)}
-                        className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20 font-semibold text-sm"
-                    >
-                        <Plus size={18} />
-                        Yangi Model Yaratish
-                    </button>
-                )}
             </div>
 
             {/* Model Creation Form */}
@@ -756,21 +861,21 @@ const Modelxona = () => {
                 </div>
             )}
 
-            {/* Tabs */}
-            <div className="flex flex-wrap items-center gap-2 mb-6 bg-[var(--bg-card)] p-2 rounded-2xl border border-[var(--border-color)]">
+            {/* Sub Tabs (Image 2 style) */}
+            <div className="flex flex-wrap items-center gap-2 border-b border-[var(--border-color)] pb-3">
                 {[
-                    { id: 'barcha', label: 'Barcha Modellar' },
-                    { id: 'tasdiqlangan', label: 'Tasdiqlangan Model' },
+                    { id: 'barcha', label: 'Jarayondagi modellar' },
+                    { id: 'tasdiqlangan', label: 'Tasdiqlangan modellar' },
                     { id: 'shablonlar', label: 'Shablonlar' },
                     { id: 'arxivlar', label: 'Arxivlar' }
                 ].map(tab => (
                     <button
                         key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
-                        className={`px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-all ${
+                        onClick={() => { setActiveTab(tab.id); setSelectedModelIds([]); }}
+                        className={`px-5 py-2.5 rounded-xl font-bold text-xs transition-all ${
                             activeTab === tab.id
-                                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
-                                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]'
+                                ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
+                                : 'bg-[var(--bg-card)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] border border-[var(--border-color)]'
                         }`}
                     >
                         {tab.label}
@@ -778,13 +883,76 @@ const Modelxona = () => {
                 ))}
             </div>
 
-            {/* Model List */}
-            <div className="grid grid-cols-1 gap-4">
+            {/* Top Bar Controls (Search, Category Filter, Actions, Add Button - Image 2 Style) */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[var(--bg-card)] p-4 rounded-2xl border border-[var(--border-color)] shadow-sm">
+                <div className="flex flex-1 flex-col sm:flex-row items-center gap-3">
+                    {/* Search Input */}
+                    <div className="relative w-full sm:w-80">
+                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                        <input
+                            type="text"
+                            placeholder="Qidiruv"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl pl-10 pr-4 py-2 text-xs text-[var(--text-primary)] outline-none focus:border-blue-500 transition-all font-medium"
+                        />
+                        {searchQuery && (
+                            <button
+                                onClick={() => setSearchQuery('')}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                            >
+                                <X size={14} />
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Ruknlar bo'yicha saralash Dropdown */}
+                    <div className="relative w-full sm:w-60">
+                        <select
+                            value={categoryFilter}
+                            onChange={(e) => setCategoryFilter(e.target.value)}
+                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-xl px-4 py-2 text-xs text-[var(--text-primary)] outline-none focus:border-blue-500 transition-all font-medium appearance-none cursor-pointer pr-8"
+                        >
+                            <option value="all">Ruknlar bo'yicha saralash</option>
+                            {categoriesList.map(cat => (
+                                <option key={cat} value={cat}>{cat}</option>
+                            ))}
+                        </select>
+                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={14} />
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-3 justify-end">
+                    {selectedModelIds.length > 0 && (
+                        <button
+                            onClick={() => handleExportExcel(models.filter(m => selectedModelIds.includes(m.id)))}
+                            className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-xl hover:bg-emerald-700 transition-all font-bold text-xs shadow-md shadow-emerald-600/20"
+                            title="Tanlangan modellarni Excelga yuklash"
+                        >
+                            <FileSpreadsheet size={16} />
+                            <span>Excel ({selectedModelIds.length})</span>
+                        </button>
+                    )}
+
+                    {!showForm && (
+                        <button
+                            onClick={() => setShowForm(true)}
+                            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl transition-all shadow-md shadow-blue-600/30 font-bold text-xs"
+                        >
+                            <Plus size={16} />
+                            <span>Element qo'shish</span>
+                        </button>
+                    )}
+                </div>
+            </div>
+
+            {/* Model List Table (Excel-like layout - Image 2) */}
+            <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] overflow-hidden shadow-sm">
                 {loading ? (
-                    <div className="p-20 flex justify-center"><Activity className="animate-spin text-indigo-500" /></div>
+                    <div className="p-20 flex justify-center"><Activity className="animate-spin text-blue-500" /></div>
                 ) : filteredModels.length === 0 ? (
-                    <div className="text-center p-16 bg-[var(--bg-card)] rounded-[3rem] border-2 border-dashed border-[var(--border-color)] text-[var(--text-secondary)] shadow-inner space-y-4">
-                        <Shirt size={48} className="mx-auto text-indigo-400 opacity-40 animate-pulse" />
+                    <div className="text-center p-16 border-2 border-dashed border-[var(--border-color)] text-[var(--text-secondary)] shadow-inner space-y-4">
+                        <Shirt size={48} className="mx-auto text-blue-400 opacity-40 animate-pulse" />
                         <h4 className="text-lg font-black text-[var(--text-primary)]">Ushbu bo'limda modellar topilmadi</h4>
                         <p className="text-xs text-[var(--text-secondary)] max-w-md mx-auto">
                             Hozircha bazada modellar kiritilmagan bo'lishi mumkin. Qayta tiklash va namuna modellarni avtomatik kiritish uchun quyidagi tugmani bosing:
@@ -792,109 +960,157 @@ const Modelxona = () => {
                         <div className="flex flex-wrap justify-center gap-3 pt-2">
                             <button
                                 onClick={seedDefaultModels}
-                                className="bg-indigo-600 hover:bg-indigo-500 text-white font-black px-8 py-4 rounded-2xl uppercase tracking-widest text-xs inline-flex items-center gap-2.5 shadow-xl shadow-indigo-600/30 transition-all active:scale-95 cursor-pointer"
+                                className="bg-blue-600 hover:bg-blue-500 text-white font-black px-6 py-3 rounded-xl uppercase tracking-widest text-xs inline-flex items-center gap-2 shadow-lg shadow-blue-600/30 transition-all active:scale-95 cursor-pointer"
                             >
-                                <Plus size={18} />
+                                <Plus size={16} />
                                 <span>Baza Modellarni Avtomatik Tiklash (Namuna)</span>
                             </button>
                             <button
                                 onClick={() => setShowForm(true)}
-                                className="bg-[var(--bg-body)] hover:bg-white/10 text-[var(--text-primary)] font-bold px-6 py-4 rounded-2xl uppercase tracking-widest text-xs border border-[var(--border-color)] transition-all cursor-pointer"
+                                className="bg-[var(--bg-body)] hover:bg-white/10 text-[var(--text-primary)] font-bold px-6 py-3 rounded-xl uppercase tracking-widest text-xs border border-[var(--border-color)] transition-all cursor-pointer"
                             >
-                                Yangi Model Yaratish
+                                Element qo'shish
                             </button>
                         </div>
                     </div>
                 ) : (
-                    filteredModels.map((model) => (
-                        <div key={model.id} className="bg-[var(--bg-card)] rounded-[2.5rem] border border-[var(--border-color)] overflow-hidden group hover:border-indigo-500/30 transition-all shadow-2xl">
-                            <div
-                                className="p-8 flex items-center justify-between cursor-pointer hover:bg-[var(--bg-hover)] transition-colors"
-                                onClick={() => setExpandedModel(expandedModel === model.id ? null : model.id)}
-                            >
-                                <div className="flex items-center gap-6">
-                                    <div className="w-20 h-20 bg-[var(--bg-body)] text-indigo-400 rounded-3xl flex items-center justify-center overflow-hidden border border-[var(--border-color)] shadow-inner ring-1 ring-[var(--border-color)] group-hover:ring-indigo-500/30 transition-all">
-                                        {model.image_url ? (
-                                            <img src={model.image_url} alt={model.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                        ) : (
-                                            <Shirt size={32} />
-                                        )}
-                                    </div>
-                                    <div>
-                                        <div className="flex items-center gap-3">
-                                            <h4 className="text-xl font-black text-[var(--text-primary)] group-hover:text-indigo-400 transition-colors uppercase tracking-tight">{model.name}</h4>
-                                            {model.notes?.length > 0 && (
-                                                <span className="flex items-center gap-2 bg-rose-500 text-white text-[9px] font-black px-3 py-1 rounded-full animate-pulse shadow-lg shadow-rose-500/20 uppercase tracking-widest">
-                                                    <CircleAlert size={10} /> {model.notes.length} Muhim
-                                                </span>
-                                            )}
-                                        </div>
-                                        <div className="flex items-center gap-4 mt-2">
-                                            <span className="text-[10px] font-mono font-black text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-xl border border-indigo-500/20 tracking-widest uppercase"># {model.code}</span>
-                                            <span className="w-1 h-1 bg-[var(--border-color)] rounded-full"></span>
-                                            <span className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em]">{model.age_group}</span>
-                                            <span className="w-1 h-1 bg-[var(--border-color)] rounded-full"></span>
-                                            <span className="text-[9px] font-black text-indigo-300 bg-indigo-500/5 px-3 py-1 rounded-xl border border-[var(--border-color)] uppercase tracking-widest">{model.category}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-8">
-                                    <div className="text-right hidden sm:block">
-                                        <p className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-1">BOM Tarkibi</p>
-                                        <p className="text-lg font-black text-[var(--text-primary)] flex items-center justify-end gap-1">
-                                            {model.bom_items?.length || 0}
-                                            <span className="text-[10px] text-[var(--text-secondary)] uppercase">Qism</span>
-                                        </p>
-                                        {typeof model.total_smv === 'number' && model.total_smv > 0 && (
-                                            <p className="mt-1 text-[10px] font-black text-emerald-500 uppercase tracking-widest">
-                                                SMV: {Number(model.total_smv).toFixed(2)} min
-                                            </p>
-                                        )}
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleEditModel(model);
-                                            }}
-                                            className="p-4 bg-[var(--bg-body)] text-[var(--text-secondary)] rounded-2xl hover:bg-indigo-600 hover:text-white transition-all border border-[var(--border-color)] shadow-lg group-hover:border-indigo-500/30"
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs border-collapse">
+                            <thead className="bg-[var(--bg-body)] text-[var(--text-secondary)] font-bold uppercase tracking-wider border-b border-[var(--border-color)]">
+                                <tr>
+                                    <th className="py-3 px-4 w-10 text-center">
+                                        <input
+                                            type="checkbox"
+                                            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                                            checked={filteredModels.length > 0 && selectedModelIds.length === filteredModels.length}
+                                            onChange={toggleSelectAll}
+                                        />
+                                    </th>
+                                    <th className="py-3 px-4">Artikul</th>
+                                    <th className="py-3 px-4 text-center">Rasm</th>
+                                    <th className="py-3 px-4">Nomi</th>
+                                    <th className="py-3 px-4">Kategoriya nomi</th>
+                                    <th className="py-3 px-4">Yaratilgan sana</th>
+                                    <th className="py-3 px-4">Yangilanish sanasi</th>
+                                    <th className="py-3 px-4 text-right">Amallar</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-[var(--border-color)] text-[var(--text-primary)] font-medium">
+                                {filteredModels.map((model) => {
+                                    const isSelected = selectedModelIds.includes(model.id);
+                                    return (
+                                        <tr
+                                            key={model.id}
+                                            className={`hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors ${
+                                                isSelected ? 'bg-blue-50/80 dark:bg-blue-950/30' : ''
+                                            }`}
                                         >
-                                            <Pencil size={20} />
-                                        </button>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                openOperationsModal(model);
-                                            }}
-                                            className="p-4 bg-emerald-500/10 text-emerald-500 rounded-2xl hover:bg-emerald-500 hover:text-white transition-all border border-emerald-500/40 shadow-lg"
-                                            title="Operatsiyalar va SMV"
-                                        >
-                                            <Activity size={20} />
-                                        </button>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                openOperationsModal(model);
-                                            }}
-                                            className="p-4 bg-emerald-500/10 text-emerald-500 rounded-2xl hover:bg-emerald-500 hover:text-white transition-all border border-emerald-500/40 shadow-lg"
-                                            title="Operatsiyalar va SMV"
-                                        >
-                                            <Activity size={20} />
-                                        </button>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleDeleteModel(model.id);
-                                            }}
-                                            className="p-4 bg-[var(--bg-body)] text-[var(--text-secondary)] hover:bg-rose-600 hover:text-white transition-all border border-[var(--border-color)] rounded-2xl"
-                                        >
-                                            <Trash2 size={20} />
-                                        </button>
-                                </div>
-                            </div>
-                        </div>
+                                            {/* Select Checkbox */}
+                                            <td className="py-2.5 px-4 text-center">
+                                                <input
+                                                    type="checkbox"
+                                                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                                                    checked={isSelected}
+                                                    onChange={() => toggleSelectModel(model.id)}
+                                                />
+                                            </td>
+
+                                            {/* Artikul (Code) */}
+                                            <td className="py-2.5 px-4 font-mono font-bold text-gray-700 dark:text-gray-300">
+                                                {model.code || 'N/A'}
+                                            </td>
+
+                                            {/* Rasm (Thumbnail) */}
+                                            <td className="py-2.5 px-4 text-center">
+                                                <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center overflow-hidden mx-auto shadow-sm">
+                                                    {model.image_url ? (
+                                                        <img src={model.image_url} alt={model.name} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <Shirt size={18} className="text-gray-400" />
+                                                    )}
+                                                </div>
+                                            </td>
+
+                                            {/* Nomi (Name) */}
+                                            <td className="py-2.5 px-4 font-bold">
+                                                <button
+                                                    onClick={() => setExpandedModel(model.id)}
+                                                    className="text-blue-600 dark:text-blue-400 hover:underline text-left"
+                                                >
+                                                    {model.name}
+                                                </button>
+                                                {model.notes?.length > 0 && (
+                                                    <span className="ml-2 inline-flex items-center gap-1 bg-rose-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">
+                                                        {model.notes.length}
+                                                    </span>
+                                                )}
+                                            </td>
+
+                                            {/* Kategoriya nomi */}
+                                            <td className="py-2.5 px-4 text-gray-600 dark:text-gray-400">
+                                                {model.category || 'Standart'}
+                                            </td>
+
+                                            {/* Yaratilgan sana */}
+                                            <td className="py-2.5 px-4 text-gray-500 font-mono text-[11px]">
+                                                {formatDate(model.created_at)}
+                                            </td>
+
+                                            {/* Yangilanish sanasi */}
+                                            <td className="py-2.5 px-4 text-gray-500 font-mono text-[11px]">
+                                                {formatDate(model.updated_at || model.created_at)}
+                                            </td>
+
+                                            {/* Amallar (Excel, Edit, Archive, Delete) */}
+                                            <td className="py-2.5 px-4 text-right">
+                                                <div className="flex items-center justify-end gap-1.5">
+                                                    {/* Excel export */}
+                                                    <button
+                                                        onClick={() => handleExportExcel(model)}
+                                                        className="p-1.5 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-lg transition-colors"
+                                                        title="Excelga yuklash"
+                                                    >
+                                                        <FileSpreadsheet size={16} />
+                                                    </button>
+
+                                                    {/* Edit */}
+                                                    <button
+                                                        onClick={() => handleEditModel(model)}
+                                                        className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-lg transition-colors"
+                                                        title="Tahrirlash"
+                                                    >
+                                                        <Pencil size={16} />
+                                                    </button>
+
+                                                    {/* Archive */}
+                                                    <button
+                                                        onClick={() => handleArchiveModel(model.id, model.status)}
+                                                        className={`p-1.5 rounded-lg transition-colors ${
+                                                            model.status === 'arxiv'
+                                                                ? 'text-amber-500 bg-amber-50 dark:bg-amber-950/30'
+                                                                : 'text-gray-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/30'
+                                                        }`}
+                                                        title={model.status === 'arxiv' ? 'Arxivdan chiqarish' : 'Arxivlash'}
+                                                    >
+                                                        <Archive size={16} />
+                                                    </button>
+
+                                                    {/* Delete */}
+                                                    <button
+                                                        onClick={() => handleDeleteModel(model.id)}
+                                                        className="p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-colors"
+                                                        title="O'chirish"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
                     </div>
-                    ))
                 )}
             </div>
 
