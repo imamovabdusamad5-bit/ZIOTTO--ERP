@@ -1171,17 +1171,17 @@ const Modelxona = () => {
                                             </td>
 
                                             {/* 3. Artikul (Code) */}
-                                            <td style={{ width: `${columnWidths.code}px` }} className="py-2.5 px-4 font-mono text-xs font-semibold text-gray-700 dark:text-gray-300 truncate">
+                                            <td style={{ width: `${columnWidths.code}px` }} className="py-2.5 px-4 font-mono text-xs font-semibold text-[var(--text-primary)] truncate">
                                                 {model.code || 'N/A'}
                                             </td>
 
                                             {/* 4. Kategoriya nomi */}
-                                            <td style={{ width: `${columnWidths.category}px` }} className="py-2.5 px-4 text-gray-600 dark:text-gray-400 text-xs truncate">
+                                            <td style={{ width: `${columnWidths.category}px` }} className="py-2.5 px-4 text-[var(--text-primary)] font-medium text-xs truncate">
                                                 {model.category || 'Standart'}
                                             </td>
 
                                             {/* 5. Segment */}
-                                            <td style={{ width: `${columnWidths.segment}px` }} className="py-2.5 px-4 text-gray-600 dark:text-gray-400 text-xs truncate">
+                                            <td style={{ width: `${columnWidths.segment}px` }} className="py-2.5 px-4 text-[var(--text-primary)] font-medium text-xs truncate">
                                                 {model.age_group || '-'}
                                             </td>
 
