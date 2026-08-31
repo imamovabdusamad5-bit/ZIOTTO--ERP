@@ -986,12 +986,11 @@ const Modelxona = () => {
                                             onChange={toggleSelectAll}
                                         />
                                     </th>
-                                    <th className="py-3 px-4">Artikul</th>
+                                    <th className="py-3 px-4 text-left">Nomi</th>
                                     <th className="py-3 px-4 text-center">Rasm</th>
-                                    <th className="py-3 px-4">Nomi</th>
-                                    <th className="py-3 px-4">Kategoriya nomi</th>
-                                    <th className="py-3 px-4">Yaratilgan sana</th>
-                                    <th className="py-3 px-4">Yangilanish sanasi</th>
+                                    <th className="py-3 px-4 text-left font-mono">Artikul</th>
+                                    <th className="py-3 px-4 text-left">Kategoriya nomi</th>
+                                    <th className="py-3 px-4 text-left">Segment</th>
                                     <th className="py-3 px-4 text-right">Amallar</th>
                                 </tr>
                             </thead>
@@ -1015,24 +1014,8 @@ const Modelxona = () => {
                                                 />
                                             </td>
 
-                                            {/* Artikul (Code) */}
-                                            <td className="py-2.5 px-4 font-mono font-bold text-gray-700 dark:text-gray-300">
-                                                {model.code || 'N/A'}
-                                            </td>
-
-                                            {/* Rasm (Thumbnail) */}
-                                            <td className="py-2.5 px-4 text-center">
-                                                <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center overflow-hidden mx-auto shadow-sm">
-                                                    {model.image_url ? (
-                                                        <img src={model.image_url} alt={model.name} className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        <Shirt size={18} className="text-gray-400" />
-                                                    )}
-                                                </div>
-                                            </td>
-
-                                            {/* Nomi (Name) */}
-                                            <td className="py-2.5 px-4 font-bold">
+                                            {/* 1. Nomi (Name) */}
+                                            <td className="py-2.5 px-4 font-semibold text-sm">
                                                 <button
                                                     onClick={() => setExpandedModel(model.id)}
                                                     className="text-blue-600 dark:text-blue-400 hover:underline text-left"
@@ -1046,19 +1029,30 @@ const Modelxona = () => {
                                                 )}
                                             </td>
 
-                                            {/* Kategoriya nomi */}
-                                            <td className="py-2.5 px-4 text-gray-600 dark:text-gray-400">
+                                            {/* 2. Rasm (Thumbnail) */}
+                                            <td className="py-2.5 px-4 text-center">
+                                                <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center overflow-hidden mx-auto shadow-sm">
+                                                    {model.image_url ? (
+                                                        <img src={model.image_url} alt={model.name} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <Shirt size={18} className="text-gray-400" />
+                                                    )}
+                                                </div>
+                                            </td>
+
+                                            {/* 3. Artikul (Code) */}
+                                            <td className="py-2.5 px-4 font-mono text-xs font-semibold text-gray-700 dark:text-gray-300">
+                                                {model.code || 'N/A'}
+                                            </td>
+
+                                            {/* 4. Kategoriya nomi */}
+                                            <td className="py-2.5 px-4 text-gray-600 dark:text-gray-400 text-xs">
                                                 {model.category || 'Standart'}
                                             </td>
 
-                                            {/* Yaratilgan sana */}
-                                            <td className="py-2.5 px-4 text-gray-500 font-mono text-[11px]">
-                                                {formatDate(model.created_at)}
-                                            </td>
-
-                                            {/* Yangilanish sanasi */}
-                                            <td className="py-2.5 px-4 text-gray-500 font-mono text-[11px]">
-                                                {formatDate(model.updated_at || model.created_at)}
+                                            {/* 5. Segment */}
+                                            <td className="py-2.5 px-4 text-gray-600 dark:text-gray-400 text-xs">
+                                                {model.age_group || '-'}
                                             </td>
 
                                             {/* Amallar (Excel, Edit, Archive, Delete) */}
