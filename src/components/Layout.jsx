@@ -21,6 +21,14 @@ const Layout = () => {
     const { tenant } = useAuth();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [alerts, setAlerts] = useState([]);
+    const [hiddenAlertKeys, setHiddenAlertKeys] = useState(() => {
+        try {
+            return JSON.parse(localStorage.getItem('ziyo_hidden_alerts')) || [];
+        } catch {
+            return [];
+        }
+    });
+    const [showHidden, setShowHidden] = useState(false);
     const [sidebarWidth, setSidebarWidth] = useState(() => {
         return parseInt(localStorage.getItem('ziyo_sidebar_width')) || 256;
     });
