@@ -19,6 +19,55 @@ const Modelxona = () => {
     const [categoryFilter, setCategoryFilter] = useState('all');
     const [selectedModelIds, setSelectedModelIds] = useState([]);
 
+    // --- COLUMN RESIZING STATE & HANDLER (EXCEL-STYLE) ---
+    const defaultWidths = {
+        select: 44,
+        name: 240,
+        image: 70,
+        code: 130,
+        category: 150,
+        segment: 130,
+        actions: 130
+    };
+
+    const [columnWidths, setColumnWidths] = useState(() => {
+        try {
+            const saved = localStorage.getItem('ziyo_model_col_widths');
+            return saved ? { ...defaultWidths, ...JSON.parse(saved) } : defaultWidths;
+        } catch {
+            return defaultWidths;
+        }
+    });
+
+    const handleResizeStart = (e, colKey) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const startX = e.clientX;
+        const startWidth = columnWidths[colKey] || defaultWidths[colKey] || 100;
+
+        const handleMouseMove = (moveEvent) => {
+            const delta = moveEvent.clientX - startX;
+            const newWidth = Math.max(colKey === 'select' ? 36 : 50, startWidth + delta);
+            setColumnWidths(prev => {
+                const next = { ...prev, [colKey]: newWidth };
+                localStorage.setItem('ziyo_model_col_widths', JSON.stringify(next));
+                return next;
+            });
+        };
+
+        const handleMouseUp = () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        };
+
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+    };
+
     const ALLOWED_UNITS = ['kg', 'metr', 'dona', 'pachka'];
 
     // Form State
@@ -975,23 +1024,104 @@ const Modelxona = () => {
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
-                        <table className="w-full text-left text-xs border-collapse">
-                            <thead className="bg-[var(--bg-body)] text-[var(--text-secondary)] font-bold uppercase tracking-wider border-b border-[var(--border-color)]">
+                        <table className="w-full text-left text-xs border-collapse table-fixed">
+                            <thead className="bg-[var(--bg-body)] text-[var(--text-secondary)] font-bold uppercase tracking-wider border-b border-[var(--border-color)] select-none">
                                 <tr>
-                                    <th className="py-3 px-4 w-10 text-center">
+                                    {/* Select Checkbox Column */}
+                                    <th
+                                        style={{ width: `${columnWidths.select}px` }}
+                                        className="py-3 px-3 text-center relative group/col border-r border-[var(--border-color)]/30"
+                                    >
                                         <input
                                             type="checkbox"
                                             className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                                             checked={filteredModels.length > 0 && selectedModelIds.length === filteredModels.length}
                                             onChange={toggleSelectAll}
                                         />
+                                        <div
+                                            onMouseDown={(e) => handleResizeStart(e, 'select')}
+                                            className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-blue-500/50 active:bg-blue-600 z-10 group-hover/col:bg-blue-500/30 transition-colors"
+                                            title="Surish orqali o'lchamni o'zgartiring"
+                                        />
                                     </th>
-                                    <th className="py-3 px-4 text-left">Nomi</th>
-                                    <th className="py-3 px-4 text-center">Rasm</th>
-                                    <th className="py-3 px-4 text-left font-mono">Artikul</th>
-                                    <th className="py-3 px-4 text-left">Kategoriya nomi</th>
-                                    <th className="py-3 px-4 text-left">Segment</th>
-                                    <th className="py-3 px-4 text-right">Amallar</th>
+
+                                    {/* 1. Nomi (Name) */}
+                                    <th
+                                        style={{ width: `${columnWidths.name}px` }}
+                                        className="py-3 px-4 text-left relative group/col border-r border-[var(--border-color)]/30 truncate"
+                                    >
+                                        Nomi
+                                        <div
+                                            onMouseDown={(e) => handleResizeStart(e, 'name')}
+                                            className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-blue-500/50 active:bg-blue-600 z-10 group-hover/col:bg-blue-500/30 transition-colors"
+                                            title="Surish orqali o'lchamni o'zgartiring"
+                                        />
+                                    </th>
+
+                                    {/* 2. Rasm (Thumbnail) */}
+                                    <th
+                                        style={{ width: `${columnWidths.image}px` }}
+                                        className="py-3 px-4 text-center relative group/col border-r border-[var(--border-color)]/30 truncate"
+                                    >
+                                        Rasm
+                                        <div
+                                            onMouseDown={(e) => handleResizeStart(e, 'image')}
+                                            className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-blue-500/50 active:bg-blue-600 z-10 group-hover/col:bg-blue-500/30 transition-colors"
+                                            title="Surish orqali o'lchamni o'zgartiring"
+                                        />
+                                    </th>
+
+                                    {/* 3. Artikul (Code) */}
+                                    <th
+                                        style={{ width: `${columnWidths.code}px` }}
+                                        className="py-3 px-4 text-left font-mono relative group/col border-r border-[var(--border-color)]/30 truncate"
+                                    >
+                                        Artikul
+                                        <div
+                                            onMouseDown={(e) => handleResizeStart(e, 'code')}
+                                            className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-blue-500/50 active:bg-blue-600 z-10 group-hover/col:bg-blue-500/30 transition-colors"
+                                            title="Surish orqali o'lchamni o'zgartiring"
+                                        />
+                                    </th>
+
+                                    {/* 4. Kategoriya nomi */}
+                                    <th
+                                        style={{ width: `${columnWidths.category}px` }}
+                                        className="py-3 px-4 text-left relative group/col border-r border-[var(--border-color)]/30 truncate"
+                                    >
+                                        Kategoriya nomi
+                                        <div
+                                            onMouseDown={(e) => handleResizeStart(e, 'category')}
+                                            className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-blue-500/50 active:bg-blue-600 z-10 group-hover/col:bg-blue-500/30 transition-colors"
+                                            title="Surish orqali o'lchamni o'zgartiring"
+                                        />
+                                    </th>
+
+                                    {/* 5. Segment */}
+                                    <th
+                                        style={{ width: `${columnWidths.segment}px` }}
+                                        className="py-3 px-4 text-left relative group/col border-r border-[var(--border-color)]/30 truncate"
+                                    >
+                                        Segment
+                                        <div
+                                            onMouseDown={(e) => handleResizeStart(e, 'segment')}
+                                            className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-blue-500/50 active:bg-blue-600 z-10 group-hover/col:bg-blue-500/30 transition-colors"
+                                            title="Surish orqali o'lchamni o'zgartiring"
+                                        />
+                                    </th>
+
+                                    {/* Amallar (Actions) */}
+                                    <th
+                                        style={{ width: `${columnWidths.actions}px` }}
+                                        className="py-3 px-4 text-right relative group/col truncate"
+                                    >
+                                        Amallar
+                                        <div
+                                            onMouseDown={(e) => handleResizeStart(e, 'actions')}
+                                            className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-blue-500/50 active:bg-blue-600 z-10 group-hover/col:bg-blue-500/30 transition-colors"
+                                            title="Surish orqali o'lchamni o'zgartiring"
+                                        />
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-[var(--border-color)] text-[var(--text-primary)] font-medium">
@@ -1005,7 +1135,7 @@ const Modelxona = () => {
                                             }`}
                                         >
                                             {/* Select Checkbox */}
-                                            <td className="py-2.5 px-4 text-center">
+                                            <td style={{ width: `${columnWidths.select}px` }} className="py-2.5 px-3 text-center truncate">
                                                 <input
                                                     type="checkbox"
                                                     className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
@@ -1015,49 +1145,49 @@ const Modelxona = () => {
                                             </td>
 
                                             {/* 1. Nomi (Name) */}
-                                            <td className="py-2.5 px-4 font-semibold text-sm">
+                                            <td style={{ width: `${columnWidths.name}px` }} className="py-2.5 px-4 font-semibold text-sm truncate">
                                                 <button
                                                     onClick={() => setExpandedModel(model.id)}
-                                                    className="text-blue-600 dark:text-blue-400 hover:underline text-left"
+                                                    className="text-blue-600 dark:text-blue-400 hover:underline text-left truncate max-w-full inline-block"
                                                 >
                                                     {model.name}
                                                 </button>
                                                 {model.notes?.length > 0 && (
-                                                    <span className="ml-2 inline-flex items-center gap-1 bg-rose-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">
+                                                    <span className="ml-2 inline-flex items-center gap-1 bg-rose-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0">
                                                         {model.notes.length}
                                                     </span>
                                                 )}
                                             </td>
 
                                             {/* 2. Rasm (Thumbnail) */}
-                                            <td className="py-2.5 px-4 text-center">
-                                                <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center overflow-hidden mx-auto shadow-sm">
+                                            <td style={{ width: `${columnWidths.image}px` }} className="py-2.5 px-4 text-center truncate">
+                                                <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center overflow-hidden mx-auto shadow-sm shrink-0">
                                                     {model.image_url ? (
                                                         <img src={model.image_url} alt={model.name} className="w-full h-full object-cover" />
                                                     ) : (
-                                                        <Shirt size={18} className="text-gray-400" />
+                                                        <Shirt size={16} className="text-gray-400" />
                                                     )}
                                                 </div>
                                             </td>
 
                                             {/* 3. Artikul (Code) */}
-                                            <td className="py-2.5 px-4 font-mono text-xs font-semibold text-gray-700 dark:text-gray-300">
+                                            <td style={{ width: `${columnWidths.code}px` }} className="py-2.5 px-4 font-mono text-xs font-semibold text-gray-700 dark:text-gray-300 truncate">
                                                 {model.code || 'N/A'}
                                             </td>
 
                                             {/* 4. Kategoriya nomi */}
-                                            <td className="py-2.5 px-4 text-gray-600 dark:text-gray-400 text-xs">
+                                            <td style={{ width: `${columnWidths.category}px` }} className="py-2.5 px-4 text-gray-600 dark:text-gray-400 text-xs truncate">
                                                 {model.category || 'Standart'}
                                             </td>
 
                                             {/* 5. Segment */}
-                                            <td className="py-2.5 px-4 text-gray-600 dark:text-gray-400 text-xs">
+                                            <td style={{ width: `${columnWidths.segment}px` }} className="py-2.5 px-4 text-gray-600 dark:text-gray-400 text-xs truncate">
                                                 {model.age_group || '-'}
                                             </td>
 
                                             {/* Amallar (Excel, Edit, Archive, Delete) */}
-                                            <td className="py-2.5 px-4 text-right">
-                                                <div className="flex items-center justify-end gap-1.5">
+                                            <td style={{ width: `${columnWidths.actions}px` }} className="py-2.5 px-4 text-right truncate">
+                                                <div className="flex items-center justify-end gap-1">
                                                     {/* Excel export */}
                                                     <button
                                                         onClick={() => handleExportExcel(model)}
